@@ -1,3 +1,4 @@
+
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from e_delegacje.enums import (
@@ -59,7 +60,8 @@ class BtCountry(models.Model):
 class BtDelegationRate(models.Model):
     delagation_rate = models.IntegerField()
     country = models.ForeignKey(BtCountry, on_delete=models.PROTECT, related_name="Bt_Delegation")
-
+    
+    country = models.CharField(max_length=50)
     def __str__(self):
         return f'{self.country.country_name} - {self.delagation_rate}'
 

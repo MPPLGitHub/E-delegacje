@@ -17,14 +17,14 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
-from setup.views import user_login
+# from setup.views import user_login
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('e-delegacje/', include("e_delegacje.urls")),
-    path('setup/', include("setup.urls")),
+    # path('admin/', admin.site.urls),
+    # path('e-delegacje/', include("e_delegacje.urls")),
+    # path('setup/', include("setup.urls")),
     # path('', user_login, name='login'),
-    path('accounts/login/', user_login, name='login'),
+    # path('accounts/login/', user_login, name='login'),
 ]
 
 if settings.DEBUG:

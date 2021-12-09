@@ -7,258 +7,258 @@ from django.contrib.auth.views import PasswordChangeView, PasswordResetDoneView
 from django.contrib import messages
 from setup.forms import LoginForm, BtUserCreationForm, LocationForm
 from django.shortcuts import render, redirect
-from setup.models import (
-    BtUser,
-    BtRegion,
-    BtDivision,
-    BtLocation,
-    BtCostCenter,
-    BtMileageRates,
-    BtDelegationRate,
-    BtDepartment,
+# from setup.models import (
+#     BtUser,
+#     BtRegion,
+#     BtDivision,
+#     BtLocation,
+#     BtCostCenter,
+#     BtMileageRates,
+#     BtDelegationRate,
+#     BtDepartment,
 
-)
+# )
 
 
-def user_login(request):
-    if request.method == 'POST':
-        form = LoginForm(data=request.POST)
-        if form.is_valid():
-            # cd = form.cleaned_data
-            # entered_usr = BtUser.objects.get(username=cd['username'])
-            # user = authenticate(request, username=entered_usr.username, password=cd['password'])
-            user = form.get_user()
-            if user is not None:
-                if user.is_active:
-                    login(request, user)
-                    return HttpResponseRedirect(reverse('e_delegacje:index'))
-                else:
-                    return HttpResponse('Konto jest zablokowane.')
-            else:
-                print(f'user {form.cleaned_data["username"]} is none')
-        else:
-            for item in form.errors:
-                print(f'form errors: {item}')
-    else:
+# def user_login(request):
+#     if request.method == 'POST':
+#         form = LoginForm(data=request.POST)
+#         if form.is_valid():
+#             # cd = form.cleaned_data
+#             # entered_usr = BtUser.objects.get(username=cd['username'])
+#             # user = authenticate(request, username=entered_usr.username, password=cd['password'])
+#             user = form.get_user()
+#             if user is not None:
+#                 if user.is_active:
+#                     login(request, user)
+#                     return HttpResponseRedirect(reverse('e_delegacje:index'))
+#                 else:
+#                     return HttpResponse('Konto jest zablokowane.')
+#             else:
+#                 print(f'user {form.cleaned_data["username"]} is none')
+#         else:
+#             for item in form.errors:
+#                 print(f'form errors: {item}')
+#     else:
 
-        form = LoginForm()
-    return render(request, 'login.html', {'form': form})
+#         form = LoginForm()
+#     return render(request, 'login.html', {'form': form})
 
 
-def user_logout(request):
-    logout(request)
-#    messages.info(request, "logged successfylly!")
-    return redirect('setup:login')
+# def user_logout(request):
+#     logout(request)
+# #    messages.info(request, "logged successfylly!")
+#     return redirect('setup:login')
 
 
-class MyPasswordChangeView(PasswordChangeView):
-    template_name = 'password_change_form.html'
-    success_url = reverse_lazy('setup:password-change-done')
+# class MyPasswordChangeView(PasswordChangeView):
+#     template_name = 'password_change_form.html'
+#     success_url = reverse_lazy('setup:password-change-done')
 
 
-class MyPasswordResetDoneView(PasswordResetDoneView):
-    template_name = 'password_change_done.html'
+# class MyPasswordResetDoneView(PasswordResetDoneView):
+#     template_name = 'password_change_done.html'
 
 
-class BtUserCreateView(CreateView):
-    model = BtUser
-    template_name = "my_name.html"
-    form_class = BtUserCreationForm
-    # fields = "__all__"
-    success_url = reverse_lazy("setup:user-list-view")
+# class BtUserCreateView(CreateView):
+#     model = BtUser
+#     template_name = "my_name.html"
+#     form_class = BtUserCreationForm
+#     # fields = "__all__"
+#     success_url = reverse_lazy("setup:user-list-view")
 
 
-class BtUserListView(ListView):
-    model = BtUser
-    template_name = "user_list_view.html"
+# class BtUserListView(ListView):
+#     model = BtUser
+#     template_name = "user_list_view.html"
 
 
-class BtUserDetailView(DetailView):
-    model = BtUser
-    template_name = "user_details_view.html"
+# class BtUserDetailView(DetailView):
+#     model = BtUser
+#     template_name = "user_details_view.html"
 
 
-class BtRegionListView(ListView):
-    model = BtRegion
-    template_name = "region_list_view.html"
+# class BtRegionListView(ListView):
+#     model = BtRegion
+#     template_name = "region_list_view.html"
 
 
-class BtRegionDetailView(DetailView):
-    model = BtRegion
-    template_name = "region_details_view.html"
+# class BtRegionDetailView(DetailView):
+#     model = BtRegion
+#     template_name = "region_details_view.html"
 
 
-class BtRegionUpdateView(UpdateView):
-    model = BtRegion
-    fields = ("name", )
-    template_name = "my_name.html"
-    success_url = reverse_lazy("setup:region-list-view")
+# class BtRegionUpdateView(UpdateView):
+#     model = BtRegion
+#     fields = ("name", )
+#     template_name = "my_name.html"
+#     success_url = reverse_lazy("setup:region-list-view")
 
 
-class BtRegionCreateView(CreateView):
-    model = BtRegion
-    template_name = "my_name.html"
-    fields = "__all__"
-    success_url = reverse_lazy("setup:region-create")
+# class BtRegionCreateView(CreateView):
+#     model = BtRegion
+#     template_name = "my_name.html"
+#     fields = "__all__"
+#     success_url = reverse_lazy("setup:region-create")
 
 
-class BtDivisionListView(ListView):
-    model = BtDivision
-    template_name = "division_list_view.html"
+# class BtDivisionListView(ListView):
+#     model = BtDivision
+#     template_name = "division_list_view.html"
 
 
-class BtDivisionDetailView(DetailView):
-    model = BtDivision
-    template_name = "division_details_view.html"
+# class BtDivisionDetailView(DetailView):
+#     model = BtDivision
+#     template_name = "division_details_view.html"
 
 
-class BtDivisionUpdateView(UpdateView):
-    model = BtDivision
-    fields = ("name", )
-    template_name = "my_name.html"
-    success_url = reverse_lazy("setup:division-list-view")
+# class BtDivisionUpdateView(UpdateView):
+#     model = BtDivision
+#     fields = ("name", )
+#     template_name = "my_name.html"
+#     success_url = reverse_lazy("setup:division-list-view")
 
 
-class BtDivisionCreateView(CreateView):
-    model = BtDivision
-    template_name = "my_name.html"
-    fields = "__all__"
-    success_url = reverse_lazy("setup:division-create")
+# class BtDivisionCreateView(CreateView):
+#     model = BtDivision
+#     template_name = "my_name.html"
+#     fields = "__all__"
+#     success_url = reverse_lazy("setup:division-create")
 
 
 
 
-class BtLocationListView(ListView):
-    model = BtLocation
-    template_name = "location_list_view.html"
+# class BtLocationListView(ListView):
+#     model = BtLocation
+#     template_name = "location_list_view.html"
 
 
-class BtLocationCreateView(CreateView):
-    model = BtLocation
-    template_name = "my_name.html"
-    form_class = LocationForm
-#    fields = "__all__"
-    success_url = reverse_lazy("setup:location-create")
+# class BtLocationCreateView(CreateView):
+#     model = BtLocation
+#     template_name = "my_name.html"
+#     form_class = LocationForm
+# #    fields = "__all__"
+#     success_url = reverse_lazy("setup:location-create")
 
-class BtLocationFormView(FormView):
-    model = BtLocation
-    template_name = "my_name.html"
-    form_class = LocationForm
-    success_url = reverse_lazy("setup:location-create2")
+# class BtLocationFormView(FormView):
+#     model = BtLocation
+#     template_name = "my_name.html"
+#     form_class = LocationForm
+#     success_url = reverse_lazy("setup:location-create2")
 
-    def form_valid(self, form):
-        result = super().form_valid(form)
-        profit_center = form.cleaned_data["profit_center"]
-        BtLocation.objects.create(profit_center=profit_center)
-        return result
+#     def form_valid(self, form):
+#         result = super().form_valid(form)
+#         profit_center = form.cleaned_data["profit_center"]
+#         BtLocation.objects.create(profit_center=profit_center)
+#         return result
 
-    def form_invalid(self, form):
-        return super().form_invalid(form)
-    #     profit_center = form.cleaned_data["profit_center"]
-    #     if BtLocation.objects.get(profit_center=result['profit_center']) is not None:
-    #         self.add_error('profit_center', f'Taki Profit Center juz istnieje {result["profit_center"]}')
-    #     BtLocation.objects.create(profit_center=profit_center)
-    #     return result
+#     def form_invalid(self, form):
+#         return super().form_invalid(form)
+#     #     profit_center = form.cleaned_data["profit_center"]
+#     #     if BtLocation.objects.get(profit_center=result['profit_center']) is not None:
+#     #         self.add_error('profit_center', f'Taki Profit Center juz istnieje {result["profit_center"]}')
+#     #     BtLocation.objects.create(profit_center=profit_center)
+#     #     return result
 
-        #     if result['profit_center'] == BtLocation.objects.get['profit_center']:
-        #         raise ValidationError("cosssss!")
-        # if BtLocation.objects.get(profit_center=result['profit_center']) is not None:
-        #     self.add_error('profit_center', f'Taki Profit Center juz istnieje {result["profit_center"]}')
-        #        return result
-#        return result
+#         #     if result['profit_center'] == BtLocation.objects.get['profit_center']:
+#         #         raise ValidationError("cosssss!")
+#         # if BtLocation.objects.get(profit_center=result['profit_center']) is not None:
+#         #     self.add_error('profit_center', f'Taki Profit Center juz istnieje {result["profit_center"]}')
+#         #        return result
+# #        return result
 
 
 
-class BtLocationDetailView(DetailView):
-    model = BtLocation
-    template_name = "location_details_view.html"
+# class BtLocationDetailView(DetailView):
+#     model = BtLocation
+#     template_name = "location_details_view.html"
 
 
-class BtCostCenterListView(ListView):
-    model = BtCostCenter
-    template_name = "costcenter_list_view.html"
+# class BtCostCenterListView(ListView):
+#     model = BtCostCenter
+#     template_name = "costcenter_list_view.html"
 
 
-class BtCostCenterDetailView(DetailView):
-    model = BtCostCenter
-    template_name = "costcenter_details_view.html"
+# class BtCostCenterDetailView(DetailView):
+#     model = BtCostCenter
+#     template_name = "costcenter_details_view.html"
 
 
-class BtCostCenterCreateView(CreateView):
-    model = BtCostCenter
-    template_name = "my_name.html"
-    fields = "__all__"
-    success_url = reverse_lazy("setup:costcenter-create")
+# class BtCostCenterCreateView(CreateView):
+#     model = BtCostCenter
+#     template_name = "my_name.html"
+#     fields = "__all__"
+#     success_url = reverse_lazy("setup:costcenter-create")
 
 
-class BtMileageRatesListView(ListView):
-    model = BtMileageRates
-    template_name = "mileagetate_list_view.html"
+# class BtMileageRatesListView(ListView):
+#     model = BtMileageRates
+#     template_name = "mileagetate_list_view.html"
 
 
-class BtMileageRatesDetailView(DetailView):
-    model = BtMileageRates
-    template_name = "mileagetate_details_view.html"
+# class BtMileageRatesDetailView(DetailView):
+#     model = BtMileageRates
+#     template_name = "mileagetate_details_view.html"
 
 
-class BtMileageRatesCreateView(CreateView):
-    model = BtMileageRates
-    template_name = "my_name.html"
-    fields = "__all__"
-    success_url = reverse_lazy("setup:mileagetate-create")
+# class BtMileageRatesCreateView(CreateView):
+#     model = BtMileageRates
+#     template_name = "my_name.html"
+#     fields = "__all__"
+#     success_url = reverse_lazy("setup:mileagetate-create")
 
 
-class BtDelegationRateListView(ListView):
-    model = BtDelegationRate
-    template_name = "delegationrate_list_view.html"
+# class BtDelegationRateListView(ListView):
+#     model = BtDelegationRate
+#     template_name = "delegationrate_list_view.html"
 
 
-class BtDelegationRateDetailView(DetailView):
-    model = BtDelegationRate
-    template_name = "delegationrate_details_view.html"
+# class BtDelegationRateDetailView(DetailView):
+#     model = BtDelegationRate
+#     template_name = "delegationrate_details_view.html"
 
 
-class BtDelegationRateCreateView(CreateView):
-    model = BtDelegationRate
-    template_name = "my_name.html"
-    fields = "__all__"
-    success_url = reverse_lazy("setup:delegationrate-create")
+# class BtDelegationRateCreateView(CreateView):
+#     model = BtDelegationRate
+#     template_name = "my_name.html"
+#     fields = "__all__"
+#     success_url = reverse_lazy("setup:delegationrate-create")
 
 
-class BtDelegationRateUpdateView(UpdateView):
-    model = BtDelegationRate
-    fields = ("delegation_rate","alpha_code", )
-    template_name = "my_name.html"
-    success_url = reverse_lazy("setup:delegationrate-list-view")
+# class BtDelegationRateUpdateView(UpdateView):
+#     model = BtDelegationRate
+#     fields = ("delegation_rate","alpha_code", )
+#     template_name = "my_name.html"
+#     success_url = reverse_lazy("setup:delegationrate-list-view")
 
 
-class BtDepartmentListView(ListView):
-    model = BtDepartment
-    template_name = "department_list_view.html"
+# class BtDepartmentListView(ListView):
+#     model = BtDepartment
+#     template_name = "department_list_view.html"
 
 
-class BtDepartmentDetailView(DetailView):
-    model = BtDepartment
-    template_name = "department_details_view.html"
+# class BtDepartmentDetailView(DetailView):
+#     model = BtDepartment
+#     template_name = "department_details_view.html"
 
 
-class BtDepartmentCreateView(CreateView):
-    model = BtDepartment
-    template_name = "my_name.html"
-    fields = "__all__"
-    success_url = reverse_lazy("setup:department-create")
+# class BtDepartmentCreateView(CreateView):
+#     model = BtDepartment
+#     template_name = "my_name.html"
+#     fields = "__all__"
+#     success_url = reverse_lazy("setup:department-create")
 
 
-class BtDepartmentUpdateView(UpdateView):
-    model = BtDepartment
-    fields = ("name", )
-    template_name = "my_name.html"
-    success_url = reverse_lazy("setup:department-list-view")
+# class BtDepartmentUpdateView(UpdateView):
+#     model = BtDepartment
+#     fields = ("name", )
+#     template_name = "my_name.html"
+#     success_url = reverse_lazy("setup:department-list-view")
 
 
-def upload(request):
-    if request.method == "POST":
-        uploaded_files = request.FILES['document']
-        print(uploaded_files.name)
-        print(uploaded_files.size)
-    return render(request, 'upload.html')
+# def upload(request):
+#     if request.method == "POST":
+#         uploaded_files = request.FILES['document']
+#         print(uploaded_files.name)
+#         print(uploaded_files.size)
+#     return render(request, 'upload.html')

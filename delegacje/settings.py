@@ -13,7 +13,7 @@ import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-from delegacje import mail_config
+# from delegacje import mail_config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -78,10 +78,18 @@ WSGI_APPLICATION = 'delegacje.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
+
+# należy zmienić baze danych na postgre i wyczyścić migracje - zrobić nowe.
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        # 'ENGINE': 'django.db.backends.sqlite3',
+        # 'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'e_delegations',
+        'USER': 'postgres',
+        'PASSWORD': 'Metro2021',
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
     }
 }
 
@@ -124,10 +132,10 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
-# Email sending settings
-EMAIL_HOST = mail_config.mail_host
-EMAIL_HOST_USER = mail_config.mail
-EMAIL_HOST_PASSWORD = mail_config.password
+# # Email sending settings
+# EMAIL_HOST = mail_config.mail_host
+# EMAIL_HOST_USER = mail_config.mail
+# EMAIL_HOST_PASSWORD = mail_config.password
 # EMAIL_PORT = 465
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
