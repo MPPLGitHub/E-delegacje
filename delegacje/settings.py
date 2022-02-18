@@ -13,7 +13,7 @@ import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-# from delegacje import mail_config
+from delegacje import app_config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -22,13 +22,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'n=mmwvy217p_stf2c#y-wl&7kw$vt=z5uhlg6@9(p&6u07t5br'
+SECRET_KEY = app_config.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = False
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '10.132.15.66']
+ALLOWED_HOSTS = app_config.ALLOWED_HOSTS
 
 # Application definition
 
@@ -77,16 +77,7 @@ WSGI_APPLICATION = 'delegacje.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'db_delegations',
-        'USER': 'db_delegation',
-        'PASSWORD': 'MetroSQL2021',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
-    }
-}
+DATABASES = app_config.DATABASES
 
 
 # Password validation
@@ -130,10 +121,10 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 #  Email sending settings
-EMAIL_HOST = 'viruswall.mgi.de'
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ""
-EMAIL_PORT = 25
+EMAIL_HOST = app_config.EMAIL_HOST
+EMAIL_HOST_USER = app_config.EMAIL_HOST_USER
+EMAIL_HOST_PASSWORD = app_config.EMAIL_HOST_PASSWORD
+EMAIL_PORT = app_config.EMAIL_PORT
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 AUTH_USER_MODEL = "setup.BtUser"
