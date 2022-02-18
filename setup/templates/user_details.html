@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+    <h3>Dane użytkownika {{ object.first_name }} {{ object.last_name }}</h3>
+    <br>
+    <div class="col-4">
+    <table class="table table-primary table-striped text-uppercase text-end" style="font-size: 13px">
+        <tbody>
+            <tr></tr>
+        <th><label>Użytkownik:</label></th>
+        <td><p>{{ object.username }}</p></td>
+    </tr>
+    <tr>
+        <th><label><p>Imie:</p></label></th>
+        <td><p>{{ object.first_name }}</p></td>
+    </tr>
+    <tr>
+        <th><label><p>Nazwisko:</p></label></th>
+        <td><p>{{ object.last_name }}</p></td>
+    </tr>
+    <tr>
+        <th><label><p>email:</p></label></th>
+        <td><p>{{ object.email }}</p></td>
+    </tr>
+    <tr>
+        <th><label>Dział:</label></th>
+        <td>{{ object.department }}</td>
+    </tr>
+    <tr>
+        <th><label>Przełożony </label></th>
+        <td>{{ object.manager }}</td>
+    </tr>
+    <tr>
+        <th><label>Poziom stanowiska: </label></th>
+        <td>{{ object.get_employee_level_display }}</td>
+    </tr>
+        </tbody>
+    </table>
+    </div>
+
+
+    <a class="btn btn-outline-secondary" href="{% url 'setup:user-list-view'%}" role="button">Cofnij</a>
+{% endblock %}

@@ -139,7 +139,8 @@
                             <td class="pt-3 ps-2">
                                 <form action="{% url 'e_delegacje:settlement-cost-delete' pk=cost.pk %}" method="POST">
                                     {% csrf_token %}
-                                    <button type="submit" class="btn bi-trash-fill btn-outline-danger" ></button>
+                                    <!-- <button type="submit" class="btn bi-trash-fill btn-outline-danger" >Usuń</button> -->
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" >Usuń</button>
                                 </form>
                             </td>
                         </tr>

@@ -16,16 +16,10 @@
 	<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700&amp;subset=latin-ext" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}"/>
 	<link rel="stylesheet" type="text/css" href="{% static 'css/navbar.css' %}"/>
+	<link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}"/>
 	<link rel="stylesheet" type="text/css" href="{% static 'bootstrap-icons/bootstrap-icons.css' %}"/>
 
 <style>
-	div.picture1 {
-   width:100px; /*width of your image*/
-   height:100px; /*height of your image*/
-   background-image:url("{% static 'img/bt_image.jpg' %}");
-   margin:0; /* If you want no margin */
-   padding:0; /*if your want to padding */
-}
 
 </style>
   </head>
@@ -97,16 +91,17 @@
 				   data-bs-toggle="dropdown"
 				   aria-expanded="false">
 					<span class="hello-msg text-warning">Witaj, {{request.user.first_name}} {{request.user.last_name}}</span></a>
-
+	
 				  <ul class="dropdown-menu bg-secondary" aria-labelledby="User_profile_dropdown">
-				  <li><a class="nav-item nav-link text-warning " href="#">dane użytkownika</a></li>
+				  <li><a class="nav-item nav-link text-warning " href="{% url 'setup:user-details-view' pk=request.user.id %}">dane użytkownika</a></li>
                     {% if request.user.is_anonymous  %}
 				  <li><a class="nav-item nav-link text-warning " href="{% url 'setup:login' %}">zaloguj</a></li>
                     {% else %}
 				  <li><a class="nav-item nav-link text-warning " href="{% url 'setup:logout' %}">wyloguj</a></li>
-                        {% endif %}
-				  <li><a class="nav-item nav-link text-warning " href="#">zmień hasło</a></li>
-				  </ul>
+                        
+				  <li><a class="nav-item nav-link text-warning " href="{% url 'setup:password-change' %}">zmień hasło</a></li>
+				  {% endif %}  
+				</ul>
 				</div>
             {% if request.user.is_staff %}
 			  <div class="nav-item dropdown">
@@ -134,7 +129,8 @@
                     <li><a class="nav-item nav-link text-warning " href="{% url 'setup:mileagetate-list-view' %}">
                       Stawki kilometrówki</a></li>
 				  <li><hr class="dropdown-divider"></li>
-				  <li>  <a class="nav-item nav-link text-warning " href="/admin/">Admin</a></li>
+				  <li>  <a class="nav-item nav-link text-warning " href="/travel-management/admin/">Admin</a></li>
+			
 				</ul>
 			  </div>
             {% endif %}
@@ -159,5 +155,24 @@
 		integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
 		crossorigin="anonymous"></script>
   </body>
+	<footer>
+		<div class="row">
+		<hr>
+		</div>
+		<div class="row">
+				<div class="col-3 justify-content-center">
+					<div>
+						<img src="{% static 'img/logo_metro_qtj_2.ico' %}" alt="" width="40" height="40">
+						Metro Properties sp. z o. o. 
+				</div>
+			</div>
+			<div class="col-5"></div>
+			<div class="col-4 justify-content-end">
+				<div>
+				<p>Autorzy: Łukasz Szcześniak, Gerard Borowski © Version 1.2.10 </p>
+			</div>
+			</div>
+		</div>
 
+	</footer>
 </html>

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <h3>Nowy wniosek</h3>
-<div class="col-7 align-items-start">
+<div class="col-6 align-items-start">
 
     <form class="form-control" method="post" >
         {% csrf_token %}
@@ -29,6 +29,17 @@
                         Powrót
                     </a>
                 </div>
+                {% if object.application_status == 'rejected' %}
+                <div class="col-3">
+
+                    <a class="btn btn-outline-danger d-grid"
+                       href="{% url 'e_delegacje:application-delete' pk=object.pk %}"
+                       style="font-size: 13px"
+                    >
+                        Usuń wniosek
+                    </a>
+          </div>
+          {% endif %}
         </div>
 
     </form>

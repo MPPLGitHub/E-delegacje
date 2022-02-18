@@ -1,6 +1,6 @@
 
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, Group
 from e_delegacje.enums import (
     BtEmployeeLevel,
     BtMileageVehicleTypes
@@ -12,9 +12,16 @@ class BtUser(AbstractUser):
     department = models.ForeignKey("BtDepartment", on_delete=models.PROTECT, related_name="bt_Users", null=True)
     employee_level = models.CharField(max_length=15, choices=BtEmployeeLevel.choices, default=BtEmployeeLevel.lvl7)
     manager = models.ForeignKey("BtUser", on_delete=models.PROTECT, related_name="bt_Users", null=True)
+    group = models.ForeignKey(Group, on_delete=models.PROTECT, null=True, blank=True)
+
 
     def __str__(self):
         return f'{self.username}'
+
+
+class BtUserVendor(models.Model):
+    user_id = models.ForeignKey(BtUser, on_delete=models.PROTECT,related_name="bt_users_vendor" )
+    vendor_id = models.CharField(max_length=10)
 
 
 class BtRegion(models.Model):
@@ -59,11 +66,10 @@ class BtCountry(models.Model):
 
 class BtDelegationRate(models.Model):
     delagation_rate = models.IntegerField()
-    country = models.ForeignKey(BtCountry, on_delete=models.PROTECT, related_name="Bt_Delegation")
-    
-    country = models.CharField(max_length=50)
-    def __str__(self):
-        return f'{self.country.country_name} - {self.delagation_rate}'
+    country = models.ForeignKey(BtCountry, on_delete=models.PROTECT, related_name="Bt_Delegationrates", default=1)
+
+    # def __str__(self):
+    #     return f'{self.country.country_name} - {self.delagation_rate}'
 
 
 class BtMileageRates(models.Model):

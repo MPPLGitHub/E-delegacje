@@ -67,7 +67,13 @@
                         {{ item.trip_purpose_text }}
                     </td>
                     <td>
-                        <p>{{ item.get_application_status_display }}</p>
+                        {% if item.application_status == 'rejected' %}
+                            <p class="text-danger"><b>{{ item.get_application_status_display }}</b></p>
+                        {% elif item.application_status == 'approved' %}
+                            <p class="text-success "><b>{{ item.get_application_status_display }}</b></p>
+                        {% else %}
+                            <p class="text-success "><b>{{ item.get_application_status_display }}</b></p>
+                        {% endif %}
                     </td>
 
                     <td>
@@ -97,7 +103,13 @@
                         {% endif %}
                     </td>
                 <td>
-                    <p>{{ item.bt_applications_settlements.get_settlement_status_display }}</p>
+                    {% if item.bt_applications_settlements.settlement_status == 'rejected' %}
+                        <p class="text-danger"><b>{{ item.bt_applications_settlements.get_settlement_status_display }}</b></p>
+                    {% elif item.bt_applications_settlements.settlement_status == 'in_progress' %}
+                    <p class="text-warning"><b>{{ item.bt_applications_settlements.get_settlement_status_display }}</b></p>
+                    {% else %}
+                        <p class="text-secondary"><b>{{ item.bt_applications_settlements.get_settlement_status_display }}</b></p>
+                    {% endif %}
                 </td>
                     <td>
                         <a class="btn btn-outline-secondary"
@@ -152,7 +164,11 @@
                         {{ item.trip_purpose_text }}
                     </td>
                     <td>
-                        <p>{{ item.get_application_status_display }}</p>
+                        {% if item.application_status == 'canceled' %}
+                            <p class="text-danger"><b>{{ item.get_application_status_display }}</b></p>
+                        {% else%}
+                            <p class="text-secondary"><b>{{ item.get_application_status_display }}</b></p>
+                        {% endif %}
                     </td>
 
                     <td>
@@ -182,7 +198,7 @@
                         {% endif %}
                     </td>
                 <td>
-                    <p>{{ item.bt_applications_settlements.get_settlement_status_display }}</p>
+                    <p class="text-success"><b>{{ item.bt_applications_settlements.get_settlement_status_display }}</b></p>
                 </td>
                     <td>
                         <a class="btn btn-outline-secondary"
@@ -195,15 +211,15 @@
                     </td>
 
                      <td>
-                     {% if item.application_status != 'canceled' %}
+                      {% if item.application_status != 'canceled' %}
                         <a class="btn btn-outline-danger"
                             style="font-size: 12px"
                            href="{% url 'e_delegacje:pdf-in-line' pk=item.id %}"
-                           target="_blank"
+                           target="_blank" 
                         >
                             pdf
                         </a>
-                     {% endif %}
+                     {% endif %} 
                     </td>
 
                 </tr>

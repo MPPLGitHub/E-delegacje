@@ -1,13 +1,37 @@
 {% extends "base.html" %}
 {% block content %}
 
+<div class="col-6">
+    <form class="form-control bg-light pt-3 pb-3"  method="post">
+        {% csrf_token %}
+        <div class="row">
+                <table class="table table-sm table-light " style="font-size: 12px">
+                {{ form.as_table  }}
+                </table>
+            </div>
 
-<form class="form-control bg-light pt-3 pb-3"  method="post">
-    {% csrf_token %}
-        {{ form  }}
+            <div class="row">
+                <div class="col-3 align-self-end">
+                    <input class="btn btn-outline-success"
+                        type="submit"
+                        value="Zapisz"
+                        style="font-size: 13px"
+                        >
+                </div>
+                <div class="col-1"></div>
+                <div class="col-3 align-self-end">
+                    <a type="button"
+                    class="btn btn-outline-secondary"
+                    href="{% url 'e_delegacje:index' %}"
+                    style="font-size: 13px"
+                    >
+                        Powrót
+                    </a>
+                </div>
+        </div>
 
-    <input type ="submit" value="Submit">
 
-</form>
+    </form>
+</div>
 
 {% endblock %}

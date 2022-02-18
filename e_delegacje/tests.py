@@ -363,3 +363,7 @@ class EdelegacjeTestCase(TestCase):
         self.assertEqual(diet_reconciliation_abroad(settlement_abr), result_abr)
         self.assertEqual(diet_reconciliation_abroad(settlenemt_abr_under_8h ), result_abr_under_8h)
         self.assertEqual(diet_reconciliation_abroad(settlenemt_abr_above_12h), result_abr_above_12h)
+
+
+class EmailNotificationsTestCase(TestCase):
+    pass

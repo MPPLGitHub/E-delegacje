@@ -25,10 +25,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'n=mmwvy217p_stf2c#y-wl&7kw$vt=z5uhlg6@9(p&6u07t5br'
 
 # SECURITY WARNING: don't run with debug turned on in production!
+# DEBUG = False
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '10.132.15.66']
 
 # Application definition
 
@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'e_delegacje',
     'setup',
-
 ]
 
 MIDDLEWARE = [
@@ -78,16 +77,12 @@ WSGI_APPLICATION = 'delegacje.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
-
-# należy zmienić baze danych na postgre i wyczyścić migracje - zrobić nowe.
 DATABASES = {
     'default': {
-        # 'ENGINE': 'django.db.backends.sqlite3',
-        # 'NAME': BASE_DIR / 'db.sqlite3',
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'e_delegations',
-        'USER': 'postgres',
-        'PASSWORD': 'Metro2021',
+        'NAME': 'db_delegations',
+        'USER': 'db_delegation',
+        'PASSWORD': 'MetroSQL2021',
         'HOST': '127.0.0.1',
         'PORT': '5432',
     }
@@ -111,6 +106,7 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+LOGIN_URL = '/travel-management/accounts/login/'
 
 
 # Internationalization
@@ -127,18 +123,18 @@ USE_L10N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
-# # Email sending settings
-# EMAIL_HOST = mail_config.mail_host
-# EMAIL_HOST_USER = mail_config.mail
-# EMAIL_HOST_PASSWORD = mail_config.password
-# EMAIL_PORT = 465
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+#  Email sending settings
+EMAIL_HOST = 'viruswall.mgi.de'
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ""
+EMAIL_PORT = 25
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 AUTH_USER_MODEL = "setup.BtUser"
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True

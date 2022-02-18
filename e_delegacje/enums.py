@@ -35,7 +35,7 @@ class BtCostCategory(models.TextChoices):
     accommodation = 'accommodation', 'nocleg'
     transport = 'transport', 'dojazd'
     luggage = 'luggage', 'bagaż'
-    other = 'other', 'inne'
+    consumption = 'consumption', 'konsumpcja'
 
 
 class BtVatRates(models.TextChoices):

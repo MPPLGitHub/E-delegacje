@@ -15,10 +15,10 @@
 
             <tr>
                     <td class="col-3 ">
-                Nr: {{ item.id }}
+                        <strong>Wniosek nr:</strong> {{ item.id }}
                     </td>
                     <td class="col-4 ">
-               {{ item.trip_purpose_text }}
+                        <strong>Opis:   </strong> {{ item.trip_purpose_text }}
                     </td>
                     <td class="col-5 ">
                       <a class="btn btn-outline-secondary d-block"
@@ -53,10 +53,10 @@
                 {% for settlement in settlements %}
                 <tr>
                         <td class="col-3 ">
-                    Nr: {{ settlement.id }}
+                            <strong>Wniosek nr: </strong>{{ settlement.bt_application_id.id }}
                         </td>
                         <td class="col-4 ">
-                   {{ settlement.bt_application_id.trip_purpose_text }}
+                            <strong>Opis:   </strong> {{ settlement.bt_application_id.trip_purpose_text }}
                         </td>
                         <td class="col-5 ">
                           <a class="btn btn-outline-secondary d-block"

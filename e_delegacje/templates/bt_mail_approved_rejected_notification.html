@@ -1,0 +1,125 @@
+{% load static %}
+{#<!DOCTYPE html>#}
+<html {% if LANGUAGE_CODE %}lang="{{ LANGUAGE_CODE }}"{% endif %}>
+
+
+<head>
+  <meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>E-Delegacje</title>
+
+	<meta name="description" content="Aplikacja do zarządzania podróżami służbowymi w firmie">
+	<meta name="keywords" content="podróże służbowe, delegacje, wyniki">
+	<meta name="author" content="Łukasz Szcześniak, Gerard Borowski">
+
+	<meta http-equiv="X-Ua-Compatible" content="IE=edge">
+	<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700&amp;subset=latin-ext" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}"/>
+	<link rel="stylesheet" type="text/css" href="{% static 'css/navbar.css' %}"/>
+	<link rel="stylesheet" type="text/css" href="{% static 'bootstrap-icons/bootstrap-icons.css' %}"/>
+
+  </head>
+
+<body >
+    <main>
+		<div>
+
+		</div>
+		<div  style="font: 12px Verdana;">
+			<h2 style="color: rgb(0, 51, 102);">
+			E-delgacje <br>
+			</h2>
+			{% if application.bt_applications_settlements %}
+			<h4 style="color: rgb(0, 51, 102);">
+				Rozliczenie do wniosku nr {{  application.id }} otrzymało status: 
+				{{ approval_status }}.<br>
+				{% if approval_status == 'zaakceptowany' %}
+				<b>Wniosek został rozliczony i finalnie zaakceptowany.</b><br>
+				{% endif %}
+				Akceptujący: {{approver.first_name}} {{approver.last_name}}.
+			</h4>
+			{% else %}
+			<h4 style="color: rgb(0, 51, 102);">
+				Twój wniosek nr {{  application.id }} otrzymał status: {{approval_status}} <br>
+				Akceptujący: {{approver.first_name}} {{approver.last_name}}.<br>
+			</h4>
+			{% endif %}
+
+			<hr><br>
+			
+			<table style="font-size: 14px;
+			width: 500px;
+			border: 2px;
+			border-inline: 2px;
+			border-style: solid;">
+				<tr>
+					<th><strong>Opis: </strong> </th>	
+					<td>{{ application.trip_purpose_text.upper }}</td>
+				</tr>
+
+				{% if application.bt_applications_settlements %}
+				
+				<tr>
+					<th><strong>Delegacja od: </strong> </th>	
+					<td>{{ application.bt_application_settlement_info.bt_start_date.isoformat }} - 
+						godz.: {{ application.bt_application_settlement_info.bt_start_time.isoformat }}</td>
+				</tr>
+				<tr>
+					<th><strong>Delegacja od: </strong> </th>	
+					<td>{{ application.bt_application_settlement_info.bt_end_date.isoformat }} - 
+						godz.: {{ application.bt_application_settlement_info.bt_end_time.isoformat }}</td></tr>
+
+				{% else %}
+				<tr>
+					<th><strong>Delegacja od: </strong> </th>	
+					<td>{{ application.planned_start_date.isoformat }}</td>
+				</tr>
+				<tr>
+					<th><strong>Delegacja od: </strong> </th>	
+					<td>{{ application.planned_end_date.isoformat }}</td></tr>
+
+				{% endif %}
+				</table>
+				<br>
+				{% if not application.bt_applications_settlements and approval_status == 'zaakceptowany' %}
+				<br>
+				<u><b style="text-transform:uppercase;">
+					Pamiętaj by po powrocie z delegacji rozliczyć wniosek w aplikacji !
+				</b></u><br>
+				{% endif %}
+
+				{% if application.application_status == 'odrzucony' %}
+				<table style="font-size: 14px;
+				width: 500px;
+				border: 2px;
+				border-inline: 2px;
+				border-style: solid;">
+				<tr>
+
+					<th><strong>Powód odrzucenia: </strong></th>
+					</tr>
+					<tr>
+					<td> {{ rejection_reason }}</td>
+
+				</tr>
+
+
+			</table>
+			{% endif %}
+			<br><hr>
+
+			<a style="
+				font: 16px Verdana;
+				font-weight: bolder;"
+			href="http://10.132.15.66/travel-management/e-delegacje/applications-list " 
+			target="_blank">
+			Przejdź do aplikacji
+			</a>
+
+		</div>
+
+		
+  
+</main>
+</body>
+</html>

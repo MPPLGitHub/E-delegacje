@@ -13,95 +13,95 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}"/>
 	<link rel="stylesheet" type="text/css" href="{% static 'css/navbar.css' %}"/>
 	<link rel="stylesheet" type="text/css" href="{% static 'bootstrap-icons/bootstrap-icons.css' %}"/>
+
 </head>
 <body>
-
-{#<div class="row pb-5">#}
-{#    img <img src="{% static 'metro_logo2.png' %}" alt="no i?" >#}
-{#    img <img src="\static\img\metro_logo2.png" alt="Metro_logo1">#}
-{#</div>#}
-<div>
-    <h1 class="fw-bold pb-2 pt-0 mt-0 text-end">
-        <span style="color:#f9ae00">E</span>
-        <span style="color:#003b7e;">-delegacje</span>
-    </h1>
-    <div class="row mt-1 mb-2">
-
-    <table class="table table-sm table-secondary table-borderless">
-               <th>
-                   <h4 style="text-align:start"> Rozliczenie kosztów podróży służbowej nr:
-                       <span class="fw-bold">
-                       {{ object.id }}</span>
-                   </h4>
-               </th>
-
-                <th>
-                    <h4 style="text-align:end">
-                    Data wniosku:
-                        <span class="fw-bold ">
-                            {{ object.application_date.isoformat }}
-                        </span>
-                    </h4>
-                </th>
-    </table>
-
-</div>
+    <div>
+        <h1 class="fw-bold pb-2 pt-0 mt-0 text-end">
+            <span style="color:#f9ae00">E</span>
+            <span style="color:#003b7e;">-delegacje</span>
+        </h1>
+        <div class="row mt-1 mb-2">
+    
+        <table class="table table-sm table-secondary table-borderless">
+                   <th>
+                       <h4 style="text-align:start"> Rozliczenie kosztów podróży służbowej nr:
+                           <span class="fw-bold">
+                           {{ object.id }}</span>
+                       </h4>
+                   </th>
+    
+                    <th>
+                        <h4 style="text-align:end">
+                        Data wniosku:
+                            <span class="fw-bold ">
+                                {{ object.application_date.isoformat }}
+                            </span>
+                        </h4>
+                    </th>
+        </table>
+        
+    </div>
+    </div>
+    
     <div class="row mt-0 mb-1">
-            <div class="col-6" style="font-size: 14px; font-weight: normal;">
-                <div class="row">
-                <p>
-                    Delegowany:
+        <div class="col-6" style="font-size: 14px; font-weight: normal;">
+            <div class="row">
+            <p>
+                Delegowany:
+                <span class="fw-bold">
+                    {{ object.target_user.first_name }} {{ object.target_user.last_name }}
+                </span>
+            </p>
+    </div>
+            <div class="row">
+                    <p>
+                    Dział:
                     <span class="fw-bold">
-                        {{ object.target_user.first_name }} {{ object.target_user.last_name }}
+                        {{ object.target_user.department.name }}
                     </span>
                 </p>
+            </div>
+            <div class="row pb-5">
+                <p>
+                    Przełożony:
+                    <span class="fw-bold">
+                        {{ object.target_user.manager.first_name }} {{ object.target_user.manager.last_name}}
+                    </span>
+                </p>
+            </div>
         </div>
-                <div class="row">
-                        <p>
-                        Dział:
-                        <span class="fw-bold">
-                            {{ object.target_user.department.name }}
-                        </span>
-                    </p>
-                </div>
-                <div class="row pb-5">
-                    <p>
-                        Przełożony:
-                        <span class="fw-bold">
-                            {{ object.target_user.manager.first_name }} {{ object.target_user.manager.last_name}}
-                        </span>
-                    </p>
-                </div>
-            </div>
-            <div class="col-2"></div>
-            <div class="col-4">
-                <table class="table table-sm table-light table-borderless pt-2"
-                       >
+        <div class="col-2"></div>
+        <div class="col-4">
+            <table class="table table-sm table-light table-borderless pt-2"
+                   >
 
-                <tr>
-                    <th class="text-center" colspan="2"><h3>Akceptacja</h3></th>
-                </tr>
-                <tr style="font-size: 12px; font-weight: normal;">
-                    <td><p>Akceptujący: </p></td>
-                    <td><p><strong>{{ object.approver.first_name }} {{ object.approver.last_name }}</strong></p></td>
-                </tr>
-                <tr style="font-size: 12px; font-weight: normal;">
-                    <td><p>Data:</p></td>
-                    <td><p><strong>{{ object.approval_date }}</strong></p></td>
-                </tr>
-                </table>
+            <tr>
+                <th class="text-center" colspan="2"><h3>Akceptacja</h3></th>
+            </tr>
+            <tr style="font-size: 12px; font-weight: normal;">
+                <td><p>Akceptujący: </p></td>
+                <td><p><strong>{{ object.approver.first_name }} {{ object.approver.last_name }}</strong></p></td>
+            </tr>
+            <tr style="font-size: 12px; font-weight: normal;">
+                <td><p>Data:</p></td>
+                <td><p><strong>{{ object.approval_date }}</strong></p></td>
+            </tr>
+            </table>
 
-            </div>
-    </div>
-    <div class="row pb-2">
+        </div>
+</div>
+
+
+<div class="row pb-2">
 
 
     <div class="col-12">
         <table class="table table-primary text-center table-striped text-uppercase" style="font-size: 10px">
             <tbody>
                 <tr>
-                    <th class="fw-bold" >Cel podróży/Opis:</th>
-                    <th class="fw-bold">MPK</th>
+                    <td class="fw-bold" >Cel podróży/Opis:</td>
+                    <td class="fw-bold">MPK</td>
                 </tr>
                 <tr>
                     <td class="text-wrap fw-bold" >
@@ -114,71 +114,76 @@
                 </tr>
             </tbody>
         </table>
-    </div>
-
-    <div class="row pb-2">
-           <div class="col-12">
-      <table class="table table-light " style="font-size: 10px">
-          <tr class="table table-primary table-striped text-uppercase">
-              <th class="fw-bold">Data i godzina wyjazdu</th>
-
-              <td >
-                  {{ object.bt_applications_settlements.bt_application_info.bt_start_date.isoformat }}
-                  {{ object.bt_applications_settlements.bt_application_info.bt_start_time.isoformat }}
-              </td>
-              <th class="fw-bold">Środek lokomcji:</th>
-              <th class="fw-bold">Trasa przejazdu:</th>
-
-          </tr>
-
-          <tr class="table table-primary text-uppercase">
-            <td class="fw-bold">Data i godzina powrotu:</td>
-            <td>
-                {{ object.bt_applications_settlements.bt_application_info.bt_end_date.isoformat }}
-                  {{ object.bt_applications_settlements.bt_application_info.bt_end_time.isoformat }}
-            </td>
-            <td>
-                {{ object.get_transport_type_display }}
-            </td>
-            <td>
-                {{ object.travel_route }}
-            </td>
-          </tr>
-
-      </table>
-    </div>
 
     </div>
 
-    <hr class="pb-2">
-    <div class="row py-0 align-content-between">
-        <div class="col-3 ">
-            <p style="font-size: 14px">
-                Zaliczka: {{ object.advance_payment|floatformat:2  }} {{ object.advance_payment_currency }}
-            </p>
-        </div>
-        <div class="col-6 text-center" style="font-size: 10px">
-            {% if settlement_amount > 0 %}
-                <p style="font-size: 11px">
-                    {{ settlement_amount }}
-                </p>
-            {% else %}
-                <p style="font-size: 11px">
-                    {{ settlement_amount }}
-                </p>
-            {% endif %}
-        </div>
-        <div class="col-3 text-end">
-            <p style="font-size: 14px">
-                Suma kosztów: {{ total_costs|floatformat:2  }} zł.
-            </p>
-        </div>
 
-    </div>
-    <hr class="pt-2">
+
+
+<div class="row pb-2">
+    <div class="col-12">
+<table class="table table-light " style="font-size: 10px">
+   <tr class="table table-primary table-striped text-uppercase">
+        <td class="fw-bold">Data i godzina wyjazdu</td>
+
+       <td >
+           {{ object.bt_applications_settlements.bt_application_info.bt_start_date.isoformat }}
+           {{ object.bt_applications_settlements.bt_application_info.bt_start_time.isoformat }}
+       </td>
+       <td class="fw-bold">Środek lokomcji:</td>
+       <td class="fw-bold">Trasa przejazdu:</td>
+
+   </tr>
+
+   <tr class="table table-primary text-uppercase">
+     <td class="fw-bold">Data i godzina powrotu:</td>
+     <td>
+         {{ object.bt_applications_settlements.bt_application_info.bt_end_date.isoformat }}
+           {{ object.bt_applications_settlements.bt_application_info.bt_end_time.isoformat }}
+     </td>
+     <td>
+         {{ object.get_transport_type_display }}
+     </td>
+     <td>
+         {{ object.travel_route }}
+     </td>
+   </tr>
+
+</table>
+</div>
 
 </div>
-    <div class="row pb-4">
+
+<hr class="pb-2">
+<div class="row py-0 align-content-between">
+    <div class="col-3 ">
+        <p style="font-size: 14px">
+            Zaliczka: {{ object.advance_payment|floatformat:2  }} {{ object.advance_payment_currency }}
+        </p>
+    </div>
+    <div class="col-6 text-center" style="font-size: 10px">
+        {% if settlement_amount > 0 %}
+            <p style="font-size: 11px">
+                {{ settlement_amount }}
+            </p>
+        {% else %}
+            <p style="font-size: 11px">
+                {{ settlement_amount }}
+            </p>
+        {% endif %}
+    </div>
+    <div class="col-3 text-end">
+        <p style="font-size: 14px">
+            Suma kosztów: {{ total_costs|floatformat:2  }} zł.
+        </p>
+    </div>
+
+</div>
+<hr class="pt-2">
+
+</div>
+
+<div class="row pb-4">
 
 
     <div class="col-5">
@@ -228,6 +233,7 @@
                 <th>Waluta</th>
             </tr>
         </thead>
+        <tbody>
 
     {% for cost in object.bt_applications_settlements.bt_application_settlement_costs.all %}
             <tr>
@@ -237,7 +243,7 @@
             </tr>
 
         {% endfor %}
-
+        </tbody>
 
     </table>
     </div>
@@ -249,7 +255,6 @@
 
 
     </div>
-
     {% if object.bt_applications_settlements.bt_application_settlement_mileages.exists %}
     <div class="row pb-5">
         <div class="col-6"></div>

@@ -17,7 +17,7 @@ from setup.forms import BtUserCreationForm
 
 class BtUserAdmin(UserAdmin):
     add_form = BtUserCreationForm
-    list_display = ('username', 'first_name', 'last_name', 'manager', 'id',)
+    list_display = ('username', 'first_name', 'last_name', 'manager', 'id','group')
     fieldsets = ((None, {'fields': ('username',
                                     'password',
                                     'first_name',
@@ -26,6 +26,7 @@ class BtUserAdmin(UserAdmin):
                                     'department',
                                     'manager',
                                     'employee_level',
+                                    'group',
                                     'is_superuser',
                                     'is_staff',
                                     'is_active',
@@ -41,6 +42,7 @@ class BtUserAdmin(UserAdmin):
                    'department',
                    'manager',
                    'employee_level',
+                   'group',
                    'is_superuser',
                    'is_staff',
                    'is_active',
@@ -49,10 +51,6 @@ class BtUserAdmin(UserAdmin):
                      ),)
 
     ordering = ('id',)
-
-
-
-
 
 admin.site.register(BtUser, BtUserAdmin)
 # admin.site.register(BtUser)

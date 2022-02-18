@@ -47,6 +47,7 @@ app_name = 'setup'
 urlpatterns = [
     path('user-list-view/', BtUserListView.as_view(), name="user-list-view"),
     path('user-details-view/<pk>', BtUserDetailView.as_view(), name="user-details-view"),
+    path('user-details/<pk>', BtUserDetailView.as_view(), name="user-details"),
     path('user-create-view/', BtUserCreateView.as_view(), name="user-create"),
 
     path('region-list-view/', BtRegionListView.as_view(), name="region-list-view"),
@@ -89,8 +90,8 @@ urlpatterns = [
 
     path('login/', user_login, name='login'),
     path('logout/', user_logout, name='logout'),
-    path('password_change/', MyPasswordChangeView.as_view(), name='password-change'),
-    path('password_change/done/', MyPasswordResetDoneView.as_view(),  name='password-change-done'),
+    path('password-change/', MyPasswordChangeView.as_view(), name='password-change'),
+    path('password-change/done/', MyPasswordResetDoneView.as_view(),  name='password-change-done'),
 
     path('upload/', upload, name='upload'),
 ]

@@ -34,48 +34,20 @@
 
 <body >
     <main>
-		{% if application_status == 'in_progress' %}
-		<div  style="font: 12px Verdana;">
-			<h2 style="color: rgb(0, 51, 102);">
-				E-delgacje <br>
-			</h2>
-			<h4 style="color: rgb(0, 51, 102);">
-				Masz nowy wniosek do weryfikacji
-			</h4>
-				<hr>
-				<br>
-			<p style="text-indent: 5px; 
-			font: 16px Verdana">
-				Użytkownik <strong>{{ application.application_author.first_name }} {{ application.application_author.last_name }} </strong> 
-				wysłał/a wniosek numer <strong>{{ application.id }}</strong> do weryfikacji.
-			</p>
-			<p style="text-indent: 15px; ">		<strong>Opis: </strong> {{ application.trip_purpose_text.upper }}</p>
-			<p style="text-indent: 15px; ">		<strong>Planowana data delegacji: </strong> 
-				{{ application.planned_start_date.isoformat }} - {{ application.planned_end_date.isoformat }}</p><br>
-			<hr>
-			<a style="font: 16px Verdana;
-			font-weight: bolder"
-			href="http://10.132.15.66/travel-management/e-delegacje/approval-list  " 
-			target="_blank">
-			kliknij link by przejśc do aplikacji
-			</a>
+	
 
-		</div>
-		{% elif application_status == 'settlement_in_progress' %}
-		
+
 		<div  style="font: 12px Verdana;">
 			<h2 style="color: rgb(0, 51, 102);">
 				E-delgacje <br>
 			</h2>
 			<h4 style="color: rgb(0, 51, 102);">
-				Masz nowe rozliczenie wniosku do weryfikacji
+				Wniosek nr {application.id} został zaakceptowany. w załączeniu dane do zaksięgowania
 			</h4>
 			<hr>
 			<p style="text-indent: 5px; 
-			font: 16px Verdana">Użytkownik 
-			<strong>{{ application.application_author.first_name }} 
-				{{ application.application_author.last_name }} </strong> 
-			wysłał/a rozliczenie do wniosku numer <strong>{{ application.id }}</strong> do weryfikacji.
+			font: 16px Verdana"></p>
+			
 
 
 	<div class="row">
@@ -103,7 +75,7 @@
 					<th>Pracownik</th>
 					<td >{{ application.target_user.first_name }} {{ application.target_user.last_name }}</td>
 				</tr>
-				{% if application_status == 'settlement_in_progress' %}
+
 				<tr>
 					<th>Data wyjazdu</th>
 					<td >{{ application.bt_application_settlement_info.bt_start_date.isoformat }} - 
@@ -116,16 +88,7 @@
 						{{ application.bt_application_settlement_info.bt_end_time.isoformat }}
 					</td>
 				  </tr>
-				{% else %}
-				<tr>
-					<th>Planowana data wyjazdu</th>
-					<td >{{ application.planned_start_date.isoformat }}</td>
-				</tr>
-				<tr>
-					<th>Planowana data powrotu</th>
-					<td >{{ application.planned_end_date.isoformat }}</td>
-				  </tr>
-				{% endif %}
+
 			</table>
 
 	</div>
@@ -171,7 +134,7 @@
 
 		</div>
 		
-		{% endif %}  
+ 
 </main>
 </body>
 </html>
