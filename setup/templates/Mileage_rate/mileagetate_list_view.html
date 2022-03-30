@@ -25,8 +25,8 @@
         {% for a in object_list %}
         <tr class="table table-sm table-hover">
 
-          <td><a href="{% url 'setup:mileagetate-details-view' pk=a.pk %}">   {{ a.vehicle_type }}</a></td>
-          <td><a>Stawka -{{a.rate}}</a></td>
+          <td><a href="{% url 'setup:mileagetate-details-view' pk=a.pk %}">   {{ a.get_vehicle_type_display }}</a></td>
+          <td><a>{{a.rate}} PLN</a></td>
 
 
         </tr>

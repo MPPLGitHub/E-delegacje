@@ -1,3 +1,4 @@
+""" List of urlpatterns for app_name = e_delegacje. """
 from django.urls import path
 from e_delegacje.views import (
     index,
@@ -28,8 +29,13 @@ from e_delegacje.views import (
     CreatePDF,
     render_pdf_view,
     PrintInLinePDFView,
-    DownloadPDFView
-
+    DownloadPDFView,
+    load_costcenters,
+    load_company_codes,
+    load_settled_cancelled_filter,
+    load_current_filter,
+    load_all_applications_filter,
+    BtAllApplicationListView
 )
 
 app_name = 'e_delegacje'
@@ -40,6 +46,7 @@ urlpatterns = [
     # BtApplicatons - wnioski o delegacje
     path('applications-create/', BtApplicationCreateView.as_view(), name='applications-create'),
     path('applications-list', BtApplicationListView.as_view(), name='applications-list'),
+    path('applications-all-list', BtAllApplicationListView.as_view(), name='applications-all-list'),
     path('application-details/<pk>', BtApplicationDetailView.as_view(), name='application-details'),
     path('application-delete/<pk>', BtApplicationDeleteView.as_view(), name='application-delete'),
     path('application-update/<pk>', BtApplicationUpdateView.as_view(), name='application-update'),
@@ -48,6 +55,13 @@ urlpatterns = [
     path('application-pdf/<pk>', PrintInLinePDFView.as_view(), name='application-pdf'),
     path('application-inline-pdf/<pk>', PrintInLinePDFView.as_view(), name='pdf-in-line'),
     path('application-download-pdf/<pk>', DownloadPDFView.as_view(), name='pdf-download'),
+    path('load-cost-centers/', load_costcenters, name='load-costcenters'),
+    path('load-company-codes/', load_company_codes, name='load-company-codes'),
+    path('settled_cancelled-applications-filter/', load_settled_cancelled_filter, 
+                                name='settled_cancelled-applications-filter'),
+    path('current-applications-filter/', load_current_filter, name='current-applications-filter'),
+    path('all-applications-filter/', load_all_applications_filter, name='all-applications-filter'),
+
 
     # BtApplicatons - wnioski o rozliczenie delegacji
     path('settlement-create/<pk>', BtApplicationSettlementCreateView.as_view(), name='settlement-create'),

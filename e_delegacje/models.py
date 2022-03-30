@@ -1,8 +1,8 @@
+""" List of modelf for e_delegacje application."""
 from django.db import models
 from django.urls import reverse
 
-from setup.models import BtUser, BtCostCenter, BtDelegationRate, BtMileageRates, BtCurrency, BtCountry
-from django.contrib.auth.models import User, AbstractUser
+from setup.models import BtCompanyCode, BtUser, BtCostCenter, BtMileageRates, BtCurrency, BtCountry
 from e_delegacje.enums import (
     BtApplicationStatus,
     BtTransportType,
@@ -20,6 +20,7 @@ class BtSubmissionStatus(models.Model):
 
 
 class BtApplication(models.Model):
+    bt_company_code = models.ForeignKey(BtCompanyCode, on_delete=models.PROTECT, related_name='bt_applications')
     bt_country = models.ForeignKey(BtCountry, on_delete=models.PROTECT, related_name='bt_applications')
     target_user = models.ForeignKey(BtUser, on_delete=models.PROTECT, related_name='bt_applications')
     application_author = models.ForeignKey(BtUser, on_delete=models.PROTECT, related_name='bt_applications_author')
@@ -44,11 +45,11 @@ class BtApplication(models.Model):
                                  related_name='bt_approver',
                                  null=True,
                                  blank=True)
-    # approval_date = models.DateTimeField(blank=True, null=True)
     approval_date = models.CharField(max_length=15, blank=True, null=True)
 
     def __str__(self):
-        return f'Wniosek {self.id}: {self.trip_purpose_text}'
+        return f'Wniosek {self.id}: {self.trip_purpose_text} utworzony przez: \
+        {self.application_author} dla {self.target_user}'
 
 
 class BtApplicationSettlement(models.Model):

@@ -1,6 +1,7 @@
+""" Business logic for Views in e-delegacje """
 import functools
 import ssl
-
+from black import T
 from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
@@ -32,6 +33,7 @@ from e_delegacje.forms import (
 )
 from e_delegacje.models import (
     BtApplication,
+    BtCompanyCode,
     BtApplicationSettlement,
     BtApplicationSettlementInfo,
     BtApplicationSettlementCost,
@@ -53,7 +55,7 @@ from e_delegacje.tm_calculations import (
     diet_reconciliation_poland,
     diet_reconciliation_abroad
     )
-from setup.models import BtDelegationRate, BtMileageRates, BtUser
+from setup.models import BtCostCenter, BtDelegationRate, BtMileageRates, BtUser, BtUserAuthorisation
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.template.loader import get_template
@@ -61,10 +63,12 @@ from xhtml2pdf import pisa
 from django_weasyprint import WeasyTemplateResponseMixin
 from django_weasyprint.views import  WeasyTemplateResponse
 from django.core.files.storage import FileSystemStorage
+from django.db.models import Q
 
 
 @login_required
 def index(request):
+    """main view for main site"""
     applications = BtApplication.objects.all()
     cancelled_settled = [BtApplicationStatus.canceled, BtApplicationStatus.settled]
     items_number = BtApplication.objects.filter(application_author=request.user).exclude(application_status__in=cancelled_settled).count() + \
@@ -80,11 +84,11 @@ def index(request):
 
 
 class BtApplicationCreateView(LoginRequiredMixin,View):
+    """Creates new application"""
     def get(self, request):
         form = BtApplicationForm()
         form.fields['target_user'].queryset = \
             BtUser.objects.filter(department=request.user.department)
-
         current_datetime = ""
         return render(request,
                       template_name="form_template.html",
@@ -94,6 +98,7 @@ class BtApplicationCreateView(LoginRequiredMixin,View):
     def post(self, request):
         form = BtApplicationForm(request.POST)
         if form.is_valid():
+            bt_company_code = form.cleaned_data['bt_company_code']
             bt_country = form.cleaned_data['bt_country']
             target_user = form.cleaned_data['target_user']
             application_author = self.request.user
@@ -108,9 +113,15 @@ class BtApplicationCreateView(LoginRequiredMixin,View):
             advance_payment_currency = form.cleaned_data['advance_payment_currency']
             employee_level = BtUser.objects.get(id=target_user.id)
             current_datetime = form.cleaned_data['current_datetime']
-            application_log = f'Wniosek o delegację utworzony przez: {application_author} - {current_datetime}\n'
+            application_log = f'''
+                    Wniosek o delegację utworzony przez: {application_author} - {current_datetime}
+                    \n-----\nS
+                    kierowany do akceptacji do: {target_user.manager.first_name} {target_user.manager.last_name}
+                    \n-----\n
+                    '''
 
             BtApplication.objects.create(
+                bt_company_code=bt_company_code,
                 bt_country=bt_country,
                 target_user=target_user,
                 application_author=application_author,
@@ -132,28 +143,80 @@ class BtApplicationCreateView(LoginRequiredMixin,View):
             return HttpResponseRedirect(reverse("e_delegacje:applications-list"))
         else:
             print(form.errors)
-            return HttpResponseRedirect(reverse("e_delegacje:applications-create"))
+            form.fields['target_user'].queryset = \
+                BtUser.objects.filter(department=request.user.department)
+            current_datetime = ""
+            return render(request,
+                      template_name="form_template.html",
+                      context={"form": form, 'current_datetime': current_datetime}
+                      )
 
 
 class BtApplicationListView(LoginRequiredMixin, ListView):
+    """ List View for applications"""
     model = BtApplication
-    template_name = "bt_applications_list.html"
+    template_name = "Application/bt_applications_list.html"
     ordering = ['-id']
+
+    def get_context_data(self, **kwargs):
+        """Adds context data to the view"""
+        context = super().get_context_data(**kwargs)
+
+        filters = (Q(target_user=self.request.user) | Q(application_author=self.request.user))
+        status_filter = (Q(application_status=BtApplicationStatus.canceled) | 
+            Q(application_status=BtApplicationStatus.settled))
+
+        current_target_users_set = \
+        {item.target_user for item in BtApplication.objects.filter(filters).exclude(status_filter)}
+        
+        settled_cancelled_target_users_set = \
+        {item.target_user for item in BtApplication.objects.filter(filters).filter(status_filter)}
+        
+        current_company_codes = \
+            {item.bt_company_code for item in BtApplication.objects.filter(filters).exclude(status_filter)}
+        
+        settled_cancelled_company_codes2 = \
+            {item.bt_company_code for item in BtApplication.objects.filter(filters).filter(status_filter)}
+
+        context['company_codes1'] = current_company_codes
+        context['company_codes2'] = settled_cancelled_company_codes2
+        context['taget_users1'] = current_target_users_set
+        context['taget_users2'] = settled_cancelled_target_users_set
+        context['application_statuses'] = [BtApplicationStatus.canceled, BtApplicationStatus.settled]
+
+        return context
+
+class BtAllApplicationListView(BtApplicationListView):
+    """ List View for applications"""
+    model = BtApplication
+    template_name = "Application/bt_all_applications_list.html"
+    ordering = ['-id']
+
+    def get_context_data(self, **kwargs):
+        """Add context data to the view"""
+        context = super().get_context_data(**kwargs)
+        application_statuses = \
+        {item.application_status for item in BtApplication.objects.all()}
+
+        context['all_statuses'] = application_statuses
+        return context
+
 
 
 class BtApplicationDetailView(LoginRequiredMixin, DetailView):
+    """ Detail View for e_delegacje application"""
     model = BtApplication
-    template_name = "bt_application_details.html"
+    template_name = "Application/bt_application_details.html"
 
 class BtApplicationApprovalDetailView(LoginRequiredMixin, View):
-
+    """ Detail view for e_delegacje application which is shown in approoval view"""
     def get(self, request, pk):
 
         application = BtApplication.objects.get(id=pk)
         rejected_form = BtRejectionForm()
         approved_form = BtApprovedForm()
         try:
-            set_pk = application.bt_applications_settlements.id
+            set_pk = application.bt_applications_settlements.id      
             settlement = BtApplicationSettlement.objects.get(id=set_pk)
             advance = float(settlement.bt_application_id.advance_payment)
             cost_sum = float(settlement_cost_sum(BtApplicationSettlement.objects.get(pk=settlement.id)))
@@ -182,13 +245,16 @@ class BtApplicationApprovalDetailView(LoginRequiredMixin, View):
                     'mileage_cost': mileage_cost,
                     'diet': diet,
                     'rejected_form': rejected_form,
-                    'approved_form': approved_form
                 })
         except:
+            
+            print()
             return render(
                 request,
-                template_name="bt_application_approval.html",
-                context={'application': application, 'rejected_form': rejected_form, 'approved_form': approved_form})
+                template_name="Approval/bt_application_approval.html",
+                context={'application': application, 
+                'rejected_form': rejected_form, 
+                'approved_form': approved_form})
 
     def post(self, request, pk):
         rejected_form = BtRejectionForm(request.POST)
@@ -202,8 +268,8 @@ class BtApplicationApprovalDetailView(LoginRequiredMixin, View):
                 bt_application.application_log = \
                     bt_application.application_log + \
                     f"\n-----\nRozliczenie odrzucone przez {request.user.first_name} " \
-                    f"{request.user.last_name}.\n\n Powód: " \
-                    f"{rejection_reason}.\n-----\n"
+                    f"{request.user.last_name}.\n Powód: " \
+                    f"{rejection_reason}."
                 bt_application.save()
                 approved_or_rejected_notification(bt_application, request.user, 
                 BtApplicationStatus.rejected.label, rejection_reason)
@@ -212,8 +278,8 @@ class BtApplicationApprovalDetailView(LoginRequiredMixin, View):
                 bt_application.application_status = BtApplicationStatus.rejected.value
                 bt_application.application_log = bt_application.application_log + \
                                                  f"\n-----\nWniosek odrzucony przez {request.user.first_name} " \
-                                                 f"{request.user.last_name}.\n\n Powód: " \
-                                                 f"{rejection_reason}.\n-----\n"
+                                                 f"{request.user.last_name}.\n Powód: " \
+                                                 f"{rejection_reason}."
                 bt_application.save()
                 approved_or_rejected_notification(bt_application, request.user, 
                 BtApplicationStatus.rejected.label, rejection_reason)
@@ -222,8 +288,6 @@ class BtApplicationApprovalDetailView(LoginRequiredMixin, View):
         else:
             return HttpResponseRedirect(reverse("e_delegacje:approval", args=[pk]))
             
-        
-
 
 class BtApplicationApprovalMailDetailView(LoginRequiredMixin, View):
 
@@ -249,7 +313,7 @@ class BtApplicationApprovalMailDetailView(LoginRequiredMixin, View):
                                     f'{settlement.bt_application_id.advance_payment_currency.code}'
             return render(
                 request,
-                template_name="bt_approval_mail_detail.html",
+                template_name="Approval/bt_approval_mail_detail.html",
                 context={
                     'application': application,
                     'cost_sum': round(cost_sum, 2),
@@ -262,7 +326,7 @@ class BtApplicationApprovalMailDetailView(LoginRequiredMixin, View):
         except:
             return render(
                 request,
-                template_name="bt_approval_mail_detail.html",
+                template_name="Approval/bt_approval_mail_detail.html",
                 context={'application': application})
 
 
@@ -304,7 +368,7 @@ class BtApplicationUpdateView(LoginRequiredMixin, UpdateView):
 
 class BtApprovalListView(LoginRequiredMixin, ListView):
     model = BtApplication
-    template_name = "bt_approval_list.html"
+    template_name = "Approval/bt_approval_list.html"
     ordering = ['-id']
 
     def get_queryset(self):
@@ -358,7 +422,7 @@ class BtApplicationSettlementCreateView(LoginRequiredMixin, View):
 
 class BtApplicationSettlementsListView(LoginRequiredMixin, ListView):
     model = BtApplicationSettlement
-    template_name = "bt_applications_list.html"
+    template_name = "Application/bt_applications_list.html"
 
 
 class BtApplicationSettlementDetailView(LoginRequiredMixin, View):
@@ -382,7 +446,7 @@ class BtApplicationSettlementDetailView(LoginRequiredMixin, View):
                                 f'{settlement.bt_application_id.advance_payment_currency.text}'
         return render(
             request,
-            template_name="bt_settlement_details.html",
+            template_name="Settlement/bt_settlement_details.html",
             context={'object': settlement,
                      'cost_sum': cost_sum,
                      'total_costs': total_costs,
@@ -402,7 +466,7 @@ class BtApplicationSettlementInfoCreateFormView(LoginRequiredMixin, View):
         settlement = BtApplicationSettlement.objects.get(id=pk)
         return render(
             request,
-            template_name="settlement_subform_info.html",
+            template_name="Settlement/settlement_subform_info.html",
             context={"form": form, 'settlement': settlement})
 
     def post(self, request, pk, *args, **kwargs):
@@ -456,7 +520,7 @@ class BtApplicationSettlementCostCreateView(LoginRequiredMixin, View):
         settlement = BtApplicationSettlement.objects.get(id=pk)
         return render(
             request,
-            template_name="settlement_subform_cost.html",
+            template_name="Settlement/settlement_subform_cost.html",
             context={"form": form, 'cost_list': cost_list, 'settlement': settlement})
 
     def post(self, request, pk, *args, **kwargs):
@@ -486,7 +550,7 @@ class BtApplicationSettlementCostCreateView(LoginRequiredMixin, View):
             )
 
             return HttpResponseRedirect(reverse("e_delegacje:settlement-cost-create", args=[pk]))
-        return render(request, "settlement_subform_cost.html", {"form": form,
+        return render(request, "Settlement/settlement_subform_cost.html", {"form": form,
                                                                 'cost_list': cost_list,
                                                                 'settlement': settlement}
                       )
@@ -501,7 +565,7 @@ class BtApplicationSettlementMileageCreateView(LoginRequiredMixin, View):
             bt_application_settlement=BtApplicationSettlement.objects.get(id=pk))
         return render(
             request,
-            template_name="settlement_subform_mileage.html",
+            template_name="Settlement/settlement_subform_mileage.html",
             context={"form": form, 'settlement': settlement, 'trip_list': trip_list})
 
     def post(self, request, pk, *args, **kwargs):
@@ -528,7 +592,7 @@ class BtApplicationSettlementMileageCreateView(LoginRequiredMixin, View):
                 mileage=mileage
             )
             return HttpResponseRedirect(reverse("e_delegacje:settlement-mileage-create", args=[pk]))
-        return render(request, "settlement_subform_mileage.html", {"form": form, 'trip_list': trip_list})
+        return render(request, "Settlement/settlement_subform_mileage.html", {"form": form, 'trip_list': trip_list})
 
 
 class BtApplicationSettlementFeedingCreateView(LoginRequiredMixin, View):
@@ -546,7 +610,7 @@ class BtApplicationSettlementFeedingCreateView(LoginRequiredMixin, View):
             diet = diet_reconciliation_poland(settlement)  # dieta bez odliczeń po korekcie o wyżywienie
         return render(
             request,
-            template_name="settlement_subform_feeding.html",
+            template_name="Settlement/settlement_subform_feeding.html",
             context={"form": form,
                      'settlement': settlement,
                      'diet': diet,
@@ -570,7 +634,7 @@ class BtApplicationSettlementFeedingCreateView(LoginRequiredMixin, View):
                 supper_quantity=supper_quantity
             )
             return HttpResponseRedirect(reverse("e_delegacje:settlement-details", args=[pk]))
-        return render(request, "settlement_subform_feeding.html", {"form": form})
+        return render(request, "Settlement/settlement_subform_feeding.html", {"form": form})
 
 
 
@@ -578,7 +642,7 @@ class BtApplicationSettlementFeedingCreateView(LoginRequiredMixin, View):
 # Delete Views
 class BtApplicationDeleteView(LoginRequiredMixin, DeleteView):
     model = BtApplication
-    template_name = "bt_application_delete.html"
+    template_name = "Application/bt_application_delete.html"
     success_url = reverse_lazy("e_delegacje:applications-list")
 
 
@@ -603,7 +667,7 @@ class BtApplicationSettlementMileageDeleteView(LoginRequiredMixin, View):
 # UpdateViews
 class BtApplicationSettlementInfoUpdateView(LoginRequiredMixin, SingleObjectMixin, FormView):
     model = BtApplicationSettlementInfo
-    template_name = "settlement_subform_info.html"
+    template_name = "Settlement/settlement_subform_info.html"
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object(queryset=BtApplicationSettlement.objects.all())
@@ -642,7 +706,7 @@ class BtApplicationSettlementInfoUpdateView(LoginRequiredMixin, SingleObjectMixi
 
 class BtApplicationSettlementFeedingUpdateView(LoginRequiredMixin, SingleObjectMixin, FormView):
     model = BtApplicationSettlementFeeding
-    template_name = "settlement_subform_feeding.html"
+    template_name = "Settlement/settlement_subform_feeding.html"
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object(queryset=BtApplicationSettlement.objects.all())
@@ -804,3 +868,102 @@ class DownloadPDFView(WeasyTemplateResponseMixin, CreatePDF):
     def get_pdf_filename(self):
         obj = CreatePDF.get_object(self)
         return f'Rozliczenie delegacji nr: {obj.id}.pdf'
+
+
+def load_company_codes(request):
+    """Takes target_user id from request.
+        Filters Company codes queryset to.  
+        returns objects that the user has authorisation to and passes context data to a view.
+    """
+    target_user = request.GET.get('id_target_user')
+    company_codes = \
+        [company_code for company_code in BtUser.objects.get(id=target_user).company_code.all()]
+    return render(request, 'Company_code/company_codes_list_options.html', {'company_codes': company_codes})
+
+
+def load_costcenters(request):
+    """Takes target_user_id and Company_code_id from request.
+        Filters Cost center queryset.
+        returns filtered objects to context data.
+    """
+    target_user = request.GET.get('id_target_user')
+    company_code = request.GET.get('company_code')
+    cost_centers = \
+        [authorisation.cost_center for authorisation in \
+        BtUserAuthorisation.objects.filter(user_id=target_user).filter(company_code=company_code)]
+    return render(request, 'Cost_center/cost_centers_list_options.html', {'cost_centers': cost_centers})
+
+
+def load_settled_cancelled_filter(request):
+    """Takes company_code, target_user id, application_ststus from request.
+        Filters settled_cancelled table queryset.
+        returns filtered objects to context data.
+    """
+    applications = BtApplication.objects.all()
+
+    target_user = request.GET.get('target_user')
+    c_code = request.GET.get('c_code')
+    application_status = request.GET.get('application_status')
+    print(f'c_code: {c_code}')
+    if target_user:   
+        applications = applications.filter(target_user=target_user)
+        
+    if c_code:
+        applications = applications.filter(bt_company_code=c_code)
+    
+    if application_status:
+        
+        applications = applications.filter(application_status=application_status)
+        
+
+    return render(request, 'Application/bt_applications_filtered.html', 
+    {'applications': applications.order_by('-id')})
+
+
+def load_current_filter(request):
+    """Takes company_code, target_user id from request.
+        Filters current applications table queryset.
+        returns filtered objects to context data.
+    """
+    applications = BtApplication.objects.all()
+
+    target_user = request.GET.get('target_user')
+    c_code = request.GET.get('c_code')
+
+    if target_user:   
+        applications = applications.filter(target_user=target_user)
+        
+    if c_code:
+        applications = applications.filter(bt_company_code=c_code)      
+
+    return render(request, 'Application/bt_current_applications_filtered.html', 
+    {'current_applications': applications.order_by('-id')})
+
+
+def load_all_applications_filter(request):
+    """Takes company_code, target_user id, start_date and end_date from request.
+        Filters all_applications table queryset.
+        returns filtered objects to context data.
+    """
+    applications = BtApplication.objects.all()
+
+    target_user = request.GET.get('target_user')
+    c_code = request.GET.get('c_code')
+    start_date = request.GET.get('start_date')
+    filter_start_date = \
+        ((Q(bt_applications_settlements__bt_application_info__bt_start_date__lte=start_date) &
+                Q(bt_applications_settlements__bt_application_info__bt_end_date__gte=start_date)) |
+        (Q(planned_start_date__lte=start_date) &
+                Q(planned_end_date__gte=start_date)))
+    
+    if target_user:   
+        applications = applications.filter(target_user=target_user)
+        
+    if c_code:
+        applications = applications.filter(bt_company_code=c_code)
+    
+    if start_date:
+        applications = applications.filter(filter_start_date)
+    
+    return render(request, 'Application/bt_all_applications_filtered.html', 
+    {'applications': applications.order_by('-id')})

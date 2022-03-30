@@ -1,3 +1,4 @@
+""" Enumeration and Choices classes that are to be used in model's choice fields"""
 from enum import Enum
 from django.db import models
 
@@ -13,7 +14,7 @@ class BtApplicationStatus(models.TextChoices):
 
 
 class BtTransportType(models.TextChoices):
-    default = 'default', ''
+    
     train = 'train', "pociąg"
     plane = 'plane', 'samolot'
     company_car = 'company_car', 'samochód służbowy'

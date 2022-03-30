@@ -1,0 +1,48 @@
+<table>
+<tbody>
+<tr><td colspan="8"></td></tr>
+
+{% for item in applications %}
+
+    <tr>
+        <td>
+           <strong> {{ item.id }} </strong>
+        </td>
+        <td>
+            {{ item.bt_company_code.company_code }}
+        </td>
+        <td>
+            {{ item.target_user }}
+        </td>
+        {% if item.bt_applications_settlements.bt_application_info %}
+        <td style="min-width: 200px;">
+            {{ item.bt_applications_settlements.bt_application_info.bt_start_date.isoformat }} -
+            {{ item.bt_applications_settlements.bt_application_info.bt_end_date.isoformat }}                         
+        </td>
+        {% else %}
+        <td style="min-width: 200px;">
+            <u>Planowana data:</u><br>
+            {{ item.planned_start_date.isoformat }} - 
+            {{ item.planned_start_date.isoformat }}                         
+        </td>
+        {% endif %}
+        <td style="min-width: 300px;">
+            {{ item.trip_purpose_text }}
+        </td>
+
+
+        <td>
+            {% if item.application_status == 'canceled' %}
+                <p class="text-danger"><b>{{ item.get_application_status_display }}</b></p>
+            {% elif item.application_status == 'settled' %}
+                <p class="text-success"><b>{{ item.get_application_status_display }}</b></p>
+            {% else  %}
+            <p class="text-secondary"><b>{{ item.get_application_status_display }}</b></p>
+            {% endif%}
+
+        </td>
+    </tr>
+
+{% endfor %}
+</tbody>
+</table>

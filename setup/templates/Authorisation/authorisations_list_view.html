@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block content %}
+
+
+    <h2>Uprawnienia użytkowników</h2>
+    <div>
+        <a type="button"
+            class="btn btn-outline-warning mb-3"
+            href="{% url 'setup:authorisations-create' %}"
+            style="font-size: 13px">
+            Dodaj uprawnienia
+        </a>
+    </div>
+
+<table class="table table-sm table-hover">
+    <thead>
+        <form>
+            <tr>
+                <td class="p-6">
+                    <select class="form-select form-select-sm form-select-secondary" 
+                    id="filter_user_dropdown" 
+                    onchange="filter_context(this)">   
+                        <option value="">---------</option>
+                            {% for user in users %}
+                                <option value="{{ user.pk }}">{{ user }}</option>
+                            {% endfor %}                            
+                        </select>
+                </td>
+                <td class="p-6">  
+                    <select class="form-select form-select-sm form-select-secondary" 
+                    id="filter_c_code_dropdown" 
+                    onchange="filter_context(this)">   
+                        <option value="">---------</option>
+                            {% for c_code in c_codes %}
+                                <option value="{{ c_code.pk }}">{{ c_code }}</option>
+                            {% endfor %}                            
+                        </select>
+                </td>
+                <td class="p-6">
+                    <div class="form-row">
+                        <div class="form-group ">
+                            <div class="input-group mr-3">
+                            <input class="form-control form-control-sm form-control-secondary" 
+                            type="search" 
+                            onchange="filter_context(this)"
+                            id = 'cost_center_search'
+                            placeholder="MPK" 
+                            aria-label=".form-control-sm example">
+
+                        </div>              
+                    </div>
+                </div>
+                </td>
+                    <td>
+                        <a class="btn btn-sm btn-outline-secondary d-flex" 
+                            href="{% url 'setup:authorisations-list' %}" role="button">
+                                Wyczyść filtr
+                        </a>
+                    </td>
+            </tr>
+        </form>
+    </thead>
+        
+    <tbody id="authorisation_table_body"        
+    data-users-url="{% url 'setup:authorisationslist-filter-context' %}" 
+    novalidate>
+
+        {% for object in object_list %}
+        <tr class="table table-sm table-hover">
+
+            <td><a href="{% url 'setup:authorisations-details' pk=object.pk %}">
+                {{ object.user_id }}</a></td>
+            <td>{{ object.company_code }}</td>
+            <td><a class="btn btn-outline-secondary d-flex" 
+                href="{% url 'setup:authorisations-update' pk=object.id %}" role="button">
+                {{ object.cost_center }}</a></td>
+            
+        </tr>
+    {% endfor %}
+    </tbody>
+
+</table>
+
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+
+<script>
+
+    function filter_context(element) { 
+        console.log(element.id, element.value)
+        
+        var url = document.getElementById('authorisation_table_body').attributes[1].value
+        var user = document.getElementById('filter_user_dropdown').value; // taking user_id from HTML element
+        var c_code = document.getElementById('filter_c_code_dropdown').value; // taking user_id from HTML element
+        var c_center = document.getElementById('cost_center_search').value; // taking user_id from HTML element
+        
+        $.ajax({
+            url: url,
+            data: {
+                    'user': user,  // add the target_user id to the GET parameters
+                    'c_code': c_code,  // add the company code id to the GET parameters
+                    'c_center': c_center,    // add the cost center id to the GET parameters
+                    'element_id': element.id
+                    },
+                     success: function (data) {   // `data` is the return of the `load_costcenters` view function
+             $("#authorisation_table_body").html(data);  // replace the contents of the id_CostCenter input with the data that came from the server
+             }
+
+        })
+    
+    }
+
+    </script>
+
+
+
+{% endblock %}
+

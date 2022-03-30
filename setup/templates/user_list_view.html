@@ -2,7 +2,7 @@
 {% block content %}
 
     <h2>Lista użytkowników</h2>
-        <div class="col-3 align-self-start">
+        <div class="col-3 align-self-start mb-3 ">
             <a type="button"
                class="btn btn-outline-warning"
                href="{% url 'setup:user-create' %}"
@@ -14,29 +14,147 @@
 <table class="table table-sm table-hover">
     <thead>
         <tr>
-            <td>Id</td>
+            <form>
+                <tr><h6>Filtruj</h6></tr>
+                <tr>
+                    <td>Id.</td>
+                    <td class="p-6">
+                        <div class="form-row">
+                            <div class="form-group ">
+                                <div class="input-group mr-3">
+                                <input class="form-control form-control-sm form-control-secondary" 
+                                type="search" 
+                                onchange="filter_context(this)"
+                                id = 'name_search'
+                                placeholder="Imię i Nazwisko" 
+                                aria-label=".form-control-sm example">
+    
+                            </div>              
+                        </div>
+                    </div>
+                    <td class="p-6">
+                        <div class="form-row">
+                            <div class="form-group ">
+                                <div class="input-group mr-3">
+                                <input class="form-control form-control-sm form-control-secondary" 
+                                type="search" 
+                                onchange="filter_context(this)"
+                                id = 'department_search'
+                                placeholder="Dział" 
+                                aria-label=".form-control-sm example">
+    
+                            </div>              
+                        </div>
+                    </div>
+                    </td>
+                    
+                    <td class="p-6">
+                        <select class="form-select form-select-sm form-select-secondary" 
+                        id="filter_manager_dropdown" 
+                        onchange="filter_context(this)">   
+                            <option value="">Wybierz menadżera</option>
+                                {% for manager in managers %}
+                                    <option value="{{ manager.pk }}">{{ manager }}</option>
+                                {% endfor %}                            
+                            </select>
+
+                    </td>
+                    <td class="p-6">
+                        <div class="form-row">
+                            <div class="form-group ">
+                                <div class="input-group mr-3">
+                                <input class="form-control form-control-sm form-control-secondary" 
+                                type="search" 
+                                onchange="filter_context(this)"
+                                id = 'vendor_search'
+                                placeholder="Vendor" 
+                                aria-label=".form-control-sm example">
+    
+                            </div>              
+                        </div>
+                    </div>
+                    </td>
+                    <td class="p-6">  
+                        <select class="form-select form-select-sm form-select-secondary" 
+                        id="filter_c_code_dropdown" 
+                        onchange="filter_context(this)">   
+                            <option value="">Wybierz spółkę</option>
+                                {% for c_code in c_codes %}
+                                    <option value="{{ c_code.pk }}">{{ c_code.company_code }}</option>
+                                {% endfor %}                            
+                            </select>
+                    </td>
+                        <td>
+                            <a class="btn btn-sm btn-outline-secondary d-flex" 
+                                href="{% url 'setup:user-list-view' %}" role="button">
+                                    Wyczyść filtr
+                            </a>
+                        </td>
+                </tr>
+            </form>
+        </tr>
+        <tr>
+            <!-- <td>Id</td>
             <td>Imię i Nazwisko użytkownika</td>
-            <td>Nazwa użytkownika</td>
+            <td>Company code</td>
             <td>Dział</td>
             <td>Menager</td>
-            <td>Typ</td>
+            <td>Vendor</td> -->
         </tr>
     </thead>
-    <tbody>
+    <tbody class="mt-3"
+    id="user_table_body"
+    data-users-url="{% url 'setup:user-list-filter-context' %}" 
+    novalidate>
 
         {% for a in object_list %}
         <tr class="table table-sm table-hover">
             <td><p>{{ a.id }}</p></td>
             <td><a href="{% url 'setup:user-details-view' pk=a.pk %}">{{ a.first_name }}  {{ a.last_name }}</a></td>
-            <td><a> {{ a.username }}</a></td>
-            <td><a> {{ a.department }}</a></td>
-            <td><a> {{ a.manager.first_name }} {{ a.manager.last_name }}</a></td>
-            <td><p>{{ a.get_employee_level_display }}</p></td>
+            <td><p> {{ a.department }}</p></td>
+            <td><p> {{ a.manager.first_name }} {{ a.manager.last_name }}</p></td>
+            <td><p>{{ a.vendor_id }}</p></td>
+            <td><p>            
+                <ul style="font-size: 12px; padding: 0px;margin: 0px;">
+                {% for company in a.company_code.all %}
+                    <li>{{ company.company_code }}</li>
+                {% endfor %}
+            </ul></p></td>
 
         </tr>
     {% endfor %}
     </tbody>
     </table>
 
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script>
+    
+        function filter_context(element) { 
+                   
+            var url = document.getElementById('user_table_body').attributes[2].value
+            var name = document.getElementById('name_search').value; // taking text from HTML element
+            var c_code = document.getElementById('filter_c_code_dropdown').value; // taking company code from HTML element
+            var department = document.getElementById('department_search').value; // taking text from HTML element
+            var manager = document.getElementById('filter_manager_dropdown').value; // taking manager from HTML element
+            var vendor = document.getElementById('vendor_search').value; // taking vendor from HTML element
+            console.log(document.getElementById('user_table_body').attributes)
+            $.ajax({
+                url: url,
+                data: {
+                        'name': name,  // add the date id to the GET parameters
+                        'c_code': c_code,  // add the date id to the GET parameters
+                        'department': department,  // add the date id to the GET parameters
+                        'manager': manager,    // add the date id to the GET parameters
+                        'vendor': vendor // add the date id to the GET parameters
+                        },
+                            success: function (data) {   // `data` is the return of the `load_costcenters` view function
+                    $("#user_table_body").html(data);  // replace the contents of the CostCenter input with the data that came from the server
+                    }
+    
+            })
+        
+        }
+    
+        </script>  
 
 {% endblock %}

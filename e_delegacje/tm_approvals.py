@@ -16,12 +16,12 @@ def bt_application_approved(request, pk):
         bt_application.application_status = BtApplicationStatus.approved.value
         bt_application.application_log = \
             bt_application.application_log + \
-            f"\nWniosek zaakceptowany przez {request.user.first_name} {request.user.last_name} "
+            f"\n-----\nWniosek zaakceptowany przez: {request.user.first_name} {request.user.last_name} "
 
         bt_application.save()
         approved_or_rejected_notification(bt_application, request.user, BtApplicationStatus.approved.label, rejection_reason)
     else:
-        return render(request, template_name='already_processed.html', context={'application': bt_application})
+        return render(request, template_name='Approval/already_processed.html', context={'application': bt_application})
 
     # return render(request, template_name='approve_reject_success.html', context={'application': bt_application})
     return HttpResponseRedirect(reverse("e_delegacje:approval-list"))
@@ -33,14 +33,14 @@ def bt_application_rejected(request, pk):
         bt_application.application_status = BtApplicationStatus.rejected.value
         bt_application.application_log = \
             bt_application.application_log + \
-            f"\nWniosek odrzucony przez {request.user.first_name} {request.user.last_name} \n\n" \
+            f"\n-----\nWniosek odrzucony przez: {request.user.first_name} {request.user.last_name} \n\n" \
             f"Powód: "
         bt_application.save()
         approved_or_rejected_notification(bt_application, request.user, BtApplicationStatus.rejected.label)
     else:
-        return render(request, template_name='already_processed.html', context={'application': bt_application})
+        return render(request, template_name='Approval/already_processed.html', context={'application': bt_application})
 
-    return render(request, template_name='approve_reject_success.html', context={'application': bt_application})
+    return render(request, template_name='Approval/approve_reject_success.html', context={'application': bt_application})
     # return HttpResponseRedirect(reverse("e_delegacje:approval-list"))
 
 
@@ -49,7 +49,12 @@ def send_settlement_to_approver(request, pk):
     settlement.settlement_status = BtApplicationStatus.in_progress.value
     settlement.save()
     bt_application = BtApplication.objects.get(bt_applications_settlements__id=pk)
-    
+    now = datetime.datetime.now()
+    print(bt_application.application_log)
+    bt_application.application_log = bt_application.application_log + \
+        f'\n-----\nRozliczenie skierowane do akceptacji do: {bt_application.target_user.manager} ' + \
+        f' - {now}'
+    print(bt_application.application_log)
     new_application_notification(bt_application.target_user.manager.email,bt_application)
     return HttpResponseRedirect(reverse("e_delegacje:applications-list"))
 

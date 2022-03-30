@@ -29,21 +29,34 @@
 
  <hr>
 <div class="row">
-    <div class="col-8">
+    <div class="col-9">
         <div class="row">
             <div class="col-4">
               <table class="table table-light " style="font-size: 12px">
                   <tr class="table table-primary table-striped text-uppercase">
                       <td class="fw-bold">Numer Wniosku o delegację</td>
-                      <td >{{ object.id }}</td>
+                      <td class="fw-bold text-center" style="font-size: medium;">{{ object.id }}</td>
                   </tr>
 
                   <tr class="table table-primary text-uppercase">
                     <td class="fw-bold">Data wniosku:</td>
-                    <td>{{ object.application_date.isoformat }}</td>
+                    <td class="fw-bold" style="font-size: medium;">{{ object.application_date.isoformat }}</td>
 
                   </tr>
               </table>
+            </div>
+            <div class="col-2">
+                <table class="table table-primary text-center table-striped text-uppercase" style="font-size: 12px">
+                    <tbody>
+                        <tr>
+                            <td class="fw-bold" >Company Code:</td>
+
+                        </tr>
+                        <tr>
+                            <td class="text-wrap fw-bold" >{{ object.bt_company_code.company_code }}</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
             <div class="col-4">
                 <table class="table table-primary text-center table-striped text-uppercase" style="font-size: 12px">
@@ -58,8 +71,8 @@
                     </tbody>
                 </table>
             </div>
-            <div class="col-4">
-                <table class="table table-primary table-striped text-uppercase text-end" style="font-size: 12px">
+            <div class="col-2">
+                <table class="table table-primary table-striped text-uppercase text-center" style="font-size: 12px">
                     <tbody>
                         <tr>
                             <td class="fw-bold">Status Wniosku</td>
@@ -85,7 +98,9 @@
                   <tr>
                       <td>{{ object.bt_country }}</td>
                       <td>{{ object.target_user }}</td>
-                      <td colspan="2">{{ object.CostCenter }}</td>
+                      <td colspan="2">{{ object.CostCenter.cost_center_number }} - 
+                        {{ object.CostCenter.text }}
+                      </td>
 
                   </tr>
 
@@ -111,8 +126,8 @@
             </div>
     </div>
 
-    <div class="col-4">
-    <table class="table table-sm  table-hover">
+    <div class="col-3">
+    <table class="table table-sm  table-hover" style="font-size: 13px">
             <thead>
             <tr>
                 <th>

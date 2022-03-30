@@ -2,35 +2,34 @@
 {% block content %}
 
 
-    <h2>Stawki</h2>
+    <h2>Lista Comany Code</h2>
 <a type="button"
                class="btn btn-outline-warning"
-               href="{% url 'setup: delegationrate-create' %}"
+               href="{% url 'setup:companycode-create' %}"
                style="font-size: 13px"
             >
-                Nowa Stawka
+                Nowy company code
             </a>
 
 
 <table class="table table-sm table-hover">
     <thead>
         <tr>
-            <td>Stawka delegacji</td>
-
-            <td>Kraj</td>
+            <td>Comany code</td>
+            <td>Nazwa spółki</td>
         </tr>
     </thead>
 
     <body>
-        {% for a in object_list %}
-
+        {% for object in object_list %}
         <tr class="table table-sm table-hover">
 
-            <td><a href="{% url 'setup:delegationrate-details-view' pk=a.pk %}">{{ a.delagation_rate}} PLN</a></td>
-
-            <td><a>     {{ a.country }}</a></td>
+            <td><a href="{% url 'setup:companycode-details' pk=object.pk %}">{{ object.company_code }}</a></td>
+            <td>{{ object.company_name }}</td>
+            
         </tr>
     {% endfor %}
     </body>
     </table>
 {% endblock %}
+

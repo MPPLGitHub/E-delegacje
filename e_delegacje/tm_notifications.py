@@ -17,9 +17,8 @@ def new_application_notification(user_mail, sent_app):
     application_number = sent_app.id
     application_status = sent_app.application_status
 
-
     html_content = render_to_string(
-        'bt_mail_notification.html',
+        'Mail_templates/bt_mail_notification.html',
         {
             'application': application,
             'application_status': application_status,
@@ -60,21 +59,18 @@ def approved_or_rejected_notification(sent_app, appr_rejct_user, approval_status
     approval_status = approval_status
     
     if application.application_status == 'settled':
-        receipient_list = [application_author.email,]
+        receipient_list = [application_author.email, application.target_user.email]
         mail_subject = \
             f'Wniosek nr {application_number} został rozliczony i finalnie zaakceptowany'
         application_to_be_booked_notification(sent_app)
         
-        print(f'Wniosek {application_number} został rozliczony i finalnie zaakceptowany')
-
     else:
-
-        receipient_list = [application_author.email]
+        receipient_list = [application_author.email, application.target_user.email]
         mail_subject = f'Wniosek nr {application_number} został {approval_status}.'
 
 
     html_content = render_to_string(
-        'bt_mail_approved_rejected_notification.html',
+        'Mail_templates/bt_mail_approved_rejected_notification.html',
         {
             'application': application,
             'approval_status': approval_status,
@@ -117,7 +113,7 @@ def application_to_be_booked_notification(sent_app):
         print('utworzono listę załączników {attachments}')
 
     html_content = render_to_string(
-        'bt_mail_acoounting_notification.html',
+        'Mail_templates/bt_mail_acoounting_notification.html',
         {
             'application': application,
         }

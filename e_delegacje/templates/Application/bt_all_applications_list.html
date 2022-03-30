@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="pb-3">Wszystkie wnioski</h2>
+<div class="row mb-4">
+
+
+    <div class="col-2 align-self-end">
+            <a type="button"
+               class="btn btn-outline-secondary d-grid"
+               href="{% url 'e_delegacje:index' %}"
+               style="font-size: 13px"
+            >
+                Powrót
+            </a>
+        </div>
+
+</div>
+
+<div class="row"></div>
+<div class="row py-6 my-6">
+    <div class="col-2">
+
+                <a class="btn btn-sm btn-outline-secondary d-flex" 
+                href="{% url 'e_delegacje:applications-all-list' %}" role="button">
+                    Wyczyść filtr
+            </a>
+     
+    </div>
+    <div class="col input-group mb-3">
+        
+        <input 
+            type="date" 
+            class="form-control"
+       
+            id="start_date"
+            >
+        <button class="btn btn-sm btn-outline-secondary d-flex" onclick="filter_all_applications(this)"
+            role="button">
+                Wyszukaj datę
+    </button>
+       
+    </div>
+    </div>
+    <table class="table table-secondary table-hover table-responsive-sm">
+
+    <thead>
+        <tr class="fw-bold table-active">
+            <th>
+                  <p>Nr.</p>
+            </th>
+            <th>
+                <select class="form-select form-select-secondary" 
+                id="filter_comp_code_dropdown" 
+                onchange="filter_all_applications(this)">   
+                    <option value="">Spółka</option>
+                        {% for company_code in company_codes2 %}
+                            <option value="{{ company_code.pk }}"> {{ company_code.company_code }} </option>
+                        {% endfor %}                            
+                    </select>
+          </th>  
+            <th >
+                <select class="form-select form-select-secondary" 
+                id="filter_target_user_dropdown" 
+                onchange="filter_all_applications(this)">   
+                    <option value="">Pracownik</option>
+                        {% for user in taget_users2 %}
+            
+                            <option value="{{ user.pk }}"> {{ user.first_name }} 
+                                {{ user.last_name }}</option>
+                        {% endfor %}     
+                    </select>
+            </th>      
+            <th >
+                <p>Data wyjazdu</p>
+            </th>        
+                <th style="min-width: 300px;">
+                <p>Opis</p>
+            </th>
+                <th >
+                <p>Status wniosku</p>
+            </th>
+
+        </tr>
+    </thead>
+    <tbody id="all_applications_table_body"        
+            data-users-url="{% url 'e_delegacje:all-applications-filter' %}" 
+            novalidate>
+        <tr><td colspan="9"></td></tr>
+
+        {% for item in object_list %}
+
+                <tr>
+                    <td>
+                       <strong> {{ item.id }} </strong>
+                    </td>
+                    <td>
+                        {{ item.bt_company_code.company_code }}
+                    </td>
+                    <td>
+                        {{ item.target_user }}
+                    </td>
+                    {% if item.bt_applications_settlements.bt_application_info %}
+                    <td style="min-width: 200px;">
+                        {{ item.bt_applications_settlements.bt_application_info.bt_start_date.isoformat }} -
+                        {{ item.bt_applications_settlements.bt_application_info.bt_end_date.isoformat }}                         
+                    </td>
+                    {% else %}
+                    <td style="min-width: 200px;">
+                        <u>Planowana data:</u><br>
+                        {{ item.planned_start_date.isoformat }} - 
+                        {{ item.planned_start_date.isoformat }}                         
+                    </td>
+                    {% endif %}
+                    <td style="min-width: 300px;">
+                        {{ item.trip_purpose_text }}
+                    </td>
+
+                    <td>
+                        {% if item.application_status == 'canceled' %}
+                            <p class="text-danger"><b>{{ item.get_application_status_display }}</b></p>
+                        {% elif item.application_status == 'settled' %}
+                            <p class="text-success"><b>{{ item.get_application_status_display }}</b></p>
+                        {% else  %}
+                        <p class="text-secondary"><b>{{ item.get_application_status_display }}</b></p>
+                        {% endif%}
+            
+                    </td>
+
+
+
+
+
+                    </tr>
+
+   
+
+        {% endfor %}
+    </tbody>
+    </table>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script>
+
+    function filter_all_applications(element) { 
+     
+        
+        var url = document.getElementById('all_applications_table_body').attributes[1].value
+        var target_user = document.getElementById('filter_target_user_dropdown').value; // taking target_user from HTML element
+        var c_code = document.getElementById('filter_comp_code_dropdown').value; // taking c_code from HTML element
+        var start_date = document.getElementById('start_date').value; // taking start_date from HTML element
+     
+
+        $.ajax({
+            url: url,
+            data: {
+                    'target_user': target_user,  // add the target_user id to the GET parameters
+                    'c_code': c_code,  // add the company code id to the GET parameters
+                    'start_date': start_date,  // add the application_status to the GET parameters
+                    },
+                        success: function (data) {   // `data` is the return of the `load_costcenters` view function
+                $("#all_applications_table_body").html(data);  // replace the contents of the id_CostCenter input with the data that came from the server
+                }
+
+        })
+    
+    }
+
+ </script>
+{% endblock %}
+

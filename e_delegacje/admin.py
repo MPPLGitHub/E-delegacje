@@ -1,5 +1,5 @@
+""" List of models registered in Django Admin. """
 from django.contrib import admin
-from setup.models import BtMileageRates, BtDelegationRate
 from e_delegacje.models import (
     BtApplication,
     BtApplicationSettlement,
@@ -8,10 +8,6 @@ from e_delegacje.models import (
     BtApplicationSettlementInfo,
     BtApplicationSettlementMileage,
     BtSubmissionStatus,
-#    BtRatesTax,
-#    BtMileageRates,
-
-
 )
 
 admin.site.register(BtApplication)
@@ -21,5 +17,5 @@ admin.site.register(BtApplicationSettlementCost)
 admin.site.register(BtApplicationSettlementMileage)
 admin.site.register(BtApplicationSettlementFeeding)
 admin.site.register(BtSubmissionStatus)
-
+# admin.site.site_url = "/travel-management/e-delegacje"
 

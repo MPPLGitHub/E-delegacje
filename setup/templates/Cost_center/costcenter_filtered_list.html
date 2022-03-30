@@ -1,0 +1,15 @@
+<table class="table table-sm table-hover">
+    <tbody>
+        {% for cost_center in filtered_cost_centers %}
+        <tr class="table table-sm table-hover">
+
+            <td><a href="{% url 'setup:costcenter-details-view' pk=cost_center.pk %}">{{ cost_center.text }}</a></td>
+            <td><a>     {{ cost_center.cost_center_number}}</a></td>
+            <td><a>     {{ cost_center.profit_center_id }}</a></td>
+            <td><a>     {{ cost_center.company_code }}</a></td>
+        </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+
+

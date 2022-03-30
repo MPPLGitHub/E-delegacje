@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+    <h3>Autoryzacje - Szczegóły</h3>
+    <br><hr><br>
+    <table>
+        <tr>
+            <th style="width: 200;">
+                <p> User: </p>
+            </th>
+            <td><p>{{ object.user_id.first_name }} {{ object.user_id.last_name }}</p></td>
+        </tr>
+        <tr>
+            <th style="width: 200;">
+                <p> Company Code: </p>
+            </th>
+            <td><p>{{ object.company_code.company_code }}</p></td>
+        </tr>
+        <tr>
+            <th style="width: 200;">
+                <p>MPK: </p>
+            </th>
+            <td>
+                <p>{{ object.cost_center }}</p>
+            </td>
+        </tr>
+    </table>  
+
+    <a class="btn btn-outline-secondary" href="{% url 'setup:authorisations-list'%}" role="button">
+        Powrót
+    </a>
+    <a class="btn btn-outline-warning" href="{% url 'setup:authorisations-update' pk=object.id %}" role="button">
+        Edytuj
+    </a>
+    <a class="btn btn-outline-danger" href="{% url 'setup:authorisations-delete' pk=object.id %}" role="button">
+        Usuń
+    </a>
+{% endblock %}

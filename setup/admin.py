@@ -10,22 +10,27 @@ from setup.models import (
     BtMileageRates,
     BtDelegationRate,
     BtCurrency,
-    BtCountry
+    BtCountry,
+    BtCompanyCode,
+    BtUserAuthorisation,
+    BtOrder
 )
 from setup.forms import BtUserCreationForm
 
 
 class BtUserAdmin(UserAdmin):
     add_form = BtUserCreationForm
-    list_display = ('username', 'first_name', 'last_name', 'manager', 'id','group')
+    list_display = ('first_name', 'last_name','manager', 'id','vendor_id','group')
     fieldsets = ((None, {'fields': ('username',
                                     'password',
                                     'first_name',
                                     'last_name',
                                     'email',
+                                    'company_code',
                                     'department',
                                     'manager',
                                     'employee_level',
+                                    'vendor_id',
                                     'group',
                                     'is_superuser',
                                     'is_staff',
@@ -39,10 +44,12 @@ class BtUserAdmin(UserAdmin):
                    'first_name',
                    'last_name',
                    'email',
+                   'company_code',
                    'department',
                    'manager',
                    'employee_level',
                    'group',
+                   'vendor_id',
                    'is_superuser',
                    'is_staff',
                    'is_active',
@@ -53,7 +60,7 @@ class BtUserAdmin(UserAdmin):
     ordering = ('id',)
 
 admin.site.register(BtUser, BtUserAdmin)
-# admin.site.register(BtUser)
+admin.site.register(BtCompanyCode)
 admin.site.register(BtRegion)
 admin.site.register(BtLocation)
 admin.site.register(BtCostCenter)
@@ -63,3 +70,9 @@ admin.site.register(BtDivision)
 admin.site.register(BtDelegationRate)
 admin.site.register(BtCurrency)
 admin.site.register(BtCountry)
+admin.site.register(BtUserAuthorisation)
+admin.site.register(BtOrder)
+
+admin.AdminSite.site_url = '/travel-management/e-delegacje'
+
+

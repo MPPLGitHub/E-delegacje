@@ -1,15 +1,18 @@
-import datetime
-from django.core.exceptions import ValidationError
+""" Forms classes for e_delegacje"""
 
+import datetime
+from urllib import request
+from django.core.exceptions import ValidationError
 from django.forms.models import inlineformset_factory
 from django.forms import MultiWidget
+from django.http import QueryDict
 from e_delegacje.models import (
     BtApplicationSettlement,
     BtApplicationSettlementFeeding,
     BtApplicationSettlementInfo,
     BtApplication
 )
-from setup.models import BtMileageRates, BtUser, BtCostCenter, BtCurrency, BtCountry
+from setup.models import BtCompanyCode, BtMileageRates, BtUser, BtCostCenter, BtCurrency, BtCountry, BtUserAuthorisation
 
 from django.core.mail import EmailMultiAlternatives
 from django import forms
@@ -30,36 +33,65 @@ class TimeInputWidget(forms.TimeInput):
     input_type = 'time'
 
 
-# class CurrentDatetimeHiddenWidget:
-#     forms.CharField.widget = forms.HiddenInput()
-
-
 class BtCompletedAttributesWidget(forms.TypedChoiceField.widget):
     forms.TypedChoiceField.widget(attrs={'onchange': "ChangeAtributesRequied()", 'id': 'id_bt_completed'})
 
 
 class BtApplicationForm(forms.ModelForm):
+    target_user = forms.ModelChoiceField(
+        queryset=BtUser.objects.all(),
+        error_messages={'required': 'To pole musi być wypełnione'},
+        label="Delegowany"
+    )
+    bt_company_code = forms.ModelChoiceField(
+        queryset=BtCompanyCode.objects.all(),
+        error_messages={'required': 'To pole musi być wypełnione'},
+        
+        label="Wybierz spółkę",
+    )
     bt_country = forms.ModelChoiceField(
         queryset=BtCountry.objects.all(),
         label="Wybierz kraj",
+        error_messages={'required': 'To pole musi być wypełnione'},
+        
         initial=BtCountry.objects.get(id=1)
     )
-    target_user = forms.ModelChoiceField(
-        queryset=BtUser.objects.all(),
-        label="Delegowany")
     trip_purpose_text = forms.CharField(
         max_length=250,
         widget=forms.Textarea(attrs={'rows': 3}),
-        label="Cel podrózy")
-    CostCenter = forms.ModelChoiceField(queryset=BtCostCenter.objects.all(), label="Cost Center")
-    transport_type = forms.TypedChoiceField(choices=BtTransportType.choices, label="Rodzaj transportu",)
-    travel_route = forms.CharField(max_length=120, widget=forms.Textarea(attrs={'rows': 1}), label="Trasa podróży")
+        error_messages={'required': 'To pole musi być wypełnione'},
+        help_text='',
+        label="Cel podróży")
+    CostCenter = forms.ModelChoiceField(
+        queryset=BtCostCenter.objects.all(), 
+        error_messages={'required': 'To pole musi być wypełnione'},
+        help_text='',
+        label="Cost Center")
+    transport_type = forms.TypedChoiceField(
+        choices=BtTransportType.choices,
+        empty_value='Wybierz rodzaj transportu',
+        error_messages={
+            'required': 'To pole musi być wypełnione', 
+            'invalid_choice':'To pole musi być wypełnione'
+        },
+        label="Rodzaj transportu",)
+    travel_route = forms.CharField(
+        max_length=120, 
+        widget=forms.Textarea(attrs={'rows': 1}), 
+        error_messages={'required': 'To pole musi być wypełnione'},
+        help_text='',
+        label="Trasa podróży")
     planned_start_date = forms.DateField(
         label="Data wyjazdu",
+        initial=datetime.date.today(),
+        help_text='Domyślnie wpisana jest dzisiejsza data. Pamietaj by ją zmienić!',
         widget=DateInputWidget
     )
     planned_end_date = forms.DateField(
         label="Data powrotu",
+        error_messages={'required': 'To pole musi być wypełnione'},
+        initial=datetime.date.today(),
+        help_text='Domyślnie wpisana jest data dzisiejsza. Pamietaj by ją zmienić!',
         widget=DateInputWidget
     )
     advance_payment_currency = forms.ModelChoiceField(
@@ -68,23 +100,65 @@ class BtApplicationForm(forms.ModelForm):
         blank=True,
         initial=BtCurrency.objects.get(code='PLN')
     )
-    advance_payment = forms.DecimalField(decimal_places=2, max_digits=6, label="Zaliczka", initial=0, min_value=0)
+    advance_payment = forms.DecimalField(
+        decimal_places=2, 
+        max_digits=6, 
+        label="Zaliczka", 
+        help_text='',
+        initial=0, 
+        min_value=0)
     current_datetime = forms.CharField(widget=forms.HiddenInput())
 
     class Meta:
         model = BtApplication
-        exclude = ('employee_level',
-                   'application_author',
-                   'application_status',
-                   'application_log',
-                   'approver',
-                   'approval_date')
+        fields = ('target_user', 
+        'bt_company_code',
+        'CostCenter',
+        'trip_purpose_text',
+        'bt_country',
+        'transport_type',
+        'travel_route',
+        'planned_start_date',
+        'planned_end_date',
+        'advance_payment',
+        'advance_payment_currency',
+        'current_datetime'
+        )
+    
+    def __init__(self, *args, **kwargs):
+        # setting initial value of bt_company_code and CostCenter to empty queryset
+        super().__init__(*args, **kwargs)
+        self.fields['bt_company_code'].queryset = BtCompanyCode.objects.none()
+        self.fields['CostCenter'].queryset = BtCostCenter.objects.none()
+
+        if 'target_user' in self.data:
+        
+            try:
+                target_user = int(self.data.get('target_user'))
+                # collecting list of company codes to which target_user has authorisations set
+                c_codes_list = [cc.id for cc in BtUser.objects.get(id=target_user).company_code.all()]
+                # collecting costcenters to which target_user has authorisation
+                authorisation_list = [authorisation.cost_center.id for authorisation in BtUserAuthorisation.objects.filter(user_id=target_user)]
+                # if target_user is chosen, adding filtered querysets
+                self.fields['bt_company_code'].queryset = BtUser.objects.get(id=target_user).company_code.all()
+                self.fields['CostCenter'].queryset = BtCostCenter.objects.filter(id__in=authorisation_list)
+
+            except (ValueError, TypeError):
+                print('exception occured')
+                pass  # invalid input from the client; ignore and fallback to empty target_user queryset
+        elif self.instance.pk:
+            """when editing application"""
+            self.fields['target_user'].queryset = BtUser.objects.filter(department=self.instance.application_author.department)
+            self.fields['bt_company_code'].queryset = self.instance.target_user.company_code
+            authorisation_list = [authorisation.id for authorisation in BtUserAuthorisation.objects.filter(user_id=self.instance.target_user.id)]
+            self.fields['CostCenter'].queryset = BtCostCenter.objects.filter(id__in=authorisation_list)
 
     def clean(self):
         result = super().clean()
         if result['planned_start_date'] > result['planned_end_date']:
             raise ValidationError("Data wyjazdu musi być przed datą powrotu!")
-
+        
+        
 
 class BtApplicationSettlementForm(forms.Form):
     bt_application_id = forms.ModelChoiceField(

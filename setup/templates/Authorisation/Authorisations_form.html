@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="col-6">
+    <form 
+        class="form-control bg-light pt-3 pb-3"  
+        method="post"
+        id="authFormTemplate" 
+        data-costcenters-url="{% url 'setup:authorisations-load-costcenters' %}" 
+        data-companycodes-url="{% url 'e_delegacje:load-company-codes' %}" 
+        novalidate>
+        {% csrf_token %}
+        <div class="row">
+                <table class="table table-sm table-light " style="font-size: 12px">
+                {{ form.as_table  }}
+                </table>
+            </div>
+
+            <div class="row">
+                <div class="col-3 align-self-end">
+                    <input class="btn btn-outline-success"
+                        type="submit"
+                        value="Zapisz"
+                        style="font-size: 13px"
+                        >
+                </div>
+                <div class="col-1"></div>
+                <div class="col-3 align-self-end">
+                    <a type="button"
+                    class="btn btn-outline-secondary"
+                    href="{% url 'setup:authorisations-list' %}"
+                    style="font-size: 13px"
+                    >
+                        Powrót
+                    </a>
+                </div>
+        </div>
+
+
+    </form>
+    
+</div>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script>
+    $("#id_user_id").change(function () {
+      var url_c_codes = $("#authFormTemplate").attr("data-companycodes-url"); // get the url of the `load_company_codes` view
+      var id_user_id = $(this).val(); // get the selected target_user ID from the HTML input
+      $.ajax({                       // initialize an AJAX request
+        url: url_c_codes,                    // set the url of the request 
+        data: {
+          'id_target_user': id_user_id       // add the target_user id to the GET parameters
+        },
+        success: function (data) {   // `data` is the return of the `load_company_codes` view function
+          $("#id_company_code").html(data);  // replace the contents of the id_bt_company_code
+                                                // input with the data that came from the server
+        }
+      });
+
+    });
+  </script>
+<script>
+    $("#id_company_code").change(function () {
+      var url = $("#authFormTemplate").attr("data-costcenters-url"); // get the url of the `load_costcenters` view
+      var company_code = $(this).val(); // get the selected company_code ID from the HTML input
+      var id_user = $("#id_user_id").val() // get the selected target_user ID from the HTML input
+      $.ajax({                       // initialize an AJAX request
+        url: url,                    // set the url of the request (= localhost:8000/hr/ajax/load-cities/)
+        data: {
+          'id_target_user': id_user, // add the target_user id to the GET parameters
+          'company_code': company_code       // add the company_code id to the GET parameters
+        },
+        success: function (data) {   // `data` is the return of the `load_costcenters` view function
+          $("#id_cost_center").html(data);  // replace the contents of the id_CostCenter input with the data that came from the server
+        }
+      });
+    });
+  </script>
+
+
+{% endblock %}

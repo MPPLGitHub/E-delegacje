@@ -1,0 +1,16 @@
+
+<table class="table table-sm table-hover">
+<tbody >
+    {% for authorisation in authorisations %}
+    <tr class="table table-sm table-hover">
+
+        <td><a href="{% url 'setup:authorisations-details' pk=authorisation.pk %}">
+            {{ authorisation.user_id }}</a></td>
+        <td>{{ authorisation.company_code }}</td>
+        <td><a class="btn btn-outline-secondary d-flex" href="{% url 'setup:authorisations-update' pk=authorisation.id %}" role="button">
+            {{ authorisation.cost_center }}</a></td>
+        
+    </tr>
+{% endfor %}
+</tbody>
+</table>

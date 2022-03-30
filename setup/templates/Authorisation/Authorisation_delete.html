@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+
+<form method="POST" style="font-size: 12px">
+    {% csrf_token %}
+     <p>
+      Czy na pewno chcesz usunąć Uprawnienia dla: {{ object.user_id }} - 
+         {{ object }}?
+    </p>
+    <input class="btn btn-outline-danger" type="submit" value="Wykasuj">
+
+
+        <a class="btn btn-outline-dark" href="{% url 'setup:authorisations-details' pk=object.pk %}">
+            Anuluj
+        </a>
+
+
+
+
+
+</form>
+
+{% endblock %}

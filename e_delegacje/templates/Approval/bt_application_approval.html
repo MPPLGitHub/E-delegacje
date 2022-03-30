@@ -45,13 +45,13 @@
                 </table>
             </div>
             <div class="col-4">
-                <table class="table table-primary table-striped text-uppercase text-end" style="font-size: 12px">
+                <table class="table table-primary table-striped text-uppercase text-end" style="font-size: 14px">
                     <tbody>
                         <tr>
-                            <td class="fw-bold">Status Wniosku</td>
+                            <td class="fw-bold">Pracownik</td>
                         </tr>
                         <tr>
-                            <td colspan="2">{{ application.get_application_status_display }}</td>
+                            <td colspan="2">{{ application.target_user.first_name }} {{ application.target_user.last_name }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -64,13 +64,13 @@
                 <table class="table table-light" style="font-size: 13px">
                     <tr class="col-11 fw-bold">
 
-                        <td>Pracownik</td>
+                        <td>Status wniosku</td>
                         <td>Planowana data wyjazdu</td>
                         <td colspan="2">Planowana data powrotu</td>
 
                     </tr>
                   <tr class="col-11">
-                      <td>{{ application.target_user.first_name }} {{ application.target_user.last_name }}</td>
+                      <td>{{ application.get_application_status_display }}</td>
                       <td>{{ application.planned_start_date.isoformat }}</td>
                       <td colspan="2">{{ application.planned_end_date.isoformat }}</td>
 
@@ -255,14 +255,10 @@
         <div class="row align-content-between">
             <div class="col-3 ">
                 <h5>Zaliczka: {{ application.advance_payment|floatformat:2 }}
-                    {{ application.advance_payment_currency.text }}</h5>
+                    {{ application.advance_payment_currency.text }} i {{ advance }}</h5>
             </div>
             <div class="col-6 text-center">
-                {% if settlement_amount > 0 %}
                     <h3>{{ settlement_amount }}</h3>
-                {% else %}
-                    <h3>{{ settlement_amount }}</h3>
-                {% endif %}
             </div>
         {% if application.bt_applications_settlements %}
             <div class="col-3 text-end">

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
     <p>DETAIL VIEW</p>
-    <p>Typ pojazdu: {{ object.vehicle_type }}</p>
+    <p>Typ pojazdu: {{ object.get_vehicle_type_display }}</p>
     <p>Stawka: {{ object.rate }}</p>
 
     <a class="btn btn-outline-secondary" href="{% url 'setup:mileagetate-list-view'%}" role="button">Cofnij</a>

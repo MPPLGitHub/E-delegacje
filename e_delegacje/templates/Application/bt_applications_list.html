@@ -1,0 +1,399 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="pb-3">Lista wniosków</h2>
+<div class="row mb-4">
+
+    <div class="col-2 align-self-start">
+            <a type="button"
+               class="btn btn-outline-warning d-grid"
+               href="{% url 'e_delegacje:applications-create' %}"
+               style="font-size: 13px"
+            >
+                Nowy wniosek
+            </a>
+        </div>
+
+    <div class="col-2 align-self-end">
+            <a type="button"
+               class="btn btn-outline-secondary d-grid"
+               href="{% url 'e_delegacje:index' %}"
+               style="font-size: 13px"
+            >
+                Powrót
+            </a>
+        </div>
+
+</div>
+
+<div class="row">
+    <h4 class="pb-3">Bieżące</h4>
+    <div class="col-2">
+        <table>
+            <td>
+                <a class="btn btn-sm btn-outline-secondary d-flex" 
+                href="{% url 'e_delegacje:applications-list' %}" role="button">
+                    Wyczyść filtr
+            </a>
+            </td>
+            <td colspan="9"></td>
+        </table> 
+    </div>
+    </div>
+<div class="row">
+    <table class="table table-sm  table-hover table-responsive-sm">
+    <thead>
+        <tr class="fw-bold table-active">
+            <th>
+                <p>Nr.</p>
+            </th>
+            <th> 
+                    <select class="form-select form-select-secondary" 
+                    id="filter_c_code_dropdown_current" 
+                    onchange="filter_current(this)">   
+                        <option value="">Spółka</option>
+                            {% for company_code in company_codes1 %}
+                                <option value="{{ company_code.pk }}">{{ company_code.company_code }}</option>
+                            {% endfor %}                            
+                        </select>
+            </th>
+            <th>
+                <select class="form-select form-select-secondary" 
+                id="filter_target_user_dropdown_current" 
+                onchange="filter_current(this)">   
+                    <option value="">Pracownik</option>
+                        {% for user in taget_users1 %}
+            
+                            <option value="{{ user.pk }}"> {{ user.first_name }} 
+                                {{ user.last_name }}</option>
+                        {% endfor %}     
+                    </select>
+            </th>      
+            <th >
+                <p>Data wyjazdu</p>
+            </th>
+            <th style="min-width: 300px;">
+                <p>Opis</p>
+            </th>
+            <th class="mx-0 px-0">
+                <p>Status wniosku<br>
+                (Akceptujący)</p>
+            </th>
+                </th>
+            <th class="mx-0 px-0">
+                <p>Rozliczenie</p>
+            </th>
+            <th class="mx-0 px-0">
+                <p>Status <br>rozliczenia</p>
+            </th>
+                <th colspan="2">
+                <p>Szczegóły</p>
+            </th>
+
+        </tr>
+    </thead>
+    <tbody  id="current_table_body"        
+            data-users-url="{% url 'e_delegacje:current-applications-filter' %}" 
+            novalidate>
+    <tr>
+        <td colspan="10"></td>
+    </td></tr>
+
+        {% for item in object_list  %}
+
+            {% if item.target_user == request.user or item.application_author == request.user %}
+                {% if item.application_status not in 'settled, canceled' %}
+                <tr>
+                    <td>
+                      <strong>{{ item.id }}</strong>
+                    </td>
+                    <td>
+                        {{ item.bt_company_code.company_code }}
+                    </td>
+                    <td>
+                        {{ item.target_user }}
+                    </td>
+                    <td>
+                        {{ item.planned_start_date.isoformat }} - <br>
+                        {{ item.planned_end_date.isoformat }}
+                    </td>
+                    <td style="min-width: 300px;">
+                        {{ item.trip_purpose_text }}
+                    </td>
+                    <td class="mx-0 px-0">
+                        {% if item.application_status == 'rejected' %}
+                            <p class="text-danger"><b>{{ item.get_application_status_display }}</b></p>
+                            <span><br>({{ item.target_user.manager.first_name}} 
+                                {{ item.target_user.manager.last_name}})</span>
+                        {% elif item.application_status == 'approved' %}
+                            <p class="text-success "><b>{{ item.get_application_status_display }}</b></p>
+                            <span><br>({{ item.target_user.manager.first_name}} 
+                                {{ item.target_user.manager.last_name}})</span>
+                        {% else %}
+                            <p class="text-success "><b>{{ item.get_application_status_display }}</b>
+                            <span class="text-secondary"><br>({{ item.target_user.manager.first_name}} 
+                                {{ item.target_user.manager.last_name}})</span></p>
+                            
+                        {% endif %}
+                    </td>
+
+                    <td class="mx-0 px-0">
+                        {% if not item.bt_applications_settlements and item.application_status == 'approved' %}
+
+                          <a class="btn btn-outline-secondary"
+                             href="{% url 'e_delegacje:settlement-create' pk=item.id %}"
+                          style="font-size: 12px"
+                          >
+                            Rozlicz wniosek
+                        </a>
+                        {% elif item.bt_applications_settlements and item.application_status == 'settled' %}
+                        <a class="btn btn-outline-secondary px-0 mx-0"
+                             href="{{ item.bt_applications_settlements.get_absolute_url }}"
+                          style="font-size: 12px"
+                          >
+                            Zobacz rozliczenie wniosku
+                        </a>
+                        {% elif item.bt_applications_settlements and item.application_status == 'settlement_in_progress' %}
+                        <a class="btn btn-outline-secondary mx-0 px-1"
+                             href="{{ item.bt_applications_settlements.get_absolute_url }}"
+                          style="font-size: 12px"
+                          >
+                            Zobacz rozliczenie wniosku
+                        </a>
+                        {% endif %}
+                    </td>
+                <td class="mx-0 px-0">
+                    {% if item.bt_applications_settlements.settlement_status == 'rejected' %}
+                    <p class="text-danger"><b>{{ item.bt_applications_settlements.get_settlement_status_display }}</b></p>
+                    {% elif item.bt_applications_settlements.settlement_status == 'in_progress' %}
+                    <p class="text-warning"><b>{{ item.bt_applications_settlements.get_settlement_status_display }}</b></p>
+                    {% else %}
+                    <p class="text-secondary"><b>{{ item.bt_applications_settlements.get_settlement_status_display }}</b></p>
+                    {% endif %}
+                </td>
+                    <td class="mx-0 px-0">
+                        <a class="btn btn-outline-secondary"
+                           href="{% url 'e_delegacje:application-details' pk=item.id %}"
+                        style="font-size: 12px"
+                        >
+                            Szczegóły
+                        </a>
+
+                    </td>
+
+                     <td>
+                        {% if not item.bt_applications_settlements and item.application_status == 'rejected' %}
+
+                          <a class="btn btn-outline-secondary"
+                             href="{% url 'e_delegacje:application-update' pk=item.id %}"
+                          style="font-size: 12px"
+                          >
+
+                            Edytuj wniosek
+                        </a>
+
+                        {% endif %}
+                    </td>
+
+                    </tr>
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    </tbody>
+    </table>
+</div>
+
+<hr class="bg-success border-5 border-top border-success">
+
+<div class="row">
+    <h4 class="pb-3 text-secondary">Rozliczone lub anulowane</h4>
+    <div class="col-2">
+        <table>
+            <td>
+                <a class="btn btn-sm btn-outline-secondary d-flex" 
+                href="{% url 'e_delegacje:applications-list' %}" role="button">
+                    Wyczyść filtr
+            </a>
+            </td>
+            <td colspan="9"></td>
+        </table> 
+    </div>
+    <table class="table table-secondary table-hover table-responsive-sm">
+
+    <thead>
+        <tr class="fw-bold table-active">
+            <th>
+                  <p>Nr.</p>
+            </th>
+            <th>
+                <select class="form-select form-select-secondary" 
+                id="filter_comp_code_dropdown" 
+                onchange="filter_settled_cancelled(this)">   
+                    <option value="">Spółka</option>
+                        {% for company_code in company_codes2 %}
+                            <option value="{{ company_code.pk }}"> {{ company_code.company_code }} </option>
+                        {% endfor %}                            
+                    </select>
+          </th>  
+            <th >
+                <select class="form-select form-select-secondary" 
+                id="filter_target_user_dropdown" 
+                onchange="filter_settled_cancelled(this)">   
+                    <option value="">Pracownik</option>
+                        {% for user in taget_users2 %}
+            
+                            <option value="{{ user.pk }}"> {{ user.first_name }} 
+                                {{ user.last_name }}</option>
+                        {% endfor %}     
+                    </select>
+            </th>      
+            <th >
+                <p>Data wyjazdu</p>
+            </th>        
+                <th style="min-width: 300px;">
+                  <p>Opis</p>
+            </th>
+                <th >
+                    <select class="form-select form-select-secondary" 
+                    id="filter_application_status_dropdown" 
+                    onchange="filter_settled_cancelled(this)">   
+                        <option value="">Status wniosku</option>
+                            {% for status in application_statuses %}
+                
+                                <option value="{{ status.value }}"> {{ status.label }} </option>
+                            {% endfor %}     
+                        </select>
+            </th>
+                <th>
+                  <p>Szczegóły</p>
+            </th>
+            <th>
+                <p>Pobierz PDF</p>
+          </th>
+
+        </tr>
+    </thead>
+    <tbody id="settled_cancelled_table_body"        
+            data-users-url="{% url 'e_delegacje:settled_cancelled-applications-filter' %}" 
+            novalidate>
+        <tr><td colspan="8"></td></tr>
+
+        {% for item in object_list %}
+
+            {% if item.target_user == request.user or item.application_author == request.user %}
+                {% if item.application_status in 'settled, canceled' %}
+                <tr>
+                    <td>
+                       <strong> {{ item.id }} </strong>
+                    </td>
+                    <td>
+                        {{ item.bt_company_code.company_code }}
+                    </td>
+                    <td>
+                        {{ item.target_user }}
+                    </td>
+                    <td>
+                        {{ item.bt_applications_settlements.bt_application_info.bt_start_date.isoformat }} - <br>
+                        {{ item.bt_applications_settlements.bt_application_info.bt_end_date.isoformat }}                         
+                    </td>
+                    <td style="min-width: 300px;">
+                        {{ item.trip_purpose_text }}
+                    </td>
+
+
+                <td>
+                {% if item.application_status == 'canceled' %}
+                    <p class="text-danger"><b>{{ item.get_application_status_display }}</b></p>
+                {% else  %}
+                    <p class="text-success"><b>{{ item.get_application_status_display }}</b></p>
+                {% endif%}
+
+                </td>
+
+                    <td>
+                        <a class="btn btn-outline-secondary"
+                             href="{{ item.bt_applications_settlements.get_absolute_url }}"
+                          style="font-size: 12px"
+                          >
+                            Szczegóły
+                        </a>
+
+                    </td>
+
+                     <td>
+                      {% if item.application_status != 'canceled' %}
+                        <a class="btn btn-outline-danger rounded mx-auto d-block"
+                            style="font-size: 12px"
+                           href="{% url 'e_delegacje:pdf-in-line' pk=item.id %}"
+                           target="_blank" 
+                        >
+                            pdf
+                        </a>
+                     {% endif %} 
+                    </td>
+
+                </tr>
+
+                {% endif %}
+            {% endif %}
+
+
+
+
+        {% endfor %}
+    </tbody>
+    </table>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script>
+
+    function filter_settled_cancelled(element) { 
+        console.log(element.id, element.value)
+        
+        var url = document.getElementById('settled_cancelled_table_body').attributes[1].value
+        var target_user = document.getElementById('filter_target_user_dropdown').value; // taking c_code from HTML element
+        var c_code = document.getElementById('filter_comp_code_dropdown').value; // taking c_code from HTML element
+        var application_status = document.getElementById('filter_application_status_dropdown').value; // taking c_code from HTML element
+        console.log(c_code)
+
+        $.ajax({
+            url: url,
+            data: {
+                    'target_user': target_user,  // add the target_user id to the GET parameters
+                    'c_code': c_code,  // add the company code id to the GET parameters
+                    'application_status': application_status,  // add the application_status to the GET parameters
+                    },
+                        success: function (data) {   // `data` is the return of the `load_costcenters` view function
+                $("#settled_cancelled_table_body").html(data);  // replace the contents of the id_CostCenter input with the data that came from the server
+                }
+
+        })
+    
+    }
+
+    function filter_current(element) { 
+     
+        
+        var url = document.getElementById('current_table_body').attributes[1].value
+        var target_user = document.getElementById('filter_target_user_dropdown_current').value; // taking c_code from HTML element
+        var c_code = document.getElementById('filter_c_code_dropdown_current').value; // taking c_code from HTML element
+        
+
+        $.ajax({
+            url: url,
+            data: {
+                    'target_user': target_user,  // add the target_user id to the GET parameters
+                    'c_code': c_code,  // add the company code id to the GET parameters
+                    },
+                        success: function (data) {   // `data` is the return of the load_costcenters` view function
+                $("#current_table_body").html(data);  // replace the contents of the id_CostCenter input with the data that came from the server
+                }
+
+        })
+    
+    }
+
+    </script>
+{% endblock %}
+

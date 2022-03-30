@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+    <h3>Szczegóły Cost Center: {{ object.cost_center_number}}</h3>
+    <div class="col-6">
+        <table class="table table-hover">
+        <tr>
+            <th>
+                <p>Opis: </p>
+            </th>
+            <td>
+                <p>{{ object.text }}</p>
+            </td>
+        </tr>
+        
+        <tr>
+
+            </td>
+        </tr>
+        
+        <tr>
+            <th>
+                <p>Profit Center: </p>
+            </th>
+            <td>
+                <p>{{ object.profit_center_id }}</p>
+            </td>
+        </tr>
+        
+        <tr>
+            <th>
+                <p>Company Code: </p>
+            </th>
+            <td>
+                <p>{{ object.company_code }}</p>
+            </td>
+        </tr>
+        <tr>
+            <th>
+                <p>Zlecenie: </p>
+            </th>
+            <td>
+                <p>{{ object.order }}</p>
+            </td>
+        </tr>
+        </table>
+    </div>
+
+    <a class="btn btn-outline-secondary" href="{% url 'setup:costcenter-list-view'%}" role="button">Cofnij</a>
+{% endblock %}

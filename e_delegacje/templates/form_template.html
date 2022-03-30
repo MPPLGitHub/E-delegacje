@@ -1,17 +1,39 @@
 {% extends "base.html" %}
 {% block content %}
 <h3>Nowy wniosek</h3>
-<div class="col-6 align-items-start">
+<div class="col-6 bg-primary align-items-start">
 
-    <form class="form-control" method="post" >
+    <form 
+        class="form-control bg-light" 
+        method="post" 
+        id="formTemplate" 
+        data-costcenters-url="{% url 'e_delegacje:load-costcenters' %}" 
+        data-companycodes-url="{% url 'e_delegacje:load-company-codes' %}" 
+        novalidate>
         {% csrf_token %}
-        <div class="row">
-            <table class="table table-sm table-light " style="font-size: 12px">
-                 {{ form.as_table }}
-                </table>
+      
 
-            </div>
-            <div class="row">
+            <table class="table table-sm table-hover table-light " style="font-size: 12px">
+                 {{ form.as_table }}
+              <!-- <tbody>
+              {% for field in form %}
+                <tr>
+                      {% if not field.is_hidden %}
+                        <th>{{ field.label_tag }}</th> 
+                        <td>{{ field }}</td>
+                        <td>{{ field.errors }}
+                          {% if field.help_text %}
+                          <span><p class="help">{{ field.help_text|safe }}</p></span>
+                          {% endif %}
+                        </td>
+                      {% endif %}
+                </tr> 
+              {% endfor %}
+              </tbody> -->
+            </table>
+
+       
+        <div class="row">
                 <div class="col-3 align-self-end">
                     <input class="btn btn-outline-success"
                            type="submit"
@@ -38,9 +60,10 @@
                     >
                         Usuń wniosek
                     </a>
-          </div>
-          {% endif %}
+                </div>
+                {% endif %}
         </div>
+
 
     </form>
 </div>
@@ -52,5 +75,41 @@
   let current_datetime = date+" "+hour;
   document.getElementById("id_current_datetime").value = current_datetime;
 </script>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script>
+    $("#id_bt_company_code").change(function () {
+      var url = $("#formTemplate").attr("data-costcenters-url"); // get the url of the `load_costcenters` view
+      var company_code = $(this).val(); // get the selected company_code ID from the HTML input
+      var id_target_user = $("#id_target_user").val() // get the selected target_user ID from the HTML input
+      $.ajax({                       // initialize an AJAX request
+        url: url,                    // set the url of the request (= localhost:8000/hr/ajax/load-cities/)
+        data: {
+          'id_target_user': id_target_user, // add the target_user id to the GET parameters
+          'company_code': company_code       // add the company_code id to the GET parameters
+        },
+        success: function (data) {   // `data` is the return of the `load_costcenters` view function
+          $("#id_CostCenter").html(data);  // replace the contents of the id_CostCenter input with the data that came from the server
+        }
+      });
+    });
+  </script>
+  <script>
+    $("#id_target_user").change(function () {
+      var url_c_codes = $("#formTemplate").attr("data-companycodes-url"); // get the url of the `load_company_codes` view
+      var id_target_user = $(this).val(); // get the selected target_user ID from the HTML input
+      $.ajax({                       // initialize an AJAX request
+        url: url_c_codes,                    // set the url of the request 
+        data: {
+          'id_target_user': id_target_user       // add the target_user id to the GET parameters
+        },
+        success: function (data) {   // `data` is the return of the `load_company_codes` view function
+          $("#id_bt_company_code").html(data);  // replace the contents of the id_bt_company_code
+                                                // input with the data that came from the server
+        }
+      });
+
+    });
+  </script>
+
   {% endblock %}
 

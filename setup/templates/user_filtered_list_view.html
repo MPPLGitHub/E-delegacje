@@ -1,0 +1,21 @@
+<table class="table table-sm table-hover">
+<tbody class="mt-3">
+
+    {% for user in filtered_users %}
+    <tr class="table table-sm table-hover">
+        <td><p>{{ user.id }}</p></td>
+        <td><a href="{% url 'setup:user-details-view' pk=user.pk %}">{{ user.first_name }}  {{ user.last_name }}</a></td>
+        <td><p> {{ user.department }}</p></td>
+        <td><p> {{ user.manager.first_name }} {{ user.manager.last_name }}</p></td>
+        <td><p>{{ user.vendor_id }}</p></td>
+        <td><p>            
+            <ul style="font-size: 12px; padding: 0px;margin: 0px;">
+            {% for company in user.company_code.all %}
+                <li>{{ company.company_code }}</li>
+            {% endfor %}
+        </ul></p></td>
+
+    </tr>
+{% endfor %}
+</tbody>
+</table>

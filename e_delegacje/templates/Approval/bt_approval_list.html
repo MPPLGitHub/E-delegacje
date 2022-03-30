@@ -8,19 +8,30 @@
     <div class="row pt-4">
           {% if object_list %}
         <table class="table table-sm  table-hover">
-
+            <thead>
+                <th>Wniosek nr:</th>
+                <th>pracownik:  </th>
+                <th>Data wyjazdu:  </th>
+                <th>Opis:</th>
+                <th colspan="2"></th>
+            </thead>
         <tbody>
 
                 {% for item in object_list %}
 
             <tr>
+                    <td class="col-1 ">
+                        <strong>{{ item.id }}.</strong>
+                    </td>
+                    <td class="col-2 ">
+                        {{ item.target_user.first_name }} {{ item.target_user.last_name }}
+                    </td>
+                    <td class="col-2 ">
+                        od {{ item.planned_start_date.isoformat }} <br> do {{ item.planned_end_date.isoformat }}
                     <td class="col-3 ">
-                        <strong>Wniosek nr:</strong> {{ item.id }}
+                        {{ item.trip_purpose_text }}
                     </td>
-                    <td class="col-4 ">
-                        <strong>Opis:   </strong> {{ item.trip_purpose_text }}
-                    </td>
-                    <td class="col-5 ">
+                    <td class="col-3 ">
                       <a class="btn btn-outline-secondary d-block"
                          href="{% url 'e_delegacje:approval' pk=item.pk %}"
                       style="font-size: 14px"

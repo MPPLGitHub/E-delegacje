@@ -18,12 +18,12 @@
         </tr>
     </thead>
  <body>
-    {% for d in object_list %}
+    {% for location in object_list %}
          <tr class="table table-sm table-hover">
 
 
-          <td><a href="{% url 'setup:location-details-view' pk=d.pk %}">    {{ d.name }}</a></td>
-           <td><a>     Profit Center -{{d.profit_center}}</a></td>
+          <td><a href="{% url 'setup:location-details-view' pk=location.pk %}">    {{ location.name }}</a></td>
+           <td><a>     {{location.profit_center}}</a></td>
        </tr>
     {% endfor %}
     </body>

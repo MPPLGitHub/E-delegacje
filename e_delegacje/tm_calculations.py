@@ -2,7 +2,8 @@ from e_delegacje.enums import BtApplicationStatus
 from e_delegacje.models import (
     BtApplicationSettlementCost, 
     BtApplicationSettlementMileage, 
-    BtDelegationRate)
+    )
+from setup.models import BtDelegationRate
 import datetime
 
 def settlement_cost_sum(settlement):

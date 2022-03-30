@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+
+<div class="row justify-content-between">
+ 
+        <div class="col-8 px-6">
+            <div class="row">
+                <div class="col-4 ">
+                    
+                    <ul >
+                        <li><a class="btn btn-outline-secondary my-3 d-block" href="{% url 'setup:user-list-view' %}">
+                                Użytkownicy</a></li>
+                        <li><a class="btn btn-outline-secondary my-3 d-block" href="{% url 'setup:authorisations-list' %}">
+                                Autoryzacje - uprawnienia</a></li>
+                        <li><a class="btn btn-outline-secondary my-3 d-block" href="{% url 'setup:department-list-view' %}">
+                                Działy</a></li>
+                        <li><a class="btn btn-outline-secondary my-3 d-block" href="{% url 'setup:region-list-view' %}">
+                                Regiony</a></li>
+                        <li><a class="btn btn-outline-secondary my-3 d-block" href="{% url 'setup:division-list-view' %}">
+                                Dywizje</a></li>
+                    </ul>
+                </div>
+                <div class="col-4">
+                    <ul>
+                        <li><a class="btn btn-outline-secondary my-3 d-block" href="{% url 'setup:companycode-list' %}">
+                                Company Codes</a></li>
+                        <li><a class="btn btn-outline-secondary my-3 d-block" href="{% url 'setup:costcenter-list-view' %}">
+                                Cost Centers</a></li>
+                        <li><a class="btn btn-outline-secondary my-3 d-block" href="{% url 'setup:order-list-view' %}">
+                            Zlecenia</a></li>
+
+                        <li><a class="btn btn-outline-secondary my-3 d-block" href="{% url 'setup:location-list-view' %}">
+                                Lokalizacje</a></li>
+
+                    </ul>
+                </div>
+                <div class="col-4">
+                    <ul>
+                        <li><a class="btn btn-outline-secondary my-3 d-block" href="{% url 'setup:delegationrate-list-view' %}">
+                                Stawki delegacji</a></li>
+                        <li ><a class="btn btn-outline-secondary my-3 d-block" href="{% url 'setup:mileagetate-list-view' %}">
+                                Stawki kilometrówki</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-4">
+                    
+                    <ul>                    
+                        <li>  <a class="btn btn-outline-secondary my-3 d-block" href="/travel-management/admin/">
+                            Admin</a></li>
+                        </ul>
+
+                </div>
+            
+            </div>
+        </div>
+        <div class="col-4 pl-4" >
+            <!-- <img src="{% static 'img/bt_image.jpg' %}" alt="" width="800" height="auto" > -->
+            <img 
+                id='setup_img' 
+                style=" height: auto; width: auto;"
+                src="{% static 'img/industrial-gears-2-1563945.jpg' %}" 
+                class="rounded img-fluid" 
+                alt="" >
+        </div>
+
+</div>
+  {% endblock %}

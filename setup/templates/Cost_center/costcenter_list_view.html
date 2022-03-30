@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% block content %}
+
+
+    <h2>Lista MPK-ów</h2>
+<a type="button"
+               class="btn btn-outline-warning mb-3"
+               href="{% url 'setup:costcenter-create' %}"
+               style="font-size: 13px"
+            >
+                Nowy MPK
+            </a>
+
+
+<table class="table table-sm table-hover">
+    <thead >
+       
+            <form class="mb-3">
+                <tr><h6>Filtruj</h6></tr>
+                <tr>
+                    <td class="p-6">
+                        <div class="form-row">
+                            <div class="form-group ">
+                                <div class="input-group mr-3">
+                                <input class="form-control form-control-sm form-control-secondary" 
+                                type="search" 
+                                onchange="filter_context(this)"
+                                id = 'text_search'
+                                placeholder="Text" 
+                                aria-label=".form-control-sm example">
+    
+                            </div>              
+                        </div>
+                    </div>
+                    <td class="p-6">
+                        <div class="form-row">
+                            <div class="form-group ">
+                                <div class="input-group mr-3">
+                                <input class="form-control form-control-sm form-control-secondary" 
+                                type="search" 
+                                onchange="filter_context(this)"
+                                id = 'cost_center_search'
+                                placeholder="Cost Center" 
+                                aria-label=".form-control-sm example">
+    
+                            </div>              
+                        </div>
+                    </div>
+                    </td>
+                    </td>
+                    <td class="p-6">
+                        <select class="form-select form-select-sm form-select-secondary" 
+                        id="filter_profit_center_dropdown" 
+                        onchange="filter_context(this)">   
+                            <option value="">---------</option>
+                                {% for profit_center in profit_centers %}
+                                    <option value="{{ profit_center.pk }}">{{ profit_center }}</option>
+                                {% endfor %}                            
+                            </select>
+
+                    </td>
+                    <td class="p-6">  
+                        <select class="form-select form-select-sm form-select-secondary" 
+                        id="filter_c_code_dropdown" 
+                        onchange="filter_context(this)">   
+                            <option value="">---------</option>
+                                {% for c_code in c_codes %}
+                                    <option value="{{ c_code.pk }}">{{ c_code }}</option>
+                                {% endfor %}                            
+                            </select>
+                    </td>
+                 
+                        <td>
+                            <a class="btn btn-sm btn-outline-secondary d-flex" 
+                                href="{% url 'setup:costcenter-list-view' %}" role="button">
+                                    Wyczyść filtr
+                            </a>
+                        </td>
+                </tr>
+            </form>
+        
+        <tr>
+            
+        </tr>
+    </thead>
+
+    <tbody class="mt-3"
+    id="cost_center_table_body"
+    data-costcenters-url="{% url 'setup:costcenter-filtered-context' %}" 
+    novalidate>
+    
+        {% for cost_center in object_list %}
+        <tr class="table table-sm table-hover">
+
+            <td><a href="{% url 'setup:costcenter-details-view' pk=cost_center.pk %}">{{ cost_center.text }}</a></td>
+            <td><a>     {{ cost_center.cost_center_number}}</a></td>
+            <td><a>     {{ cost_center.profit_center_id }}</a></td>
+            <td><a>     {{ cost_center.company_code }}</a></td>
+        </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script>
+
+    function filter_context(element) { 
+               
+        var url = document.getElementById('cost_center_table_body').attributes[2].value
+        var text = document.getElementById('text_search').value; // taking text from HTML element
+        var p_center = document.getElementById('filter_profit_center_dropdown').value; // taking profit_center from HTML element
+        var c_code = document.getElementById('filter_c_code_dropdown').value; // taking company code from HTML element
+        var c_center = document.getElementById('cost_center_search').value; // taking cost center from HTML element
+        $.ajax({
+            url: url,
+            data: {
+                    'text': text,  // add the target_user id to the GET parameters
+                    'p_center': p_center,  // add the target_user id to the GET parameters
+                    'c_code': c_code,  // add the company code id to the GET parameters
+                    'c_center': c_center,    // add the cost center id to the GET parameters
+                    'element_id': element.id
+                    },
+                        success: function (data) {   // `data` is the return of the `load_costcenters` view function
+                $("#cost_center_table_body").html(data);  // replace the contents of the CostCenter input with the data that came from the server
+                }
+
+        })
+    
+    }
+
+    </script>
+{% endblock %}
+

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+    <h3>Company Code - Szczegóły</h3>
+    <br><hr><br>
+    <table>
+        <tr>
+            <th style="width: 200;">
+                <p> Company Code: </p>
+            </th>
+            <td><p>{{ object.company_code }}</p></td>
+        </tr>
+        <tr>
+            <th style="width: 200;">
+                <p>Nazwa jednostki: </p>
+            </th>
+            <td>
+                <p>{{ object.company_name }}</p>
+            </td>
+        </tr>
+    </table>  
+
+    <a class="btn btn-outline-secondary" href="{% url 'setup:companycode-list'%}" role="button">
+        Powrót
+    </a>
+    <a class="btn btn-outline-secondary" href="{% url 'setup:companycode-update' pk=object.id %}" role="button">
+        Edytuj
+    </a>
+{% endblock %}

@@ -1,0 +1,4 @@
+<option value="">---------</option>
+{% for company_code in company_codes %}
+<option value="{{ company_code.pk }}">{{ company_code }}</option>
+{% endfor %}
