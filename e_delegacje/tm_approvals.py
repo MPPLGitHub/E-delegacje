@@ -1,3 +1,4 @@
+"""Module containig approval and rejection functions"""
 from e_delegacje.enums import BtApplicationStatus
 from e_delegacje.models import (
     BtApplication,
@@ -10,6 +11,7 @@ import datetime
 from e_delegacje.tm_notifications import approved_or_rejected_notification, new_application_notification
 
 def bt_application_approved(request, pk):
+
     bt_application = BtApplication.objects.get(id=pk)
     rejection_reason = ""
     if bt_application.application_status == BtApplicationStatus.in_progress.value:

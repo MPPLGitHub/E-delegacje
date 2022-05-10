@@ -81,7 +81,7 @@
                         <tr class="fw-bold">
 
                             <td>Kraj</td>
-                            <td>Trasa podrózy</td>
+                            <td>Trasa podróży</td>
                             <td>Rodzaj transportu</td>
                             <td>Cost center</td>
 
@@ -255,12 +255,13 @@
         <div class="row align-content-between">
             <div class="col-3 ">
                 <h5>Zaliczka: {{ application.advance_payment|floatformat:2 }}
-                    {{ application.advance_payment_currency.text }} i {{ advance }}</h5>
-            </div>
+                    {{ application.advance_payment_currency.text }} </h5>
+            </div>        
+            {% if application.bt_applications_settlements %}
             <div class="col-6 text-center">
                     <h3>{{ settlement_amount }}</h3>
             </div>
-        {% if application.bt_applications_settlements %}
+
             <div class="col-3 text-end">
                 <h5>Suma kosztów: {{ total_costs|floatformat:2 }} zł.</h5>
             </div>

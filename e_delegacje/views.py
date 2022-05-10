@@ -115,8 +115,8 @@ class BtApplicationCreateView(LoginRequiredMixin,View):
             current_datetime = form.cleaned_data['current_datetime']
             application_log = f'''
                     Wniosek o delegację utworzony przez: {application_author} - {current_datetime}
-                    \n-----\nS
-                    kierowany do akceptacji do: {target_user.manager.first_name} {target_user.manager.last_name}
+                    \n-----\n
+                    Skierowany do akceptacji do: {target_user.manager.first_name} {target_user.manager.last_name}
                     \n-----\n
                     '''
 
@@ -213,26 +213,37 @@ class BtApplicationApprovalDetailView(LoginRequiredMixin, View):
     def get(self, request, pk):
 
         application = BtApplication.objects.get(id=pk)
+        advance = application.advance_payment
+        cost_sum = 0
+        mileage_cost = 0
+        diet = 0
+        total_costs = 0
+        settlement_amount = 0
         rejected_form = BtRejectionForm()
         approved_form = BtApprovedForm()
         try:
-            set_pk = application.bt_applications_settlements.id      
-            settlement = BtApplicationSettlement.objects.get(id=set_pk)
+            settlement_pk = application.bt_applications_settlements.id    
+            settlement = BtApplicationSettlement.objects.get(id=settlement_pk)
             advance = float(settlement.bt_application_id.advance_payment)
             cost_sum = float(settlement_cost_sum(BtApplicationSettlement.objects.get(pk=settlement.id)))
             mileage_cost = float(mileage_cost_sum(BtApplicationSettlement.objects.get(pk=settlement.id)))
+            print('mileage_cost',mileage_cost)
             if settlement.bt_application_id.bt_country.country_name.lower() == 'polska':
                 diet = diet_reconciliation_poland(settlement)
             else:
                 diet = diet_reconciliation_abroad(settlement)
+            print('diet',diet)
             total_costs = cost_sum + mileage_cost + diet
+            print('total_costs',total_costs)
             settlement_amount = round(advance - total_costs, 2)
+            print('settlement_amount',settlement_amount)
             if settlement_amount < 0:
                 settlement_amount = f'Do zwrotu dla pracownika: {abs(settlement_amount)} ' \
                                     f'{settlement.bt_application_id.advance_payment_currency.text}.'
             else:
                 settlement_amount = f'Do zapłaty przez pracownika: {settlement_amount} ' \
                                     f'{settlement.bt_application_id.advance_payment_currency.text}'
+            print('settlement_amount',settlement_amount)
             return render(
                 request,
                 template_name="bt_application_approval.html",
@@ -252,7 +263,14 @@ class BtApplicationApprovalDetailView(LoginRequiredMixin, View):
             return render(
                 request,
                 template_name="Approval/bt_application_approval.html",
-                context={'application': application, 
+                context={
+                    'application': application, 
+                    'cost_sum': round(cost_sum, 2),
+                    'total_costs': round(total_costs, 2),
+                    'advance': advance,
+                    'settlement_amount': settlement_amount,
+                    'mileage_cost': mileage_cost,
+                    'diet': diet,
                 'rejected_form': rejected_form, 
                 'approved_form': approved_form})
 
@@ -379,7 +397,8 @@ class BtApprovalListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['settlements'] = BtApplicationSettlement.objects.filter(
-            settlement_status=BtApplicationStatus.in_progress.value)
+            settlement_status=BtApplicationStatus.in_progress.value).filter(
+            bt_application_id__target_user__manager=self.request.user)
         return context
 
 
@@ -462,8 +481,11 @@ class BtApplicationSettlementDetailView(LoginRequiredMixin, View):
 class BtApplicationSettlementInfoCreateFormView(LoginRequiredMixin, View):
 
     def get(self, request, pk):
-        form = BtApplicationSettlementInfoForm()
         settlement = BtApplicationSettlement.objects.get(id=pk)
+        application = BtApplication.objects.get(id=settlement.bt_application_id.id)
+        form = BtApplicationSettlementInfoForm()
+        form.initial['bt_start_date'] = application.planned_start_date
+        form.initial['bt_end_date'] = application.planned_end_date
         return render(
             request,
             template_name="Settlement/settlement_subform_info.html",

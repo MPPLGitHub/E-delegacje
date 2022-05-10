@@ -26,18 +26,22 @@ from e_delegacje.enums import (
 
 
 class DateInputWidget(forms.DateInput):
+    """Changes input type in DateInput"""
     input_type = 'date'
 
 
 class TimeInputWidget(forms.TimeInput):
+    """Changes input type in Timeinput"""
     input_type = 'time'
 
 
 class BtCompletedAttributesWidget(forms.TypedChoiceField.widget):
+    """Adds attributes to TypedChoiceField """
     forms.TypedChoiceField.widget(attrs={'onchange': "ChangeAtributesRequied()", 'id': 'id_bt_completed'})
 
 
 class BtApplicationForm(forms.ModelForm):
+    """form for creating applications"""
     target_user = forms.ModelChoiceField(
         queryset=BtUser.objects.all(),
         error_messages={'required': 'To pole musi być wypełnione'},
@@ -126,13 +130,14 @@ class BtApplicationForm(forms.ModelForm):
         )
     
     def __init__(self, *args, **kwargs):
-        # setting initial value of bt_company_code and CostCenter to empty queryset
+        """setting initial value of bt_company_code and CostCenter to empty queryset
+            if target_user exist in self.data, Filters list of company codes and CostCenters to 
+            which target_user has authorisations"""
         super().__init__(*args, **kwargs)
         self.fields['bt_company_code'].queryset = BtCompanyCode.objects.none()
         self.fields['CostCenter'].queryset = BtCostCenter.objects.none()
 
         if 'target_user' in self.data:
-        
             try:
                 target_user = int(self.data.get('target_user'))
                 # collecting list of company codes to which target_user has authorisations set
@@ -154,6 +159,7 @@ class BtApplicationForm(forms.ModelForm):
             self.fields['CostCenter'].queryset = BtCostCenter.objects.filter(id__in=authorisation_list)
 
     def clean(self):
+        """planned_end_date can't be before planned_start_date"""
         result = super().clean()
         if result['planned_start_date'] > result['planned_end_date']:
             raise ValidationError("Data wyjazdu musi być przed datą powrotu!")
@@ -161,6 +167,7 @@ class BtApplicationForm(forms.ModelForm):
         
 
 class BtApplicationSettlementForm(forms.Form):
+    """Settlement form"""
     bt_application_id = forms.ModelChoiceField(
         queryset=BtApplication.objects.all(),
         label="",
@@ -169,6 +176,7 @@ class BtApplicationSettlementForm(forms.Form):
 
 
 class BtApplicationSettlementInfoForm(forms.ModelForm):
+    """Form for detailed information of settlement"""
     bt_completed = forms.TypedChoiceField(
         label="Czy delegacja się odbyła?",
         choices=[('', ''), ('tak', 'tak'), ('nie', 'nie')],
@@ -207,7 +215,7 @@ class BtApplicationSettlementInfoForm(forms.ModelForm):
     class Meta:
         model = BtApplicationSettlementInfo
         exclude = ('bt_application_settlement', 'advance_payment', 'settlement_log')
-
+    
     def clean(self):
         result = super().clean()
 
@@ -233,6 +241,7 @@ class BtApplicationSettlementInfoForm(forms.ModelForm):
 
 
 class BtApplicationSettlementCostForm(forms.Form):
+    """Settlement cost form"""
     bt_cost_category = forms.TypedChoiceField(choices=BtCostCategory.choices, label="Kategoria kosztu", initial="")
     bt_cost_description = forms.CharField(max_length=120, label="Opis")
     bt_cost_amount = forms.DecimalField(decimal_places=2, max_digits=8, label="Kwota", min_value=0)
@@ -243,6 +252,7 @@ class BtApplicationSettlementCostForm(forms.Form):
 
 
 class BtApplicationSettlementMileageForm(forms.Form):
+    """Mileage lump sum form"""
     bt_car_reg_number = forms.CharField(max_length=8, label='Numer rejestracyjny')
     bt_mileage_rate = forms.ModelChoiceField(queryset=BtMileageRates.objects.all(), label='Stawka')
     trip_start_place = forms.CharField(max_length=50, label='Miejsce wyjazdu')
@@ -254,6 +264,7 @@ class BtApplicationSettlementMileageForm(forms.Form):
 
 
 class BtApplicationSettlementFeedingForm(forms.ModelForm):
+    """Feedeing form"""
     breakfast_quantity = forms.IntegerField(label='Liczba zapewnionych śniadań', min_value=0, initial=0)
     dinner_quantity = forms.IntegerField(label='Liczba zapewnionych obiadów', min_value=0, initial=0)
     supper_quantity = forms.IntegerField(label='Liczba zapewnionych kolacji', min_value=0, initial=0)
@@ -312,6 +323,7 @@ BtApplicationSettlementFeedingFormset = inlineformset_factory(
 
 
 class BtRejectionForm(forms.Form):
+    """Rejection form"""
     application_log = forms.CharField(max_length=240,
                                       label="Przyczyna odrzucenia",
                                       widget=forms.Textarea(attrs={'rows': 5})
@@ -319,6 +331,7 @@ class BtRejectionForm(forms.Form):
 
 
 class BtApprovedForm(forms.Form):
+    """Approval form"""
     application_log = forms.CharField(max_length=240,
                                       label="Przyczyna odrzucenia",
                                       widget=forms.HiddenInput(),

@@ -1,3 +1,4 @@
+"""Module containig calculation functions"""
 from e_delegacje.enums import BtApplicationStatus
 from e_delegacje.models import (
     BtApplicationSettlementCost, 
@@ -7,6 +8,7 @@ from setup.models import BtDelegationRate
 import datetime
 
 def settlement_cost_sum(settlement):
+    """"""
     cost_sum = 0
     cost_list = BtApplicationSettlementCost.objects.filter(bt_application_settlement=settlement)
     for cost in cost_list:
