@@ -1,9 +1,7 @@
-from email import message
-from msilib import text
-from socket import timeout
+# from email import message
+# from msilib import text
+# from socket import timeout
 
-# from prompt_toolkit import application
-# from e_delegacje.enums import BtApplicationStatus
 from e_delegacje.models import BtApplicationSettlementCost
 from setup.models import BtUser
 from django.template.loader import render_to_string
@@ -101,8 +99,9 @@ def application_to_be_booked_notification(sent_app):
     attachments = []
     receipient_list = []
     for accountant in BtUser.objects.filter(group=1):
+        """collecting the list of accountants marked to receive the notifications"""
         receipient_list.append(accountant.email)
-        print(accountant.email)
+        
     
     mail_subject = \
         f'Wniosek nr {application.id} został zaakceptowany. w załączeniu dane do zaksięgowania'
@@ -110,7 +109,6 @@ def application_to_be_booked_notification(sent_app):
     for cost in BtApplicationSettlementCost.objects.\
         filter(bt_application_settlement = application.bt_applications_settlements.id):
         attachments.append(cost.attachment)
-        print('utworzono listę załączników {attachments}')
 
     html_content = render_to_string(
         'Mail_templates/bt_mail_acoounting_notification.html',
@@ -134,4 +132,38 @@ def application_to_be_booked_notification(sent_app):
     if attachments:
         for attachment in attachments:
             email.attach_file(attachment.path)
+    email.send()
+
+
+def advance_payment_notification(approved_app, approver):
+    approver=approver
+    application = approved_app
+    receipient_list = []
+    for accountant in BtUser.objects.filter(group=1):
+        """collecting the list of accountants marked to receive the notifications"""
+        receipient_list.append(accountant.email)
+    
+    mail_subject = \
+        f'Wniosek nr {application.id} został zaakceptowany. Dane do wypłaty zaliczki'
+
+    html_content = render_to_string(
+        'Mail_templates/bt_mail_advance_payment_notification.html',
+        {
+            'application': application,
+            'approver':approver,
+        }
+    )
+    text_content = strip_tags(html_content)
+
+    email = EmailMultiAlternatives(
+        # subject
+        mail_subject,
+        # content
+        text_content,
+        # from email
+        'travel-management@metro-properties.pl',
+        # receipients list
+        receipient_list
+    )
+    email.attach_alternative(html_content, 'text/html')
     email.send()

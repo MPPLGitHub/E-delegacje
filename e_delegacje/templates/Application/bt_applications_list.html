@@ -130,7 +130,7 @@
                             <span><br>({{ item.target_user.manager.first_name}} 
                                 {{ item.target_user.manager.last_name}})</span>
                         {% else %}
-                            <p class="text-success "><b>{{ item.get_application_status_display }}</b>
+                            <p class="text-warning "><b>{{ item.get_application_status_display }}</b>
                             <span class="text-secondary"><br>({{ item.target_user.manager.first_name}} 
                                 {{ item.target_user.manager.last_name}})</span></p>
                             
@@ -140,7 +140,7 @@
                     <td class="mx-0 px-0">
                         {% if not item.bt_applications_settlements and item.application_status == 'approved' %}
 
-                          <a class="btn btn-outline-secondary"
+                          <a class="btn btn-warning"
                              href="{% url 'e_delegacje:settlement-create' pk=item.id %}"
                           style="font-size: 12px"
                           >

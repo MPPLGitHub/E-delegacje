@@ -9,6 +9,10 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
+
+""" Wersja testowa aplikacji
+"""
+
 import os
 from pathlib import Path
 from delegacje import app_config
@@ -24,6 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = app_config.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
+
 # DEBUG = False
 DEBUG = True
 
@@ -77,7 +82,7 @@ WSGI_APPLICATION = 'delegacje.wsgi.application'
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
 DATABASES = app_config.DATABASES
-
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -114,13 +119,13 @@ USE_TZ = True
 """ jeśli ma działać na serwerze IIS użyj /travel-management/static/
     Jeśli ma działać na localhost użyj /static/
 """
-STATIC_URL = '/travel-management/static/'
+STATIC_URL = '/static/'
 # STATIC_URL = '/static/'
-# STATIC_ROOT = os.path.join(BASE_DIR, '/travel-management/static')
+# STATIC_ROOT = os.path.join(BASE_DIR, '/E-delegacje/static')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/travel-management/media/'
+MEDIA_URL = '/media/'
 
 #  Email sending settings
 EMAIL_HOST = app_config.EMAIL_HOST

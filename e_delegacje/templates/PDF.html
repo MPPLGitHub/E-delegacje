@@ -58,7 +58,7 @@
     </div>
     
     <div class="row mt-0 mb-1">
-        <div class="col-6" style="font-size: 14px; font-weight: normal;">
+        <div class="col-4" style="font-size: 14px; font-weight: normal;">
             <div class="row">
             <p>
                 Delegowany:
@@ -85,7 +85,7 @@
             </div>
         </div>
         <div class="col-2"></div>
-        <div class="col-4">
+        <div class="col-6">
             <table class="table table-sm table-light table-borderless pt-2"
                    >
 
@@ -93,12 +93,19 @@
                 <th class="text-center" colspan="2"><h3>Akceptacja</h3></th>
             </tr>
             <tr style="font-size: 12px; font-weight: normal;">
-                <td><p>Akceptujący: </p></td>
-                <td><p><strong>{{ object.approver.first_name }} {{ object.approver.last_name }}</strong></p></td>
-            </tr>
-            <tr style="font-size: 12px; font-weight: normal;">
-                <td><p>Data:</p></td>
+                <td><p>Akceptujący wniosek: </p></td>
+                <td><p><strong>{{ object.approver.first_name }}
+                     {{ object.approver.last_name }}</strong></p></td>
+                    <td><p>Data:</p></td>
                 <td><p><strong>{{ object.approval_date }}</strong></p></td>
+            
+            </tr>
+                        <tr style="font-size: 12px; font-weight: normal;">
+                <td><p>Akceptujący rozliczenie: </p></td>
+                <td><p><strong>{{ object.bt_applications_settlements.bt_application_info.approver.first_name }}
+                     {{ object.bt_applications_settlements.bt_application_info.approver.last_name }}</strong></p></td>
+                <td><p>Data:</p></td>
+                <td><p><strong>{{ object.bt_applications_settlements.bt_application_info.approval_date }}</strong></p></td>
             </tr>
             </table>
 

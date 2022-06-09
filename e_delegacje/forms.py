@@ -214,7 +214,7 @@ class BtApplicationSettlementInfoForm(forms.ModelForm):
 
     class Meta:
         model = BtApplicationSettlementInfo
-        exclude = ('bt_application_settlement', 'advance_payment', 'settlement_log')
+        exclude = ('bt_application_settlement', 'advance_payment', 'settlement_log', 'approver', 'approval_date')
     
     def clean(self):
         result = super().clean()

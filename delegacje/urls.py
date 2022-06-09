@@ -27,6 +27,7 @@ urlpatterns = [
     path('travel-management/setup/', include("setup.urls")),
     path('travel-management/', user_login, name='login'),
     path('travel-management/accounts/login/', user_login, name='login'),
+    path('travel-management/accounts/', include("django.contrib.auth.urls")),
 ]
 urlpatterns += staticfiles_urlpatterns()
 if settings.DEBUG:

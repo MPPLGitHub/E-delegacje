@@ -14,18 +14,21 @@
         <td>
             {{ item.target_user }}
         </td>
-        {% if item.bt_applications_settlements.bt_application_info %}
-        <td style="min-width: 200px;">
-            {{ item.bt_applications_settlements.bt_application_info.bt_start_date.isoformat }} -
-            {{ item.bt_applications_settlements.bt_application_info.bt_end_date.isoformat }}                         
-        </td>
-        {% else %}
         <td style="min-width: 200px;">
             <u>Planowana data:</u><br>
             {{ item.planned_start_date.isoformat }} - 
-            {{ item.planned_start_date.isoformat }}                         
+            {{ item.planned_end_date.isoformat }}                         
+        
+
+        {% if item.bt_applications_settlements.bt_application_info %}
+        <br>
+            <u>Data wyjazdu:<br></u>
+            {{ item.bt_applications_settlements.bt_application_info.bt_start_date.isoformat }} -
+            {{ item.bt_applications_settlements.bt_application_info.bt_end_date.isoformat }}                         
+            {% endif %}
+        
         </td>
-        {% endif %}
+        
         <td style="min-width: 300px;">
             {{ item.trip_purpose_text }}
         </td>

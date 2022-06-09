@@ -85,6 +85,12 @@ class BtApplicationSettlementInfo(models.Model):
     )
     settlement_exchange_rate = models.DecimalField(decimal_places=5, max_digits=8,null=True, blank=True)
     settlement_log = models.CharField(max_length=2400)
+    approver = models.ForeignKey(BtUser,
+                                on_delete=models.PROTECT,
+                                related_name='bt_settlement_approver',
+                                null=True,
+                                blank=True)
+    approval_date = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
         return f'Informacje {self.id} do rozliczenia wniosku {self.bt_application_settlement}'

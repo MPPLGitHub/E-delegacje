@@ -35,7 +35,8 @@ from e_delegacje.views import (
     load_settled_cancelled_filter,
     load_current_filter,
     load_all_applications_filter,
-    BtAllApplicationListView
+    BtAllApplicationListView,
+    BtApprovaHistorylListView
 )
 
 app_name = 'e_delegacje'
@@ -72,6 +73,7 @@ urlpatterns = [
     # Approvals
     path('approve/<pk>', BtApplicationApprovalDetailView.as_view(), name='approval'),
     path('approval-list', BtApprovalListView.as_view(), name='approval-list'),
+    path('approval-history', BtApprovaHistorylListView.as_view(), name='approval-history'),
     path('application-approved/<pk>', bt_application_approved, name='application-approved'),
     path('application-rejected/<pk>', bt_application_rejected, name='application-rejected'),
     path('settlement-approved/<pk>', bt_settlement_approved, name='settlement-approved'),

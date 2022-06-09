@@ -1,4 +1,3 @@
-from unicodedata import name
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
@@ -39,7 +38,9 @@ from setup.views import (
     BtDepartmentUpdateView,
     user_login,
     user_logout,
-    MyPasswordResetDoneView,
+    PasswordResetView,
+    PasswordResetDoneView,
+    MyPasswordChangeDoneView,
     MyPasswordChangeView,
     BtLocationFormView,
     upload,
@@ -120,7 +121,9 @@ urlpatterns = [
     path('login/', user_login, name='login'),
     path('logout/', user_logout, name='logout'),
     path('password-change/', MyPasswordChangeView.as_view(), name='password-change'),
-    path('password-change/done/', MyPasswordResetDoneView.as_view(),  name='password-change-done'),
+    path('password-reset/', PasswordResetView.as_view(), name='password-reset'),
+    path('password-reset/done/', PasswordResetDoneView.as_view(),  name='password-reset-done'),
+    path('password-change/done/', MyPasswordChangeDoneView.as_view(),  name='password-change-done'),
 
     path('upload/', upload, name='upload'),
 
