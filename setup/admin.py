@@ -73,6 +73,6 @@ admin.site.register(BtCountry)
 admin.site.register(BtUserAuthorisation)
 admin.site.register(BtOrder)
 
-admin.AdminSite.site_url = '/travel-management/e-delegacje'
+admin.AdminSite.site_url = '/prod/e-delegacje'
 
 

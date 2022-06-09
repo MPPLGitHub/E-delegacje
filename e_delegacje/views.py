@@ -864,8 +864,8 @@ class CustomWeasyTemplateResponse(LoginRequiredMixin, WeasyTemplateResponse):
 class PrintInLinePDFView(WeasyTemplateResponseMixin, CreatePDF):
     # output of MyModelView rendered as PDF with hardcoded CSS
     pdf_stylesheets = [
-        # settings.STATIC_ROOT + '/css/bootstrap.css',
-        settings.STATICFILES_DIRS[0] + '/css/bootstrap.css',
+        settings.STATIC_ROOT + '/css/bootstrap.css',
+        # settings.STATICFILES_DIRS[0] + '/css/bootstrap.css',
     ]
     # show pdf in-line (default: True, show download dialog)
     pdf_attachment = False
@@ -880,8 +880,8 @@ class PrintInLinePDFView(WeasyTemplateResponseMixin, CreatePDF):
 class DownloadPDFView(WeasyTemplateResponseMixin, CreatePDF):
     # suggested filename (is required for attachment/download!)
     pdf_stylesheets = [
-        # settings.STATIC_ROOT + '/css/bootstrap.css',
-        settings.STATICFILES_DIRS[0] + '/css/bootstrap.css',
+        settings.STATIC_ROOT + '/css/bootstrap.css',
+        # settings.STATICFILES_DIRS[0] + '/css/bootstrap.css',
     ]
     # show pdf in-line (default: True, show download dialog)
     pdf_attachment = True

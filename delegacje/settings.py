@@ -29,8 +29,8 @@ SECRET_KEY = app_config.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-# DEBUG = False
-DEBUG = True
+DEBUG = False
+# DEBUG = True
 
 ALLOWED_HOSTS = app_config.ALLOWED_HOSTS
 
@@ -101,7 +101,7 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-LOGIN_URL = '/travel-management/accounts/login/'
+LOGIN_URL = '/prod/accounts/login/'
 
 
 # Internationalization
@@ -116,13 +116,13 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-""" jeśli ma działać na serwerze IIS użyj /travel-management/static/
+""" jeśli ma działać na serwerze IIS użyj /prod/static/
     Jeśli ma działać na localhost użyj /static/
 """
 STATIC_URL = '/static/'
 # STATIC_URL = '/static/'
-# STATIC_ROOT = os.path.join(BASE_DIR, '/E-delegacje/static')
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATIC_ROOT = os.path.join(BASE_DIR, '/E-delegacje/static')
+# STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'

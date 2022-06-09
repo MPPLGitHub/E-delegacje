@@ -22,12 +22,12 @@ from setup.views import user_login
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 urlpatterns = [
-    path('travel-management/admin/', admin.site.urls),
-    path('travel-management/e-delegacje/', include("e_delegacje.urls")),
-    path('travel-management/setup/', include("setup.urls")),
-    path('travel-management/', user_login, name='login'),
-    path('travel-management/accounts/login/', user_login, name='login'),
-    path('travel-management/accounts/', include("django.contrib.auth.urls")),
+    path('prod/admin/', admin.site.urls),
+    path('prod/e-delegacje/', include("e_delegacje.urls")),
+    path('prod/setup/', include("setup.urls")),
+    path('prod/', user_login, name='login'),
+    path('prod/accounts/login/', user_login, name='login'),
+    path('prod/accounts/', include("django.contrib.auth.urls")),
 ]
 urlpatterns += staticfiles_urlpatterns()
 if settings.DEBUG:
