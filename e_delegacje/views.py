@@ -401,7 +401,7 @@ class BtApprovaHistorylListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         user_cost_center = BtUser.objects.get(id = self.request.user.id).department.cost_center
         return BtApplication.objects.filter(
-            application_status=BtApplicationStatus.in_progress.value).filter(
+            application_status=BtApplicationStatus.approved.value).filter(
             CostCenter=user_cost_center)
 
 # Settlement Views

@@ -33,7 +33,7 @@
                     </td>
                     <td class="col-3 ">
                       <a class="btn btn-outline-secondary d-block"
-                         href="{% url 'e_delegacje:application-details' pk=item.pk %}"
+                         href="{% url 'e_delegacje:settlement-details' pk=item.pk %}"
                       style="font-size: 14px"
                       >
                         Szczegóły wniosku
@@ -44,7 +44,7 @@
 
             {% endfor %}
             {% else %}
-                <h6 class="offset-1 mt-2 pt-2"> Brak wniosków do akceptacji </h6>
+                <h6 class="offset-1 mt-2 pt-2"> Brak wnioskó do wyświetlenia </h6>
             {% endif %}
 
         </tbody>
@@ -53,51 +53,16 @@
     </div>
 
 
-<h2>Rozliczenia delegacji</h2>
-
-    <div class="row pt-4">
-        {% if settlements %}
-            <table class="table table-sm  table-hover">
-
-            <tbody>
-
-                {% for settlement in settlements %}
-                <tr>
-                        <td class="col-3 ">
-                            <strong>Wniosek nr: </strong>{{ settlement.bt_application_id.id }}
-                        </td>
-                        <td class="col-4 ">
-                            <strong>Opis:   </strong> {{ settlement.bt_application_id.trip_purpose_text }}
-                        </td>
-                        <td class="col-5 ">
-                          <a class="btn btn-outline-secondary d-block"
-                             href="{% url 'e_delegacje:approval' pk=settlement.bt_application_id.id %}"
-                          style="font-size: 14px"
-                          >
-                            Zweryfikuj rozliczenie
-                        </a>
-
-                            </td>
-                    </tr>
-
-                {% endfor %}
-            </tbody>
-            </table>
-        {% else %}
-            <h6 class="offset-1 mt-2 pt-2"> Brak rozliczeń do akceptacji </h6>
-        {% endif %}
-    <hr>
-    </div>
-
     <div class="row">
         <div class="col-3 align-self-end">
             <a type="button"
                class="btn btn-outline-secondary d-grid"
-               href="{% url 'e_delegacje:index' %}"
+               href="{% url 'e_delegacje:approval-list' %}"
                style="font-size: 13px"
             >
                 Powrót
             </a>
+            
         </div>
     </div>
 </div>
