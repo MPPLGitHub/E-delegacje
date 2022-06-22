@@ -18,16 +18,18 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
+import delegacje
 from setup.views import user_login
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from delegacje import app_config
 
 urlpatterns = [
-    path('prod/admin/', admin.site.urls),
-    path('prod/e-delegacje/', include("e_delegacje.urls")),
-    path('prod/setup/', include("setup.urls")),
-    path('prod/', user_login, name='login'),
-    path('prod/accounts/login/', user_login, name='login'),
-    path('prod/accounts/', include("django.contrib.auth.urls")),
+    path(app_config.LINK_PREFIX + 'admin/', admin.site.urls),
+    path(app_config.LINK_PREFIX + 'e-delegacje/', include("e_delegacje.urls")),
+    path(app_config.LINK_PREFIX + 'setup/', include("setup.urls")),
+    path(app_config.LINK_PREFIX , user_login, name='login'),
+    path(app_config.LINK_PREFIX + 'accounts/login/', user_login, name='login'),
+    path(app_config.LINK_PREFIX + 'accounts/', include("django.contrib.auth.urls")),
 ]
 urlpatterns += staticfiles_urlpatterns()
 if settings.DEBUG:

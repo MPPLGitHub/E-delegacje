@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<body>
+<h2>Konta GL - lista</h2>
+        <div class="col-3 align-self-start">
+            <a type="button"
+               class="btn btn-outline-warning"
+               href="{% url 'setup:gl_account-create' %}"
+               style="font-size: 13px"
+            >
+                Nowe konto GL
+            </a>
+        </div>
+
+<table class="table table-sm table-hover">
+    <thead>
+        <tr>
+            <td>Id.</td>
+            <td>Konto GL</td>
+            <td>Opis</td>
+            <td>Kategoria</td>
+            <td>KUP/NKUP</td>
+
+
+        </tr>
+    </thead>
+
+    {% for item in object_list %}
+    <tr class="table table-sm table-hover">
+
+            <td></a>  {{item.id}}</a></td>
+            <td><a href="{% url 'setup:gl_account-update-view' pk=item.pk %}">{{item.gl_account_number}}</a></td>
+            <td></a>  {{item.description}}</a></td>
+            <td></a>  {{item.cost_category}}</a></td>
+            <td></a>  {{item.tax_category}}</a></td>
+            </tr>
+       {% endfor %}
+
+      </body>
+</table>
+
+{% endblock %}

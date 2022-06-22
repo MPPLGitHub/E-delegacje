@@ -1,11 +1,13 @@
 
+from pydoc import describe
 from pyexpat import model
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Group
 from e_delegacje.enums import (
     BtEmployeeLevel,
-    BtMileageVehicleTypes
-
+    BtMileageVehicleTypes,
+    BtCostCategory,
+    BtTaxCategory
 )
 
 class BtCompanyCode(models.Model):
@@ -132,3 +134,12 @@ class BtUserAuthorisation(models.Model):
     def __str__(self):
         return f'{self.user_id.first_name} {self.user_id.last_name} - {self.cost_center.cost_center_number}'
 
+
+class BtGLAccounts(models.Model):
+    gl_account_number = models.CharField(max_length=100)
+    description = models.CharField(max_length=100)
+    cost_category = models.CharField(max_length=40, choices=BtCostCategory.choices)
+    tax_category = models.CharField(max_length=40, choices=BtTaxCategory.choices)
+    
+    def __str__(self):
+        return f'{self.gl_account_number} - {self.cost_category}: {self.description}'

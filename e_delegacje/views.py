@@ -55,7 +55,7 @@ from e_delegacje.tm_calculations import (
     diet_reconciliation_poland,
     diet_reconciliation_abroad
     )
-from setup.models import BtCostCenter, BtDelegationRate, BtMileageRates, BtUser, BtUserAuthorisation
+from setup.models import BtCostCenter, BtDelegationRate, BtMileageRates, BtUser, BtUserAuthorisation, BtCurrency
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.template.loader import get_template
@@ -396,13 +396,13 @@ class BtApprovalListView(LoginRequiredMixin, ListView):
 class BtApprovaHistorylListView(LoginRequiredMixin, ListView):
     model = BtApplication
     template_name = "Approval/bt_approval_list_history.html"
-    ordering = ['-id']
+    # ordering = ['-id']
 
     def get_queryset(self):
         user_cost_center = BtUser.objects.get(id = self.request.user.id).department.cost_center
         return BtApplication.objects.filter(
-            application_status=BtApplicationStatus.in_progress.value).filter(
-            CostCenter=user_cost_center)
+            application_status=BtApplicationStatus.approved.value).filter(
+            CostCenter=user_cost_center).order_by('-id')
 
 # Settlement Views
 
@@ -460,7 +460,7 @@ class BtApplicationSettlementDetailView(LoginRequiredMixin, View):
         total_costs = cost_sum + mileage_cost + diet
         settlement_amount = advance - total_costs
         if settlement_amount < 0:
-            settlement_amount = f'Do zwrotu dla pracownika: {abs(settlement_amount)} ' \
+            settlement_amount = f'Do zwrotu dla pracownika: {abs(round(settlement_amount,2))} ' \
                                 f'{settlement.bt_application_id.advance_payment_currency.text}'
         else:
             settlement_amount = f'Do zapłaty przez pracownika: {settlement_amount} ' \
@@ -538,14 +538,16 @@ class BtApplicationSettlementInfoCreateFormView(LoginRequiredMixin, View):
 class BtApplicationSettlementCostCreateView(LoginRequiredMixin, View):
 
     def get(self, request, pk):
+        settlement = BtApplicationSettlement.objects.get(id=pk)
         form = BtApplicationSettlementCostForm()
+        currency = settlement.bt_application_id.advance_payment_currency.code
         cost_list = BtApplicationSettlementCost.objects.filter(
             bt_application_settlement=BtApplicationSettlement.objects.get(id=pk))
-        settlement = BtApplicationSettlement.objects.get(id=pk)
+        
         return render(
             request,
             template_name="Settlement/settlement_subform_cost.html",
-            context={"form": form, 'cost_list': cost_list, 'settlement': settlement})
+            context={"form": form, 'cost_list': cost_list, 'settlement': settlement, 'currency': currency})
 
     def post(self, request, pk, *args, **kwargs):
         settlement = BtApplicationSettlement.objects.get(id=pk)
@@ -553,13 +555,14 @@ class BtApplicationSettlementCostCreateView(LoginRequiredMixin, View):
         cost_list = BtApplicationSettlementCost.objects.filter(
             bt_application_settlement=BtApplicationSettlement.objects.get(id=pk))
         uploaded_file = request.FILES.get('attachment')
+        currency = settlement.bt_application_id.advance_payment_currency.code
 
         if form.is_valid():
             bt_application_settlement = BtApplicationSettlement.objects.get(id=pk)
             bt_cost_category = form.cleaned_data["bt_cost_category"]
             bt_cost_description = form.cleaned_data["bt_cost_description"]
             bt_cost_amount = form.cleaned_data["bt_cost_amount"]
-            bt_cost_currency = form.cleaned_data["bt_cost_currency"]
+            bt_cost_currency = settlement.bt_application_id.advance_payment_currency
             bt_cost_document_date = form.cleaned_data["bt_cost_document_date"]
             bt_cost_VAT_rate = form.cleaned_data["bt_cost_VAT_rate"]
             BtApplicationSettlementCost.objects.create(
@@ -574,10 +577,12 @@ class BtApplicationSettlementCostCreateView(LoginRequiredMixin, View):
             )
 
             return HttpResponseRedirect(reverse("e_delegacje:settlement-cost-create", args=[pk]))
-        return render(request, "Settlement/settlement_subform_cost.html", {"form": form,
-                                                                'cost_list': cost_list,
-                                                                'settlement': settlement}
-                      )
+        return render(request, "Settlement/settlement_subform_cost.html", {
+            "form": form,
+            'cost_list': cost_list,
+            'settlement': settlement,
+            'currency': currency
+            })
 
 
 class BtApplicationSettlementMileageCreateView(LoginRequiredMixin, View):

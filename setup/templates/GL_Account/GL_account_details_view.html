@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+    <h3>Szczegóły Konta GL {{ object.gl_account_number }} - {{object.description}}</h3>
+    <div class="col-6">
+        <table class="table table-hover">
+            <tr>
+                <th colspan="2">Opis:</th>
+                <td>{{ object.description }}</td>
+            </tr>
+            <tr>
+                <th colspan="2">Kategoria: </th>
+                <td>{{ object.cost_category }}</td>
+            </tr>
+            <tr>
+                <th colspan="2">KUP/NKUP: </th>
+                <td>{{ object.tax_category }}</td>
+            </tr>
+        </table>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-2">
+            <a class="btn btn-outline-warning" href="{% url 'setup:gl_account-update-view' pk=object.pk %}" role="button">Edytuj</a>
+        </div>
+        <div class="col-2">
+            <a class="btn btn-outline-secondary" href="{% url 'setup:gl_account-list-view'%}" role="button">Powrót</a>
+        </div>
+    </div>
+    {% endblock %}
