@@ -57,6 +57,10 @@ from setup.views import (
     BtOrderDetailView,
     BtOrderListView,
     BtOrderUpdateView,
+    BtGlAccountCreateView,
+    BtGlAccountUpdateView,
+    BtGlAccountListView,
+    BtGlAccountDetailView,
     indexsetup
 
 #    main_login,
@@ -117,6 +121,11 @@ urlpatterns = [
     path('order-details-view/<pk>', BtOrderDetailView.as_view(), name="order-details-view"),
     path('order-create-view/', BtOrderCreateView.as_view(), name="order-create"),
     path('order-update-view/<pk>', BtOrderUpdateView.as_view(), name="order-update-view"),
+
+    path('gl_account-list-view/', BtGlAccountListView.as_view(), name="gl_account-list-view"),
+    path('gl_account-details-view/<pk>', BtGlAccountDetailView.as_view(), name="gl_account-details-view"),
+    path('gl_account-create-view/', BtGlAccountCreateView.as_view(), name="gl_account-create"),
+    path('gl_account-update-view/<pk>', BtGlAccountUpdateView.as_view(), name="gl_account-update-view"),
 
     path('login/', user_login, name='login'),
     path('logout/', user_logout, name='logout'),

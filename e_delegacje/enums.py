@@ -36,10 +36,27 @@ class BtEmployeeLevel(models.TextChoices):
 
 class BtCostCategory(models.TextChoices):
     """Cost Categories"""
-    accommodation = 'accommodation', 'nocleg'
-    transport = 'transport', 'dojazd'
-    luggage = 'luggage', 'bagaż'
-    consumption = 'consumption', 'konsumpcja'
+    accommodation = 'accommodation', 'nocleg'  # musi być faktura na firmę - musi byc oddzielne księgowanie z numerem faktury w referencji
+                                               # (księgowy musi wpisać do uloadu numer vendora i numer faktury),
+    transport = 'transport', 'autostrady'
+    transport_nkup = 'transport - NKUP', 'autostrady - własny transport'
+    
+    tickets = 'bilety', 'bilety - transport publiczny'
+
+    taxi = 'taxi', 'taxi - paragon z NIPem'
+    taxi_nkup = 'taxi - NKUP', 'taxi - paragon bez NIP'
+
+    parking = 'parking', 'Parking - paragon z NIPem'
+    parking_nkup = 'parking - NKUP', 'Parking - paragon bez NIP'
+
+    mileage = 'ryczałt', 'ryczałt za auto'
+    diet = 'dieta', 'dieta'
+
+    consumption_nkup = 'consumption - NKUP', 'konsumpcja - paragon bez NIP'
+    consumption = 'consumption', 'konsumpcja - paragon z NIPem'  # może być KUP - ale musi być sprawdzone przez księgowego cel podróży i konsumpcji
+    consumption_invoice = 'consumption - invoice', 'konsumpcja - faktura' # musi byc oddzielne księgowanie z numerem faktury w referencji(księgowy musi wpisać do uloadu numer vendora i numer faktury),
+                                                                        # musi być sprawdzone przez księgowego cel podróży i konsumpcji.
+    
 
 
 class BtVatRates(models.TextChoices):
@@ -48,6 +65,11 @@ class BtVatRates(models.TextChoices):
     W8 = 'W8', '8 %'
     WN = 'WN', 'nie dotyczy'
     W0 = 'W0', 'zwolniony'
+
+
+class BtTaxCategory(models.TextChoices):
+    KUP = 'KUP', 'Koszty podatkowe'
+    NKUP = 'NKUP', 'Koszty niepodatkowe'
 
 
 class BtMileageVehicleTypes(models.TextChoices):

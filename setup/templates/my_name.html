@@ -22,7 +22,8 @@
                 <div class="col-3 align-self-end">
                     <a type="button"
                     class="btn btn-outline-secondary"
-                    href="{% url 'setup:index' %}"
+                   
+                    href="{{request.META.HTTP_REFERER}}"
                     style="font-size: 13px"
                     >
                         Powrót

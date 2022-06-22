@@ -90,7 +90,7 @@ class BtApplicationSettlementInfo(models.Model):
                                 related_name='bt_settlement_approver',
                                 null=True,
                                 blank=True)
-    approval_date = models.CharField(max_length=100, blank=True, null=True)
+    approval_date = models.DateField(null=True, blank=True)
 
     def __str__(self):
         return f'Informacje {self.id} do rozliczenia wniosku {self.bt_application_settlement}'
@@ -115,7 +115,7 @@ class BtApplicationSettlementCost(models.Model):
     attachment = models.FileField(null=True, )
 
     def __str__(self):
-        return f'{self.bt_cost_description}'
+        return f'{self.bt_application_settlement} - {self.bt_cost_description}'
 
 
 class BtApplicationSettlementMileage(models.Model):

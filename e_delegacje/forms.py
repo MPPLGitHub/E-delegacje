@@ -245,7 +245,7 @@ class BtApplicationSettlementCostForm(forms.Form):
     bt_cost_category = forms.TypedChoiceField(choices=BtCostCategory.choices, label="Kategoria kosztu", initial="")
     bt_cost_description = forms.CharField(max_length=120, label="Opis")
     bt_cost_amount = forms.DecimalField(decimal_places=2, max_digits=8, label="Kwota", min_value=0)
-    bt_cost_currency = forms.ModelChoiceField(queryset=BtCurrency.objects.all(), label="Waluta", initial='')
+    # bt_cost_currency = forms.CharField(max_length=3, label="Waluta", initial='')
     bt_cost_document_date = forms.DateField(label="Data dokumentu", widget=DateInputWidget)
     bt_cost_VAT_rate = forms.TypedChoiceField(choices=BtVatRates.choices, label="Stawka vat")
     attachment = forms.FileField()

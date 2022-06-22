@@ -2,7 +2,7 @@
 {% block content %}
 
   <h2>Rozliczenie wniosku o delegację - koszty</h2>
-    <h5>Wniosek o delegację nr: {{ settlement.id }}</h5>
+    <h5>Wniosek o delegację nr: {{ settlement.bt_application_id.id }}</h5>
 
 <div class="container-fluid pt-3">
     <div class="row align-content-between">
@@ -56,7 +56,7 @@
                         </select>
                         </div>
                     </div>
-
+                    <div class="mb-3">
                     <div class="input-group mb-3 ">
                         <input type="number"
                                class="form-control"
@@ -66,15 +66,12 @@
                                id="id_bt_cost_amount"
                                placeholder="Kwota Brutto"
                         >
-                    <select name="bt_cost_currency" id="bt_cost_currency" class="form-select">
-                            <option selected>Waluta</option>
-                    {% for currency in form.bt_cost_currency %}
-                        {{ currency  }}
-                    {% endfor %}
-                    </select>
-
-
-
+                        
+                            <div name="bt_cost_currency" id="bt_cost_currency" class="form-control">
+                               {{ currency }}
+                            </div>   
+                    </div>
+                        
                     </div>
                     <div class="col-auto py-2">
 

@@ -13,9 +13,11 @@ from setup.models import (
     BtCountry,
     BtCompanyCode,
     BtUserAuthorisation,
-    BtOrder
+    BtOrder,
+    BtGLAccounts
 )
 from setup.forms import BtUserCreationForm
+from delegacje import app_config
 
 
 class BtUserAdmin(UserAdmin):
@@ -72,7 +74,8 @@ admin.site.register(BtCurrency)
 admin.site.register(BtCountry)
 admin.site.register(BtUserAuthorisation)
 admin.site.register(BtOrder)
+admin.site.register(BtGLAccounts)
 
-admin.AdminSite.site_url = '/travel-management/e-delegacje'
+admin.AdminSite.site_url = '/' + app_config.LINK_PREFIX + 'e-delegacje'
 
 
