@@ -15,6 +15,7 @@
 <table class="table table-sm table-hover">
     <thead>
         <tr>
+            <td>Lp.</td>
             <td>Nazwa działu</td>
             <td>Manager</td>
             <td>Profit Center</td>
@@ -26,10 +27,11 @@
     {% for d in object_list %}
     <tr class="table table-sm table-hover">
 
-          <td><a href="{% url 'setup:department-details-view' pk=d.pk %}">{{d.name}}</a></td>
-            <td></a>  {{d.menager_id}}</a></td>
-            <td></a>  {{d.profit_center}}</a></td>
-            </tr>
+        <td></a>  {{d.id}}</a></td>  
+        <td><a href="{% url 'setup:department-details-view' pk=d.pk %}">{{d.name}}</a></td>
+        <td></a>  {{d.menager_id}}</a></td>
+        <td></a>  {{d.profit_center}}</a></td>
+    </tr>
        {% endfor %}
 
       </body>

@@ -93,6 +93,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {'min_length': 12, }
     },
     {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
@@ -100,8 +101,20 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
+    {
+        'NAME': 'delegacje.validators.NumberValidator'
+    },
+    {
+        'NAME': 'delegacje.validators.UppercaseValidator'
+    },
+    {
+        'NAME': 'delegacje.validators.LowercaseValidator'
+    },
+    {
+        'NAME': 'delegacje.validators.SymbolValidator'
+    },
 ]
-LOGIN_URL = '/travel-management/accounts/login/'
+LOGIN_URL = '/' + app_config.LINK_PREFIX + 'accounts/login/'
 
 
 # Internationalization
@@ -119,10 +132,10 @@ USE_TZ = True
 """ jeśli ma działać na serwerze IIS użyj /travel-management/static/
     Jeśli ma działać na localhost użyj /static/
 """
-STATIC_URL = '/static/'
 # STATIC_URL = '/static/'
-# STATIC_ROOT = os.path.join(BASE_DIR, '/E-delegacje/static')
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, '/E-delegacje/static')
+# STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
@@ -136,3 +149,27 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 AUTH_USER_MODEL = "setup.BtUser"
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+LOGGING = {
+    'version': 1,
+    'loggers':{
+        'django': {
+            'handlers':['file'],
+            'level':'DEBUG',
+        }
+    },
+    'handlers':{
+        'file':{
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename':'.\logs\debug2.log',
+            'formatter': 'simpleRe'
+        }
+    },
+    'formatters':{
+        'simpleRe':{
+            'format': '{levelname} {asctime} {process:d} {message} ',
+            'style': '{'
+        }
+    },
+}

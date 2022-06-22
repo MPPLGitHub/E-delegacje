@@ -16,7 +16,7 @@ def bt_application_approved(request, pk):
     bt_application = BtApplication.objects.get(id=pk)
     rejection_reason = ""
     approver = request.user.first_name+" "+request.user.last_name
-    now = datetime.datetime.now().strftime("%Y.%m.%d %H:%M:%S")
+    now = datetime.datetime.now()
     if bt_application.application_status == BtApplicationStatus.in_progress.value:
         bt_application.application_status = BtApplicationStatus.approved.value
         bt_application.application_log = \

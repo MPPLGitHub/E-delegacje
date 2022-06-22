@@ -182,7 +182,7 @@
 
 
                     <div class="row">
-                        <h5>Koszty: {{ cost_sum|floatformat:2 }} zł.</h5>
+                        <h5>Koszty: {{ cost_sum|floatformat:2 }} {{ object.bt_application_id.advance_payment_currency.text }}.</h5>
                     <hr>
                     </div>
                 {% if object.bt_application_settlement_costs.exists %}
@@ -299,7 +299,7 @@
             <div class="col-3 align-content-end">
                     <div class="row">
                         <h5 class="vIntegerField">
-                            Dieta: {{ diet|floatformat:2 }} zł.
+                            Dieta: {{ diet|floatformat:2 }} {{ object.bt_application_id.advance_payment_currency.text }}.
                         </h5>
                     <hr>
                     </div>

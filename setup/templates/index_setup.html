@@ -26,6 +26,8 @@
                     <ul>
                         <li><a class="btn btn-outline-secondary my-3 d-block" href="{% url 'setup:companycode-list' %}">
                                 Company Codes</a></li>
+                        <li><a class="btn btn-outline-secondary my-3 d-block" href="{% url 'setup:gl_account-list-view' %}">
+                            GL Accounts</a></li>
                         <li><a class="btn btn-outline-secondary my-3 d-block" href="{% url 'setup:costcenter-list-view' %}">
                                 Cost Centers</a></li>
                         <li><a class="btn btn-outline-secondary my-3 d-block" href="{% url 'setup:order-list-view' %}">
@@ -50,7 +52,7 @@
                 <div class="col-4">
                     
                     <ul>                    
-                        <li>  <a class="btn btn-outline-secondary my-3 d-block" href="/travel-management/admin/">
+                        <li>  <a class="btn btn-outline-secondary my-3 d-block" href="{% url 'admin:index' %}">
                             Admin</a></li>
                         </ul>
 

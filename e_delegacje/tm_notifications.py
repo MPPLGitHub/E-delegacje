@@ -92,7 +92,6 @@ def approved_or_rejected_notification(sent_app, appr_rejct_user, approval_status
     email.send()
    
 
-
 def application_to_be_booked_notification(sent_app):
     
     application = sent_app

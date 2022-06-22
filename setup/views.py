@@ -20,8 +20,8 @@ from setup.models import (
     BtDelegationRate,
     BtDepartment,
     BtUserAuthorisation,
-    BtOrder
-
+    BtOrder,
+    BtGLAccounts
 )
 import json
 from django.contrib.auth.decorators import login_required
@@ -490,3 +490,30 @@ class BtOrderUpdateView(LoginRequiredMixin, UpdateView):
     fields = ("name", "order", "cost_center")
     template_name = "my_name.html"
     success_url = reverse_lazy("setup:order-list-view")
+
+
+class BtGlAccountListView(LoginRequiredMixin, ListView):
+    model = BtGLAccounts
+    template_name = "GL_Account/GL_account_list_view.html"
+    
+    def get_queryset(self):
+        return BtGLAccounts.objects.order_by('id')
+
+
+class BtGlAccountDetailView(LoginRequiredMixin, DetailView):
+    model = BtGLAccounts
+    template_name = "GL_Account/GL_account_details_view.html"
+
+
+class BtGlAccountCreateView(LoginRequiredMixin, CreateView):
+    model = BtGLAccounts
+    template_name = "my_name.html"
+    fields = "__all__"
+    success_url = reverse_lazy("setup:gl_account-list-view")
+
+
+class BtGlAccountUpdateView(LoginRequiredMixin, UpdateView):
+    model = BtGLAccounts
+    fields = "__all__"
+    template_name = "my_name.html"
+    success_url = reverse_lazy("setup:gl_account-list-view")
