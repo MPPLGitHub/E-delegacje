@@ -30,6 +30,7 @@ e_delegacje/migrations
 setup/migrations
 delegacje/settings.py
 *.csv
+.vscode/
 
 
 

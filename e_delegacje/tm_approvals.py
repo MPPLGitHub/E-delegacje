@@ -69,18 +69,18 @@ def send_settlement_to_approver(request, pk):
 
 def bt_settlement_approved(request, pk):
     bt_application = BtApplication.objects.get(bt_applications_settlements__id=pk)
-    now = datetime.datetime.now().strftime("%Y.%m.%d %H:%M:%S")
+    now = datetime.datetime.now()
     bt_application.application_status = BtApplicationStatus.settled.value
     bt_application.application_log \
         += f"\n-----\nRozliczenie zaakceptowane przez: {request.user.first_name} {request.user.last_name} \n\n" \
-        + f"Data:  {now} "
+        + f"Data:  {now.strftime('%Y.%m.%d %H:%M:%S')} "
     bt_application.save()
 
     settlement = BtApplicationSettlement.objects.get(id=pk)
     settlement.settlement_status = BtApplicationStatus.approved.value
     settlement.save()
     settlement.bt_application_info.approver = request.user
-    settlement.bt_application_info.approval_date = now
+    settlement.bt_application_info.approval_date = now.strftime("%Y-%m-%d")
     settlement.bt_application_info.save()
     
     approved_or_rejected_notification(bt_application, request.user, BtApplicationStatus.approved.label,"")

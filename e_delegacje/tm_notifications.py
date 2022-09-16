@@ -138,6 +138,7 @@ def advance_payment_notification(approved_app, approver):
     approver=approver
     application = approved_app
     receipient_list = []
+    
     for accountant in BtUser.objects.filter(group=1):
         """collecting the list of accountants marked to receive the notifications"""
         receipient_list.append(accountant.email)

@@ -1,6 +1,4 @@
 
-from pydoc import describe
-from pyexpat import model
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Group
 from e_delegacje.enums import (
@@ -71,7 +69,7 @@ class BtCostCenter(models.Model):
     text = models.CharField(max_length=50)
     cost_center_number = models.CharField(max_length=10)
     profit_center_id = models.ForeignKey(BtLocation, on_delete=models.PROTECT, related_name="Bt_CostCenters")
-    company_code = models.ForeignKey(BtCompanyCode, on_delete=models.PROTECT, related_name="Bt_CostCenters")
+    company_code = models.ForeignKey(BtCompanyCode, on_delete=models.PROTECT, related_name="Bt_CostCenters", default=1)
     order = models.ForeignKey(
         BtOrder, 
         on_delete=models.PROTECT, 
@@ -103,9 +101,10 @@ class BtDelegationRate(models.Model):
     delagation_rate = models.IntegerField()
     country = models.ForeignKey(BtCountry, on_delete=models.PROTECT, related_name="Bt_Delegationrates", default=1)
     currency = models.ForeignKey(BtCurrency, on_delete=models.PROTECT, related_name="Bt_Delegationrates", default=1)    
+    start_date = models.DateField(null=True, blank=True)
 
     def __str__(self):
-        return f'{self.country.country_name} - {self.delagation_rate} {self.currency}'
+        return f'{self.country.country_name} - {self.delagation_rate} {self.currency} - start_date: {self.start_date}'
 
 
 class BtMileageRates(models.Model):

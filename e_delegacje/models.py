@@ -45,7 +45,7 @@ class BtApplication(models.Model):
                                  related_name='bt_approver',
                                  null=True,
                                  blank=True)
-    approval_date = models.CharField(max_length=15, blank=True, null=True)
+    approval_date = models.CharField(max_length=50, blank=True, null=True)
 
     def __str__(self):
         return f'Wniosek {self.id}: {self.trip_purpose_text} utworzony przez: \

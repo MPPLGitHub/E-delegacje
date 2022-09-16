@@ -79,7 +79,7 @@
               </a>
 			</li>
                 {% endif %}
-				{% if request.user.group.id == 2 %}
+				{% if request.user.group.id == 2 or 1 %}
 				<li class="nav-item">
 					<a class="nav-item nav-link text-warning hello-msg" href="{% url 'e_delegacje:applications-all-list' %}">
 						Wszystkie wnioski

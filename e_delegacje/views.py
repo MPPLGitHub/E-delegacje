@@ -396,12 +396,11 @@ class BtApprovalListView(LoginRequiredMixin, ListView):
 class BtApprovaHistorylListView(LoginRequiredMixin, ListView):
     model = BtApplication
     template_name = "Approval/bt_approval_list_history.html"
-    # ordering = ['-id']
 
     def get_queryset(self):
         user_cost_center = BtUser.objects.get(id = self.request.user.id).department.cost_center
         return BtApplication.objects.filter(
-            application_status=BtApplicationStatus.approved.value).filter(
+            application_status=BtApplicationStatus.settled.value).filter(
             CostCenter=user_cost_center).order_by('-id')
 
 # Settlement Views
@@ -757,20 +756,14 @@ class BtApplicationSettlementFeedingUpdateView(LoginRequiredMixin, SingleObjectM
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         settlement = BtApplicationSettlement.objects.get(id=self.object.id)
-        diet_amount = get_diet_amount_poland(settlement)
+        if settlement.bt_application_id.bt_country.country_name.lower() == 'polska':
+            diet = round(diet_reconciliation_poland(settlement), 2)
+        else:
+            diet = round(diet_reconciliation_abroad(settlement), 2)
 
         context['settlement'] = settlement
-        context['diet_amount'] = diet_amount
-        if settlement.bt_application_id.bt_country.country_name.lower() == 'polska':
-            context['diet'] = round(diet_reconciliation_poland(settlement), 2)
-            context['diet_rate'] = BtDelegationRate.objects.get(
-                country=settlement.bt_application_id.bt_country
-            ).delagation_rate
-        else:
-            context['diet'] = round(diet_reconciliation_abroad(settlement), 2)
-            context['diet_rate'] = BtDelegationRate.objects.get(
-                country=settlement.bt_application_id.bt_country
-            ).delagation_rate
+        context['diet_amount'] = diet
+        
         return context
 
 
@@ -869,8 +862,8 @@ class CustomWeasyTemplateResponse(LoginRequiredMixin, WeasyTemplateResponse):
 class PrintInLinePDFView(WeasyTemplateResponseMixin, CreatePDF):
     # output of MyModelView rendered as PDF with hardcoded CSS
     pdf_stylesheets = [
-        settings.STATIC_ROOT + '/css/bootstrap.css',
-        # settings.STATICFILES_DIRS[0] + '/css/bootstrap.css',
+        # settings.STATIC_ROOT + '/css/bootstrap.css',
+        settings.STATICFILES_DIRS[0] + '/css/bootstrap.css',
     ]
     # show pdf in-line (default: True, show download dialog)
     pdf_attachment = False
@@ -885,8 +878,8 @@ class PrintInLinePDFView(WeasyTemplateResponseMixin, CreatePDF):
 class DownloadPDFView(WeasyTemplateResponseMixin, CreatePDF):
     # suggested filename (is required for attachment/download!)
     pdf_stylesheets = [
-        settings.STATIC_ROOT + '/css/bootstrap.css',
-        # settings.STATICFILES_DIRS[0] + '/css/bootstrap.css',
+        # settings.STATIC_ROOT + '/css/bootstrap.css',
+        settings.STATICFILES_DIRS[0] + '/css/bootstrap.css',
     ]
     # show pdf in-line (default: True, show download dialog)
     pdf_attachment = True
@@ -994,3 +987,14 @@ def load_all_applications_filter(request):
     
     return render(request, 'Application/bt_all_applications_filtered.html', 
     {'applications': applications.order_by('-id')})
+
+
+class CreateCSVview(LoginRequiredMixin,View):
+    """View for accounting department for updateing all necessary data to prepare 
+    CSV upload to SAP system"""
+    def get(self, request):
+
+        return render(request,
+                      template_name="form_template.html",
+                      context={}
+                      )

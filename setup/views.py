@@ -98,7 +98,7 @@ class BtUserListView(LoginRequiredMixin, ListView):
     template_name = "user_list_view.html"
 
     def get_queryset(self):
-        return BtUser.objects.order_by('id')
+        return BtUser.objects.order_by('-id')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

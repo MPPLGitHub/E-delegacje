@@ -41,44 +41,58 @@ def trip_duration(settlement):
     # print(f'{settlement.bt_application_id.trip_purpose_text} trip duration: {bt_end - bt_start}')
     return bt_end - bt_start
 
+def get_delegation_rate(settlement):
+    try:
+        country = settlement.bt_application_id.bt_country
+        start_date = settlement.bt_application_info.bt_start_date
+        rate_list = [rate for rate in BtDelegationRate.objects.filter(country=country).order_by('-start_date')]
+        print(rate_list)
+        if len(rate_list) == 1:
+            result = rate_list[0]  
+        else:
+            # excliuding later started rates
+            for rate in rate_list:
+                if rate.start_date > start_date:
+                    rate_list.remove(rate)
+            result = rate_list[0]
+    except:
+        result = BtDelegationRate.objects.first()
+    return result
 
 def get_diet_amount_poland(settlement):
     bt_duration = trip_duration(settlement)
     diet = 0
-    country = settlement.bt_application_id.bt_country
+    rate = get_delegation_rate(settlement)
     if bt_duration.days < 1:
         if (bt_duration.seconds / 3600) < 8:
             diet = 0
         elif 8 <= (bt_duration.seconds / 3600) <= 12:
-            diet = BtDelegationRate.objects.get(country=country).delagation_rate / 2
+            diet = rate.delagation_rate / 2
         elif (bt_duration.seconds / 3600) >= 12:
-            diet = BtDelegationRate.objects.get(country=country).delagation_rate
+            diet = rate.delagation_rate
         else:
             print('pol poniżej żaden if')
     elif bt_duration.days >= 1:
         if (bt_duration.seconds / 3600) <= 8:
-            diet = bt_duration.days * BtDelegationRate.objects.get(country=country).delagation_rate + \
-                   BtDelegationRate.objects.get(country=country).delagation_rate / 2
+            diet = bt_duration.days * rate.delagation_rate + \
+                   rate.delagation_rate / 2
         elif 8 < (bt_duration.seconds / 3600):
-            diet = (bt_duration.days + 1) * BtDelegationRate.objects.get(country=country).delagation_rate
-        # elif (bt_duration.seconds / 3600) >= 12:
-        #     diet = (bt_duration.days + 1) * BtDelegationRate.objects.get(country=country).delagation_rate
-        # else:
-        #     print('pol powyżej żaden if')
+            diet = (bt_duration.days + 1) * rate.delagation_rate
+
     return diet
 
 
 def diet_reconciliation_poland(settlement):
     diet = get_diet_amount_poland(settlement)
-    country = settlement.bt_application_id.bt_country
+    rate = get_delegation_rate(settlement)
     if diet > 0:
         try:
             breakfasts_correction = settlement.bt_application_settlement_feeding.breakfast_quantity * \
-                                    BtDelegationRate.objects.get(country=country).delagation_rate * 0.25
+                                    rate.delagation_rate * 0.25
             dinners_correction = settlement.bt_application_settlement_feeding.dinner_quantity * \
-                                 BtDelegationRate.objects.get(country=country).delagation_rate * 0.5
+                                 rate.delagation_rate * 0.5
             suppers_correction = settlement.bt_application_settlement_feeding.supper_quantity * \
-                                 BtDelegationRate.objects.get(country=country).delagation_rate * 0.25
+                                 rate.delagation_rate * 0.25
         except:
             breakfasts_correction = 0
             dinners_correction = 0
@@ -90,29 +104,29 @@ def diet_reconciliation_poland(settlement):
 
 def get_diet_amount_abroad(settlement):
     bt_duration = trip_duration(settlement)
-    country = settlement.bt_application_id.bt_country
     diet = 0
+    rate = get_delegation_rate(settlement)
     if bt_duration.days < 1:
         if (bt_duration.seconds / 3600) <= 8:
-            diet = bt_duration.days * BtDelegationRate.objects.get(country=country).delagation_rate + \
-                   BtDelegationRate.objects.get(country=country).delagation_rate / 3
+            diet = bt_duration.days * rate.delagation_rate + \
+                   rate.delagation_rate / 3
         elif 8 < (bt_duration.seconds / 3600) <= 12:
-            diet = bt_duration.days * BtDelegationRate.objects.get(country=country).delagation_rate + \
-                   BtDelegationRate.objects.get(country=country).delagation_rate / 2
+            diet = bt_duration.days * rate.delagation_rate + \
+                   rate.delagation_rate / 2
         elif (bt_duration.seconds / 3600) > 12:
-            diet = (bt_duration.days + 1) * BtDelegationRate.objects.get(country=country).delagation_rate
+            diet = (bt_duration.days + 1) * rate.delagation_rate
         else:
             print('poniżej żaden if')
 
     elif bt_duration.days >= 1:
         if (bt_duration.seconds / 3600) <= 8:
-            diet = bt_duration.days * BtDelegationRate.objects.get(country=country).delagation_rate + \
-                   BtDelegationRate.objects.get(country=country).delagation_rate / 3
+            diet = bt_duration.days * rate.delagation_rate + \
+                   rate.delagation_rate / 3
         elif 8 < (bt_duration.seconds / 3600) <= 12:
-            diet = bt_duration.days * BtDelegationRate.objects.get(country=country).delagation_rate + \
-                   BtDelegationRate.objects.get(country=country).delagation_rate / 2
+            diet = bt_duration.days * rate.delagation_rate + \
+                   rate.delagation_rate / 2
         elif 12 < (bt_duration.seconds / 3600):
-            diet = (bt_duration.days + 1) * BtDelegationRate.objects.get(country=country).delagation_rate
+            diet = (bt_duration.days + 1) * rate.delagation_rate
         else:
             print('z powyżej żaden if')
     return diet
@@ -121,13 +135,14 @@ def get_diet_amount_abroad(settlement):
 def diet_reconciliation_abroad(settlement):
     diet = get_diet_amount_abroad(settlement)
     country = settlement.bt_application_id.bt_country
+    rate = get_delegation_rate(settlement)
     try:
         breakfasts_correction = settlement.bt_application_settlement_feeding.breakfast_quantity * \
-                                BtDelegationRate.objects.get(country=country).delagation_rate * 0.15
+                                rate.delagation_rate * 0.15
         dinners_correction = settlement.bt_application_settlement_feeding.dinner_quantity * \
-                             BtDelegationRate.objects.get(country=country).delagation_rate * 0.30
+                             rate.delagation_rate * 0.30
         suppers_correction = settlement.bt_application_settlement_feeding.supper_quantity * \
-                             BtDelegationRate.objects.get(country=country).delagation_rate * 0.30
+                             rate.delagation_rate * 0.30
     except:
         breakfasts_correction = 0
         dinners_correction = 0
