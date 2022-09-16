@@ -30,6 +30,25 @@
 			</h4></li>
                 {% endif %}
 
+                {% if request.user.group.id == 2 or 1 %}
+                <li><h4>
+                    <a class="btn btn-outline-secondary my-3 d-block" 
+                    href="{% url 'e_delegacje:applications-all-list' %}">
+                    Wszystkie wnioski
+                    </a>
+                  </h4></li>
+				{% endif %}
+				{% if request.user.group.id == 1 %}
+                <li><h4>
+                    <a class="btn btn-outline-secondary my-3 d-block" 
+                    href="{% url 'e_delegacje:ApplicationsToBeBooked-list' %}"
+                    >
+                    Do zaksięgowania
+                    </a>
+                  </h4></li>
+
+				{% endif %}
+
             </ul>
         </div>
         <div class="col-8" >

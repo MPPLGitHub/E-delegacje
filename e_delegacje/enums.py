@@ -38,15 +38,15 @@ class BtCostCategory(models.TextChoices):
     """Cost Categories"""
     accommodation = 'accommodation', 'nocleg'  # musi być faktura na firmę - musi byc oddzielne księgowanie z numerem faktury w referencji
                                                # (księgowy musi wpisać do uloadu numer vendora i numer faktury),
-    transport = 'transport', 'autostrady'
-    transport_nkup = 'transport - NKUP', 'autostrady - własny transport'
+    transport = 'transport', 'autostrady'  # 50%
+    transport_nkup = 'transport - NKUP', 'autostrady - własny transport'  # NKUP
     
-    tickets = 'bilety', 'bilety - transport publiczny'
+    tickets = 'bilety', 'bilety - transport publiczny'  # 100%
 
-    taxi = 'taxi', 'taxi - paragon z NIPem'
-    taxi_nkup = 'taxi - NKUP', 'taxi - paragon bez NIP'
+    taxi = 'taxi', 'taxi - paragon z NIPem' # 100%
+    taxi_nkup = 'taxi - NKUP', 'taxi - paragon bez NIP' #  nkup
 
-    parking = 'parking', 'Parking - paragon z NIPem'
+    parking = 'parking', 'Parking - paragon z NIPem'  # 100%
     parking_nkup = 'parking - NKUP', 'Parking - paragon bez NIP'
 
     mileage = 'ryczałt', 'ryczałt za auto'
@@ -79,3 +79,7 @@ class BtMileageVehicleTypes(models.TextChoices):
     motorbike = 'motorbike', 'motocykl'
     moped = 'moped', 'motorower'
 
+class BtBookingStatus(models.TextChoices):
+    booked_upload = 'booked - upload', 'Zaksięgowany - upload'
+    booked_manually = 'booked manually', 'Zaksięgowany - ręcznie'
+    no_booking_needed = 'No booking needed', 'Wniosek bez księgowania'

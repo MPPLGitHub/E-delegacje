@@ -19,8 +19,12 @@ def settlement_cost_sum(settlement):
 def mileage_cost_sum(settlement):
     mileage_cost = 0
     mileage_cost_list = BtApplicationSettlementMileage.objects.filter(bt_application_settlement=settlement)
-    for mileage in mileage_cost_list:
-        mileage_cost = mileage_cost + mileage.bt_mileage_rate.rate * mileage.mileage
+    try:
+        for mileage in mileage_cost_list:
+            mileage_cost = mileage_cost + mileage.amount
+    except:
+        return round(mileage_cost, 2)
+
     return round(mileage_cost, 2)
 
 def trip_duration(settlement):
@@ -133,3 +137,11 @@ def diet_reconciliation_abroad(settlement):
         dinners_correction = 0
         suppers_correction = 0
     return round(diet - breakfasts_correction - dinners_correction - suppers_correction, 2)
+
+def update_diet_amount(settlement):
+    if settlement.bt_application_id.bt_country.country_name.lower() == 'polska':
+        diet = round(diet_reconciliation_poland(settlement), 2)
+    else:
+        diet = round(diet_reconciliation_abroad(settlement), 2)
+    return diet
+

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+<div class="col-8">
+    <table class="table table-light table-striped" style="font-size: 12px">
+        <thead>
+            <tr class="fw-bold table-active">
+                <th>Kategoria</th>
+                <th>Opis kosztu</th>
+                <th>Data dokumentu</th>
+                <th>Kwota</th>
+                <th>Waluta</th>
+                <th>Stawka VAT</th>
+                <th>Załącznik</th>               
+
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+              
+                <td>{{ object.get_bt_cost_category_display }}</td>
+                <td>{{ object.bt_cost_description }}</td>
+                <td>{{ object.bt_cost_document_date }}</td>
+                <td>{{ object.bt_cost_amount|floatformat:2 }}</td>
+                <td>{{ object.bt_cost_currency }}</td>
+                <td>{{ object.get_bt_cost_VAT_rate_display }}</td>
+                
+                <td class="pt-2 ps-2" >
+                    {% if object.attachment %}
+                        <a class="btn btn-sm btn-outline-secondary"
+                            href="{{ cost.attachment.url }}"
+                            target="_blank"
+                            style="font-size: 12px"
+                        >Pokaż załącznik</a>
+                    {% endif %}
+                </td>         
+
+            </tr>
+        </tbody>
+    </table>
+</div>
+</div>
+<div class="row">
+    <div class="col-4">
+        <form class="form-control" method="post" >
+            {% csrf_token %}
+
+            <table class="table" style="font-size: 12px">
+            
+                {{ form.as_table }}
+            </table>
+            <div class="row">
+                <div class="col-2">
+                    <input 
+                    class="btn btn-outline-danger"
+                    type="submit"
+                    value="zmień"
+                    
+                    >
+                </div>
+        
+                <div class="col-2">
+                    <a class="btn btn-outline-secondary"
+                    href="{% url 'e_delegacje:create-csv-ht' pk=object.bt_application_settlement.id %}"
+                
+                    >
+                    Powrót
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+
+{% endblock content %}

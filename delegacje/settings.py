@@ -134,8 +134,8 @@ USE_TZ = True
 """
 # STATIC_URL = '/static/'
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, '/E-delegacje/static')
-# STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+# STATIC_ROOT = os.path.join(BASE_DIR, '/E-delegacje/static')
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
@@ -149,6 +149,14 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 AUTH_USER_MODEL = "setup.BtUser"
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+
+# HTTPS settings
+# CSRF_COOKIE_SECURE = True
+
+# SESSION_COOKIE_SECURE = True
+
+# SECURE_SSL_REDIRECT = True
 
 LOGGING = {
     'version': 1,

@@ -35,10 +35,26 @@ from e_delegacje.views import (
     load_settled_cancelled_filter,
     load_current_filter,
     load_all_applications_filter,
+    load_applications_to_be_booked_filter,
     BtAllApplicationListView,
-    BtApprovaHistorylListView
+    BtApprovaHistorylListView,
+    ApplicationsToBeBooked,
+    ApplicationToBeBookedDetails,
+    BtDietAmountUpdate,
+    CostCategoryUpdateView
+    
 )
-
+from e_delegacje.tm_upload_creator import (
+    set_application_as_booked_manually,
+    set_application_as_booked_upload,
+    set_application_as_no_booking_needed,
+    set_cost_tax_deductable,
+    set_cost_non_tax_deductable,
+    prepare_ht_document_upload,
+    create_invoice_document_upload,
+    download_upload
+    
+)
 app_name = 'e_delegacje'
 urlpatterns = [
 
@@ -126,8 +142,65 @@ urlpatterns = [
         name='settlement-info-update'
     ),
     path(
+        'settlement-diet-update/<pk>',
+        BtDietAmountUpdate.as_view(),
+        name='settlement-diet-update'
+    ),
+    path(
         'settlement-feeding-update/<pk>',
         BtApplicationSettlementFeedingUpdateView.as_view(),
         name='settlement-feeding-update'
     ),
+    path(
+        'settlement-cost-update/<pk>',
+        CostCategoryUpdateView.as_view(),
+        name='settlement-cost-update'
+    ),
+    #Booking and create CSV file 
+    path(
+        'ApplicationsToBeBooked-list', 
+        ApplicationsToBeBooked.as_view(), 
+        name='ApplicationsToBeBooked-list'),
+    path(
+        'ApplicationsToBeBooked-filter/', 
+        load_applications_to_be_booked_filter, 
+        name='ApplicationsToBeBooked-filter'),
+    path(
+        'ApplicationsToBeBooked-details/<pk>', 
+        ApplicationToBeBookedDetails.as_view(), 
+        name='ApplicationsToBeBooked-details'),
+    path(
+        'ApplicationsToBeBooked-booked-manually/<pk>', 
+        set_application_as_booked_manually, 
+        name='ApplicationsToBeBooked-booked-manually'),
+    path(
+        'ApplicationsToBeBooked-booked-upload/<pk>', 
+        set_application_as_booked_upload, 
+        name='ApplicationsToBeBooked-booked-upload'),
+    path(
+        'ApplicationsToBeBooked-no-booking-needed/<pk>', 
+        set_application_as_no_booking_needed, 
+        name='ApplicationsToBeBooked-no-booking-needed'),
+    path( 
+        'create-csv-ht/<pk>', 
+        prepare_ht_document_upload, 
+        name='create-csv-ht'),
+    path( 
+        'add-invoice-document-upload/<pk>', 
+        create_invoice_document_upload, 
+        name='add-invoice-document-upload'),
+    path( 
+        'set-cost-tax-deductable/<pk>', 
+        set_cost_tax_deductable, 
+        name='set-cost-tax-deductable'),
+    path( 
+        'set-cost-non-tax-deductable/<pk>', 
+        set_cost_non_tax_deductable, 
+        name='set-cost-non-tax-deductable'),
+    path( 
+        'download-file/<pk>', 
+        download_upload, 
+        name='download-file'),
+
+
 ]

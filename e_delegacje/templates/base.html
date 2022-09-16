@@ -1,10 +1,10 @@
 {% load static %}
 
 
-<html {% if LANGUAGE_CODE %}lang="{{ LANGUAGE_CODE }}"{% endif %}>
+<html {% if LANGUAGE_CODE %}lang="{{ LANGUAGE_CODE }}"{% endif %} style="overflow-y:scroll;">
 
 
-<head>
+<head style="position:absolute; ">
   <meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<title>E-Delegacje</title>
@@ -57,8 +57,11 @@
       				<img src="{% static 'img/logo_metro_qtj_2.ico' %}" alt="" width="40" height="40">
 					 </a>
 			</li>
-          <li class="nav-item">
-			  <a class="navbar-brand text-light " href="{% url 'e_delegacje:index' %}">E-delegacje</a>
+          <li class="nav-item pr-6">
+			  <a class="navbar-brand text-light " href="{% url 'e_delegacje:index' %}"><h3>E-delegacje - Test!!!</h3></a>
+          </li>
+          <li class="nav-item mx-auto" style="border-right: solid;">
+			
           </li>
         {% if request.user.is_authenticated %}
 
@@ -79,13 +82,24 @@
               </a>
 			</li>
                 {% endif %}
-				{% if request.user.group.id == 2 %}
+				{% if request.user.group.id == 2 or 1 %}
 				<li class="nav-item">
 					<a class="nav-item nav-link text-warning hello-msg" href="{% url 'e_delegacje:applications-all-list' %}">
 						Wszystkie wnioski
 					</a>
 				  </li>
 				{% endif %}
+				{% if request.user.group.id == 1 %}
+				<li class="nav-item">
+					<a 
+					class="nav-item nav-link text-warning hello-msg" 
+					href="{% url 'e_delegacje:ApplicationsToBeBooked-list' %}"
+					>
+						Do zaksięgowania
+					</a>
+				  </li>
+				{% endif %}
+				
 		</ul>
 
 
@@ -169,9 +183,8 @@
     </div>
   </nav>
     {% endif %}
-	</header>
+</header>
 
-<main style="font-size: 12px">
 <div class="container text-dark " >
 
 				{% block content %}    {% endblock %}
