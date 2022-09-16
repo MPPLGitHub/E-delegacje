@@ -58,7 +58,7 @@ class BtApplicationForm(forms.ModelForm):
         label="Wybierz kraj",
         error_messages={'required': 'To pole musi być wypełnione'},
         
-        initial=BtCountry.objects.get(id=1)
+        initial=BtCountry.objects.get(id=2)
     )
     trip_purpose_text = forms.CharField(
         max_length=250,

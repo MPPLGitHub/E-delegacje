@@ -401,7 +401,7 @@ class BtApprovalListView(LoginRequiredMixin, ListView):
 class BtApprovaHistorylListView(LoginRequiredMixin, ListView):
     model = BtApplication
     template_name = "Approval/bt_approval_list_history.html"
- 
+
     def get_queryset(self):
         user_cost_center = BtUser.objects.get(id = self.request.user.id).department.cost_center
         return BtApplication.objects.filter(
@@ -857,15 +857,13 @@ class BtApplicationSettlementFeedingUpdateView(LoginRequiredMixin, SingleObjectM
         settlement = BtApplicationSettlement.objects.get(id=self.object.id)
 
         if settlement.bt_application_id.bt_country.country_name.lower() == 'polska':
-            context['diet'] = round(diet_reconciliation_poland(settlement), 2)
-            context['diet_rate'] = BtDelegationRate.objects.get(
-                country=settlement.bt_application_id.bt_country
-            ).delagation_rate
+            diet = round(diet_reconciliation_poland(settlement), 2)
         else:
-            context['diet'] = round(diet_reconciliation_abroad(settlement), 2)
-            context['diet_rate'] = BtDelegationRate.objects.get(
-                country=settlement.bt_application_id.bt_country
-            ).delagation_rate
+            diet = round(diet_reconciliation_abroad(settlement), 2)
+
+        context['settlement'] = settlement
+        context['diet_amount'] = diet
+        
         return context
 
 
@@ -1091,6 +1089,7 @@ def load_all_applications_filter(request):
     {'applications': applications.order_by('-id')})
 
 
+
 class ApplicationsToBeBooked(BtApplicationListView):
     """ List View for approved applications"""
     model = BtApplication
@@ -1200,7 +1199,7 @@ class CostCategoryUpdateView(UpdateView):
         return HttpResponseRedirect(reverse("e_delegacje:create-csv-ht",
                 args=[settlement_id]))
   
-
+  
 class CreateCSVview(LoginRequiredMixin,View):
     """View for accounting department for updateing all necessary data to prepare 
     CSV upload to SAP system"""

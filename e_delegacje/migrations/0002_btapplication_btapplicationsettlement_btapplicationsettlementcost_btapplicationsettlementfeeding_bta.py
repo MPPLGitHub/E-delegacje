@@ -8,7 +8,6 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('setup', '0002_btdelegationrate'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('e_delegacje', '0001_initial'),
     ]

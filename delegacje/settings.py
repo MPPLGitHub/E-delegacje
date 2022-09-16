@@ -29,8 +29,8 @@ SECRET_KEY = app_config.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-# DEBUG = False
-DEBUG = True
+DEBUG = False
+# DEBUG = True
 
 ALLOWED_HOSTS = app_config.ALLOWED_HOSTS
 
@@ -129,16 +129,17 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-""" jeśli ma działać na serwerze IIS użyj /travel-management/static/
+""" jeśli ma działać na serwerze IIS użyj /prod/static/
     Jeśli ma działać na localhost użyj /static/
 """
-# STATIC_URL = '/static/'
-STATIC_URL = '/static/'
-# STATIC_ROOT = os.path.join(BASE_DIR, '/E-delegacje/static')
+
+STATIC_URL = app_config.STATIC_URL
+
+
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
+MEDIA_URL = app_config.MEDIA_URL
 
 #  Email sending settings
 EMAIL_HOST = app_config.EMAIL_HOST
@@ -181,3 +182,17 @@ LOGGING = {
         }
     },
 }
+
+# HTTPS settings
+CSRF_COOKIE_SECURE = True
+
+SESSION_COOKIE_SECURE = True
+
+SECURE_SSL_REDIRECT = True
+
+# HSTS Settings
+SECURE_HSTS_SECONDS = 60
+
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+
+SECURE_HSTS_PRELOAD = True

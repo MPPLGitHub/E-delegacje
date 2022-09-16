@@ -22,7 +22,9 @@ from delegacje import app_config
 
 class BtUserAdmin(UserAdmin):
     add_form = BtUserCreationForm
-    list_display = ('first_name', 'last_name','manager', 'username','id','vendor_id','group','email')
+
+    list_display = ('id','first_name', 'last_name','username','vendor_id','group','email')
+
     fieldsets = ((None, {'fields': ('username',
                                     'password',
                                     'first_name',

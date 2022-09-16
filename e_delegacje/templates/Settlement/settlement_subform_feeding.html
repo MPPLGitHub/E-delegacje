@@ -9,14 +9,14 @@
     <hr>
     <div class="row">
         <div class="col-4">
-            <h6>Wyjazd - data:  </h6><h6 class="date">{{ settlement.bt_application_info.bt_start_date }},
-                godzina: {{ settlement.bt_application_info.bt_start_time }}</h6>
-            <h6>Powrót - data:  {{ settlement.bt_application_info.bt_end_date }},
-                godzina: {{ settlement.bt_application_info.bt_end_time }}</h6>
+            <h6>Wyjazd - data:  {{ settlement.bt_application_info.bt_start_date.isoformat }},
+                godzina: {{ settlement.bt_application_info.bt_start_time.isoformat }}</h6>
+            <h6>Powrót - data:  {{ settlement.bt_application_info.bt_end_date.isoformat }},
+                godzina: {{ settlement.bt_application_info.bt_end_time.isoformat }}</h6>
         </div>
         <div class="col-4">
             <h6 id="country">Kraj: {{ settlement.bt_application_id.bt_country }}</h6>
-            <h6 id="diet">Dieta: {{ diet }} {{ settlement.bt_application_id.advance_payment_currency }}</h6>
+            <h6 id="diet">Dieta: {{ diet_amount|floatformat:2  }} {{ settlement.bt_application_id.advance_payment_currency }}</h6>
         </div>
 
     </div>
