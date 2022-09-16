@@ -47,6 +47,7 @@
                             <td>Data przejazdu</td>
                             <td class="text-end ms-5 text-center">Cel przejazdu</td>
                             <td class="text-center">Liczba kilometrów</td>
+                            <td class="text-center">Kwota</td>
                             <td >Usuń</td>
                         </tr>
                     </thead>
@@ -57,6 +58,7 @@
                             <td>{{ trip.trip_date }}</td>
                             <td class="text-center">{{ trip.trip_purpose }}</td>
                             <td class="text-center">{{ trip.mileage }}</td>
+                            <td class="text-center">{{ trip.amount }}</td>
                             <td class="pt-2">
                                 <form action="{% url 'e_delegacje:settlement-mileage-delete' pk=trip.pk %}" method="POST">
                                     {% csrf_token %}

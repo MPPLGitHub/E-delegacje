@@ -1,6 +1,8 @@
+from re import template
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.auth.views import PasswordResetConfirmView
 
 from setup.views import (
     BtUserListView,
@@ -40,6 +42,7 @@ from setup.views import (
     user_logout,
     PasswordResetView,
     PasswordResetDoneView,
+    PasswordResetCompleteView,
     MyPasswordChangeDoneView,
     MyPasswordChangeView,
     BtLocationFormView,
@@ -132,6 +135,7 @@ urlpatterns = [
     path('password-change/', MyPasswordChangeView.as_view(), name='password-change'),
     path('password-reset/', PasswordResetView.as_view(), name='password-reset'),
     path('password-reset/done/', PasswordResetDoneView.as_view(),  name='password-reset-done'),
+
     path('password-change/done/', MyPasswordChangeDoneView.as_view(),  name='password-change-done'),
 
     path('upload/', upload, name='upload'),

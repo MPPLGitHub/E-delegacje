@@ -40,7 +40,6 @@ class BtUserCreationForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['manager'].queryset = BtUser.objects.all().exclude(employee_level='lvl1')
 
-
     def save(self, commit=True):
         user = super(BtUserCreationForm, self).save(commit=False)
         user.set_password(self.cleaned_data['password'])

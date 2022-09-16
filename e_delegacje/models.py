@@ -9,6 +9,8 @@ from e_delegacje.enums import (
     BtEmployeeLevel,
     BtCostCategory,
     BtVatRates,
+    BtBookingStatus,
+    BtTaxCategory
 )
 
 
@@ -21,6 +23,7 @@ class BtSubmissionStatus(models.Model):
 
 class BtApplication(models.Model):
     bt_company_code = models.ForeignKey(BtCompanyCode, on_delete=models.PROTECT, related_name='bt_applications')
+    # reference = models.CharField(max_length=20, default=id+"/2022")
     bt_country = models.ForeignKey(BtCountry, on_delete=models.PROTECT, related_name='bt_applications')
     target_user = models.ForeignKey(BtUser, on_delete=models.PROTECT, related_name='bt_applications')
     application_author = models.ForeignKey(BtUser, on_delete=models.PROTECT, related_name='bt_applications_author')
@@ -46,6 +49,8 @@ class BtApplication(models.Model):
                                  null=True,
                                  blank=True)
     approval_date = models.CharField(max_length=50, blank=True, null=True)
+    booked = models.CharField(max_length=50, choices=BtBookingStatus.choices, null=True, blank=True)
+
 
     def __str__(self):
         return f'Wniosek {self.id}: {self.trip_purpose_text} utworzony przez: \
@@ -73,7 +78,7 @@ class BtApplicationSettlementInfo(models.Model):
         on_delete=models.CASCADE,
         related_name='bt_application_info',
     )
-    bt_completed = models.CharField(max_length=25, choices=[('tak', 'tak'), ('nie', 'nie')])
+    bt_completed = models.CharField(max_length=25, choices=[('tak', 'tak'), ('nie', 'nie')], null=True, blank=True)
     bt_start_date = models.DateField(null=True, blank=True)
     bt_start_time = models.TimeField(null=True, blank=True)
     bt_end_date = models.DateField(null=True, blank=True)
@@ -84,6 +89,7 @@ class BtApplicationSettlementInfo(models.Model):
         related_name='bt_application_settlement_info'
     )
     settlement_exchange_rate = models.DecimalField(decimal_places=5, max_digits=8,null=True, blank=True)
+    diet_amount = models.DecimalField(decimal_places=2, max_digits=8, null=True, blank=True)
     settlement_log = models.CharField(max_length=2400)
     approver = models.ForeignKey(BtUser,
                                 on_delete=models.PROTECT,
@@ -113,6 +119,8 @@ class BtApplicationSettlementCost(models.Model):
     bt_cost_document_date = models.DateField()
     bt_cost_VAT_rate = models.CharField(max_length=20, choices=BtVatRates.choices)
     attachment = models.FileField(null=True, )
+    tax_deductible = models.CharField(max_length=4, choices=BtTaxCategory.choices, null=True, blank=True)
+    in_upload = models.CharField(max_length=3, choices=[('tak', 'tak'), ('nie', 'nie')], null=True, blank=True)
 
     def __str__(self):
         return f'{self.bt_application_settlement} - {self.bt_cost_description}'
@@ -136,6 +144,7 @@ class BtApplicationSettlementMileage(models.Model):
     trip_purpose = models.CharField(max_length=240)
     mileage = models.DecimalField(decimal_places=2, max_digits=8)
     is_agreement_signed = models.BooleanField(default=False)
+    amount = models.DecimalField(decimal_places=2, max_digits=8, null=True, blank=True)
 
     def __str__(self):
         return f'Kilometrówka do rozliczenia wniosku{self.bt_application_settlement}'

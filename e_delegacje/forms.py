@@ -214,7 +214,7 @@ class BtApplicationSettlementInfoForm(forms.ModelForm):
 
     class Meta:
         model = BtApplicationSettlementInfo
-        exclude = ('bt_application_settlement', 'advance_payment', 'settlement_log', 'approver', 'approval_date')
+        exclude = ('bt_application_settlement', 'advance_payment', 'settlement_log', 'approver', 'approval_date', 'diet_amount')
     
     def clean(self):
         result = super().clean()
@@ -339,3 +339,12 @@ class BtApprovedForm(forms.Form):
 
                                       )
     current_datetime = forms.CharField(widget=forms.HiddenInput())
+
+
+class BtChangeCostCategoryForm(forms.Form):
+    bt_cost_category = forms.TypedChoiceField(choices=BtCostCategory.choices, label="Kategoria kosztu", initial="")
+
+class BtAddInvoiceDataForm(forms.Form):
+    reference = forms.CharField(max_length=20, label='Numer faktury')
+    vat_date = forms.DateField(label="Data VAT", widget=DateInputWidget)
+    vendor = forms.CharField(max_length=10, label='Numer vendora')

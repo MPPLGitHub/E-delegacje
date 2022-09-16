@@ -1,0 +1,54 @@
+<table>
+<tbody>
+<tr><td colspan="8"></td></tr>
+
+{% for item in settled_applications %}
+
+    <tr>
+        <td>
+           <strong> {{ item.id }} </strong>
+        </td>
+        <td>
+            {{ item.bt_company_code.company_code }}
+        </td>
+        <td>
+            {{ item.target_user }}
+        </td>
+        <td style="min-width: 200px;">
+            {{ item.bt_applications_settlements.bt_application_info.bt_start_date.isoformat }} -
+            {{ item.bt_applications_settlements.bt_application_info.bt_end_date.isoformat }}                         
+        </td>
+        
+        <td style="min-width: 300px;">
+            {{ item.trip_purpose_text }}
+        </td>
+
+        <td>
+            {% if item.application_status == 'canceled' %}
+                <p class="text-danger"><b>{{ item.get_application_status_display }}</b></p>
+            {% elif item.application_status == 'settled' %}
+                <p class="text-success"><b>{{ item.get_application_status_display }}</b></p>
+            {% else  %}
+            <p class="text-secondary"><b>{{ item.get_application_status_display }}</b></p>
+            {% endif%}
+
+        </td>
+    </td>
+
+    <td>
+        <a 5
+        class="btn btn-outline-secondary"
+        href="{% url 'e_delegacje:createCSV-ApplicationsToBeBooked-details' pk=item.bt_applications_settlements.id %}"
+        style="font-size: 12px"
+          >
+            Szczegóły
+        </a>
+
+    </td>
+
+     <td>
+    </tr>
+
+{% endfor %}
+</tbody>
+</table>
