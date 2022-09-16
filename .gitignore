@@ -28,7 +28,7 @@ media
 static
 e_delegacje/migrations
 setup/migrations
-delegacje/settings.py
+delegacje/
 *.csv
 .vscode/
 

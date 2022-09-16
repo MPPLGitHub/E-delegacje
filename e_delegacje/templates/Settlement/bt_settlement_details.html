@@ -150,6 +150,10 @@
                               <td class="fw-bold">Godzina powrotu</td>
                               <td>{{ object.bt_application_info.bt_end_time.isoformat }}</td>
                           </tr>
+                          <tr>
+                              <td class="fw-bold">Dieta</td>
+                              <td>{{ object.bt_application_info.diet_amount }}</td>
+                          </tr>
                             <tr>
                               <td class="fw-bold">Kurs rozliczenia</td>
                               <td>{{ object.bt_application_info.settlement_exchange_rate }}</td>
@@ -261,6 +265,7 @@
                                 <td>Data przejazdu</td>
                                 <td class="text-end ms-5 text-center">Cel przejazdu</td>
                                 <td class="text-center">Liczba kilometrów</td>
+                                <td class="text-center">Kwota</td>
                             </tr>
                        </thead>
                        <tbody>
@@ -270,6 +275,7 @@
                                 <td>{{ trip.trip_date }}</td>
                                 <td class="text-center">{{ trip.trip_purpose }}</td>
                                 <td class="text-center">{{ trip.mileage|floatformat:2 }}</td>
+                                <td class="text-center">{{ trip.amount|floatformat:2 }}</td>
                             </tr>
                        {% endfor %}
                        </tbody>
@@ -299,7 +305,7 @@
             <div class="col-3 align-content-end">
                     <div class="row">
                         <h5 class="vIntegerField">
-                            Dieta: {{ diet|floatformat:2 }} {{ object.bt_application_id.advance_payment_currency.text }}.
+                            Dieta: {{ object.bt_application_info.diet_amount|floatformat:2 }} {{ object.bt_application_id.advance_payment_currency.text }}.
                         </h5>
                     <hr>
                     </div>

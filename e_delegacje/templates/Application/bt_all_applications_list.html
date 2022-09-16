@@ -80,8 +80,7 @@
                 <th >
                 <p>Status wniosku</p>
             </th>
-            </th>
-                <th >
+            <th >
                 <p>Szczegóły</p>
             </th>
             </th>
@@ -137,6 +136,29 @@
                         <p class="text-secondary"><b>{{ item.get_application_status_display }}</b></p>
                         {% endif%}
                     </td>
+                    <td>
+                        {% if item.application_status == 'settled' %}
+                        <a class="btn btn-outline-secondary"
+                             href="{{ item.bt_applications_settlements.get_absolute_url }}"
+                          style="font-size: 12px"
+                          >
+                            Szczegóły
+                        </a>
+                        {% endif %}
+            
+                    </td>
+            
+                    <td>
+                        {% if item.application_status == 'settled' %}
+                          <a class="btn btn-outline-danger rounded mx-auto d-block"
+                              style="font-size: 12px"
+                             href="{% url 'e_delegacje:pdf-in-line' pk=item.id %}"
+                             target="_blank" 
+                          >
+                              pdf
+                          </a>
+                       {% endif %} 
+                      </td>
 
                     <td>
                         {% if item.application_status == 'settled' %}

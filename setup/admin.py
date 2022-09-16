@@ -22,7 +22,7 @@ from delegacje import app_config
 
 class BtUserAdmin(UserAdmin):
     add_form = BtUserCreationForm
-    list_display = ('id','first_name', 'last_name','username','vendor_id','group','email')
+    list_display = ('first_name', 'last_name','manager', 'username','id','vendor_id','group','email')
     fieldsets = ((None, {'fields': ('username',
                                     'password',
                                     'first_name',
@@ -74,7 +74,11 @@ admin.site.register(BtCurrency)
 admin.site.register(BtCountry)
 admin.site.register(BtUserAuthorisation)
 admin.site.register(BtOrder)
-admin.site.register(BtGLAccounts)
+class BtGlAccountsAdmin(admin.ModelAdmin):
+    list_display  = ('cost_category', 'tax_category', 'gl_account_number', 'description')
+    ordering = ('cost_category',)
+admin.site.register(BtGLAccounts, BtGlAccountsAdmin)
+    
 
 admin.AdminSite.site_url = '/' + app_config.LINK_PREFIX + 'e-delegacje'
 

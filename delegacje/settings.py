@@ -132,6 +132,7 @@ USE_TZ = True
 """ jeśli ma działać na serwerze IIS użyj /prod/static/
     Jeśli ma działać na localhost użyj /static/
 """
+
 STATIC_URL = app_config.STATIC_URL
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
