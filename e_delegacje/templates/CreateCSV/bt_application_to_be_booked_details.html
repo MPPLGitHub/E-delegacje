@@ -1,0 +1,384 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container-fluid" >
+<hr>
+        <div class="row">
+            <div class="col-4">
+              <table class="table table-light " style="font-size: 12px">
+                  <tr class="table table-primary table-striped text-uppercase">
+                      <td class="fw-bold">Numer Wniosku o delegację</td>
+                      <td class="fw-bold text-center" style="font-size: medium;">{{ object.bt_application_id.id }}</td>
+                  </tr>
+
+                  <tr class="table table-primary text-uppercase">
+                    <td class="fw-bold">Data wniosku:</td>
+                    <td class="fw-bold" style="font-size: medium;">{{ object.bt_application_id.application_date.isoformat }}</td>
+
+                  </tr>
+              </table>
+            </div>
+            <div class="col-2">
+                <table class="table table-primary text-center table-striped text-uppercase" style="font-size: 12px">
+                    <tbody>
+                        <tr>
+                            <td class="fw-bold" >Company Code:</td>
+
+                        </tr>
+                        <tr>
+                            <td class="text-wrap fw-bold" >{{ object.bt_application_id.bt_company_code.company_code }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-4">
+                <table class="table table-primary text-center table-striped text-uppercase" style="font-size: 12px">
+                    <tbody>
+                        <tr>
+                            <td class="fw-bold" >Cel podróży/Opis:</td>
+
+                        </tr>
+                        <tr>
+                            <td class="text-wrap fw-bold" >{{ object.bt_application_id.trip_purpose_text }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-2">
+                <table class="table table-primary table-striped text-uppercase text-center" 
+                style="font-size: 12px;
+                color: green;">
+                    <tbody>
+                        <tr>
+                            <td class="fw-bold">Status Wniosku</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">{{ object.bt_application_id.get_application_status_display }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <table class="table table-light" style="font-size: 13px">
+                    <tr class="fw-bold">
+
+                        <td>Kraj</td>
+                        <td>Pracownik</td>
+                        
+
+                    </tr>
+                  <tr>
+                      <td>{{ object.bt_application_id.bt_country }}</td>
+                      <td>{{ object.bt_application_id.target_user }}</td>
+
+                  </tr>
+
+
+                        <tr class="fw-bold">
+                            <td>Rodzaj transportu</td>
+                            <td>Trasa podrózy</td>
+
+                  </tr>
+                            </tr>
+                        <tr>
+                            <td>{{ object.bt_application_id.get_transport_type_display }}</td>
+                            <td>{{ object.bt_application_id.travel_route }}</td>
+   
+
+                  </tr>
+                  <tr>
+                      <td>Cost center</td>
+                      <td>{{ object.bt_application_id.CostCenter.cost_center_number }} - 
+                        {{ object.bt_application_id.CostCenter.text }}
+                </tr>
+
+                </table>
+            </div>
+
+        <div class="col-4">
+          <table class="table table-light table-striped" style="font-size: 12px">
+                  <tr>
+                      <td class="fw-bold" colspan="2">Delegacja zrealizowana?</td>
+                      <td>{{ object.bt_application_info.bt_completed }}</td>
+                  </tr>
+                  <tr>
+                      <td class="fw-bold" colspan="2">Data wyjazdu</td>
+                      <td>{{ object.bt_application_info.bt_start_date.isoformat }}</td>
+                  </tr>
+                  <tr>
+                      <td class="fw-bold" colspan="2">Godzina wyjazdu</td>
+                      <td>{{ object.bt_application_info.bt_start_time.isoformat }}</td>
+                  </tr>
+                  <tr>
+                      <td class="fw-bold" colspan="2">Data powrotu</td>
+                      <td>{{ object.bt_application_info.bt_end_date.isoformat }}</td>
+                  </tr>
+                  <tr>
+                      <td class="fw-bold" colspan="2">Godzina powrotu</td>
+                      <td>{{ object.bt_application_info.bt_end_time.isoformat }}</td>
+                  </tr>
+                  <tr>
+                      <td class="fw-bold" colspan="2">Kwota diety</td>
+                      <td>{{ object.bt_application_info.diet_amount|floatformat:2 }}
+                          {{ object.bt_application_id.advance_payment_currency.text }}</td>
+                  </tr>
+                    <tr>
+                      <td class="fw-bold" colspan="2">Kurs rozliczenia</td>
+                      <td>{{ object.bt_application_info.settlement_exchange_rate }}</td>
+                  </tr>
+
+              </table>
+            </div>
+    
+
+                
+            </div>
+            
+        </div>
+    
+<hr>
+        <div class="row align-content-between">
+            <div class="col-3 align-content-end">
+                <div class="row">
+                    <table class="table table-light" >
+                        <tr>
+                            <td><h5>Dieta: </h5></td>
+                            <td><h5>{{ object.bt_application_info.diet_amount|floatformat:2 }} 
+                                {{ object.bt_application_id.advance_payment_currency.text }}.</h5></td>
+                              
+                        </tr>              
+
+                    {% if object.bt_application_settlement_mileages.exists %}
+
+                        <tr>
+                            <td><h5>Ryczałt za samochód: </h5></td>
+                            <td><h5>{{ mileage_cost|floatformat:2 }} zł.</h5></td>
+                            
+                        </tr>
+                    {% endif %}
+                    {% if object.bt_application_settlement_costs.exists %}
+                        <td><h5>Koszty: </h5></td>
+                        <td><h5>{{ cost_sum|floatformat:2 }} 
+                            {{ object.bt_application_id.advance_payment_currency.text }}.</h5></td>
+                    {% endif %}
+                    <tr><td></td><td></td></tr>
+                    <tr style="border-top: solid; border-bottom: solid;">
+                    <td ><h3>Suma kosztów: </h3></td>
+                    <td><h3>{{ total_costs|floatformat:2 }}
+                        {{ object.bt_application_id.advance_payment_currency.text }}.</h3></td>
+                    </tr>
+                        </table>
+
+                </div>
+
+            </div>
+
+        {% if object.bt_application_settlement_costs.exists %}
+        <div class="col-9">
+            <table class="table table-light table-striped" style="font-size: 12px">
+                <thead>
+                    <tr class="fw-bold table-active">
+                        <th>Kategoria</th>
+                        <th>Opis kosztu</th>
+                        <th>Data dokumentu</th>
+                        <th>Kwota</th>
+                        <th>Waluta</th>
+                        <th>Stawka VAT</th>
+                        <th>Czy jest KUP?</th>
+                        <th>Załącznik</th>
+                        <th>Zmień kategorię</th>
+                        <th >Dodaj upload</th>
+
+                    </tr>
+                </thead>
+                <body>
+
+                {% for cost in object.bt_application_settlement_costs.all|dictsort:"id" %}
+                    <tr>
+                      
+                        <td>{{ cost.get_bt_cost_category_display }}</td>
+                        <td>{{ cost.bt_cost_description }}</td>
+                        <td>{{ cost.bt_cost_document_date }}</td>
+                        <td>{{ cost.bt_cost_amount|floatformat:2 }}</td>
+                        <td>{{ cost.bt_cost_currency }}</td>
+                        <td>{{ cost.get_bt_cost_VAT_rate_display }}</td>
+                        {% if cost.tax_deductible == 'KUP' %}
+                        <td style="color: green; font-weight: bold; font-size: 12px;">{{ cost.tax_deductible}}</td>
+                        {% else %}
+                        <td style="color: red; font-weight: bold; font-size: 12px;">{{ cost.tax_deductible}}</td>
+                        {% endif %}
+                        <td class="pt-2 ps-2" >
+                            {% if cost.attachment %}
+                                <a class="btn btn-sm btn-outline-secondary"
+                                    href="{{ cost.attachment.url }}"
+                                    target="_blank"
+                                    style="font-size: 12px"
+                                >Pokaż załącznik</a>
+                            {% endif %}
+                        </td>
+                        
+                        <td class="pt-2 ps-2" >
+                        {% if cost.in_upload == 'nie' %}
+
+                            <a class="btn btn-sm btn-outline-warning"
+                                href="{% url 'e_delegacje:settlement-cost-update' pk=cost.id %}"
+                                style="font-size: 12px"
+                                >zmień kategorię
+                            </a>
+
+                        {% else %}
+                            {% if cost.bt_cost_category in invoice_required_cost_categories %}
+
+                            <a class="btn btn-sm btn-ligth disabled"
+                                href="{% url 'e_delegacje:settlement-cost-update' pk=cost.id %}"
+                                style="font-size: 12px"
+                                >zmień kategorię
+                            </a>
+                            {% else %}
+                            <a class="btn btn-sm btn-outline-warning"
+                                href="{% url 'e_delegacje:settlement-cost-update' pk=cost.id %}"
+                                style="font-size: 12px"
+                                >zmień kategorię
+                            </a>
+                            {% endif %}
+
+                        {% endif %}
+
+                            </td>
+                        {% if cost.in_upload == 'nie' %}
+                            {% if cost.bt_cost_category in invoice_required_cost_categories  %}
+                            <td class="pt-2 ps-2" >
+                                
+
+
+                                        <a class="btn btn-outline-secondary d-grid"
+                                            style="font-size: 12px"
+                                            href="{% url 'e_delegacje:add-invoice-document-upload' pk=cost.id %}"
+
+                                        >
+                                        Dodaj dane do faktury
+                                        </a>
+                                
+
+                            </td>
+                            {% else %}
+                            <td class="pt-2 ps-2" >
+                                {{ cost.in_upload }}
+        
+
+                            </td>
+                            {% endif %}
+                        {% else %}
+                        <td class="pt-2 ps-2" >
+                            {{ cost.in_upload }}
+    
+
+                        </td>
+                        {% endif %}
+
+                    </tr>
+                {% endfor %}
+                </body>
+            </table>
+        </div>
+
+
+        {% endif %}
+        <hr>
+        <br>
+        </div>
+<div class="row align-content-between">
+    <h3 class="text-center">Podgląd uploadu</h3>
+</div>
+<div class="row align-content-between">
+    <hr>
+    <table class="table table-info table-striped" >
+        {% for row in csv_file %}
+        <tr>
+            {% for cell in row %}
+            <td>
+                {{cell}}
+            </td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+
+        <div class="row">
+            <div class="col-12">
+            
+            <tr>
+                <td>
+
+                    <a  
+                    class="btn btn-outline-info my-3 mx-3 d-grid" 
+                    href = "{% url 'e_delegacje:download-file' pk=object.id %}" 
+                    > 
+                        Pobierz plik uploadu
+                   </a>
+                </td>
+
+            </tr>
+            <tr></tr>
+            
+        </div>
+    </div>
+    <dic class="row">
+        <div class="col-12">
+            <table class="table table-light table-striped text-uppercase text-center">
+                <tr>
+                    <td>
+                       Księgowanie wniosku: 
+                    </td>
+                
+
+                <td>                    
+                <a 
+                class="btn btn-outline-danger d-block" 
+                href="{% url 'e_delegacje:ApplicationsToBeBooked-booked-manually' pk=object.bt_application_id.id %}"
+             
+             >Oznacz: <br>
+               zaksięgowany ręcznie
+           </a></td>
+                <td>                    
+                <a 
+                class="btn btn-outline-success d-block" 
+                href="{% url 'e_delegacje:ApplicationsToBeBooked-booked-upload' pk=object.bt_application_id.id %}"
+             
+             >Oznacz: <br>
+               zaksięgowany uploadem
+           </a></td>
+                <td>                    
+                <a 
+                class="btn btn-outline-warning d-block" 
+                href="{% url 'e_delegacje:ApplicationsToBeBooked-no-booking-needed' pk=object.bt_application_id.id %}"
+             
+             >Oznacz: <br>
+               Brak księgowania
+           </a></td></tr>
+
+        </table>
+    </div>
+    </dic>
+        <div class="row">
+            <hr>
+            <div class="col-2 align-self-end">
+                <a class="btn btn-outline-secondary d-grid"
+                href="{% url 'e_delegacje:ApplicationsToBeBooked-list' %}"
+                style="font-size: 12px"
+                >
+                  powrót
+                </a>
+            </div>
+     
+</div>
+
+</main>
+
+
+{% endblock content %}

@@ -4,7 +4,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, F
 from django.urls import reverse_lazy, reverse
 from django.http import HttpResponse,HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.views import PasswordChangeView, PasswordResetDoneView, PasswordResetView
+from django.contrib.auth.views import PasswordChangeView, PasswordResetDoneView, PasswordResetView, PasswordResetCompleteView
 from django.contrib import messages
 from setup.forms import LoginForm, BtUserCreationForm, LocationForm, BtUserUpdateForm, AuthorisationForm
 from django.shortcuts import render, redirect
@@ -69,8 +69,11 @@ class MyPasswordChangeView(PasswordChangeView):
 
 class PasswordResetView(PasswordResetView):
     template_name = 'reset_password.html'
+    # email_template_name = "reset_password_email_template.html"
     success_url = reverse_lazy('setup:password-reset-done')
 
+class PasswordResetCompleteView(PasswordResetCompleteView):
+    template_name = 'password_reset_done.html'
 
 class PasswordResetDoneView(PasswordResetDoneView):
     template_name = 'password_reset_done.html'

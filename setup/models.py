@@ -1,6 +1,4 @@
 
-from pydoc import describe
-from pyexpat import model
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Group
 from e_delegacje.enums import (
@@ -142,4 +140,4 @@ class BtGLAccounts(models.Model):
     tax_category = models.CharField(max_length=40, choices=BtTaxCategory.choices)
     
     def __str__(self):
-        return f'{self.gl_account_number} - {self.cost_category}: {self.description}'
+        return f'{self.gl_account_number} - ({self.tax_category})- {self.cost_category}: {self.description}'

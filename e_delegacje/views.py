@@ -1,6 +1,7 @@
 """ Business logic for Views in e-delegacje """
 import functools
 import ssl
+from turtle import up
 from black import T
 from django.conf import settings
 from django.http import HttpResponseRedirect
@@ -19,7 +20,7 @@ from e_delegacje.tm_notifications import (
     new_application_notification, 
     approved_or_rejected_notification
     )
-from e_delegacje.enums import BtApplicationStatus
+from e_delegacje.enums import BtApplicationStatus, BtBookingStatus, BtTaxCategory, BtCostCategory
 from e_delegacje.forms import (
     BtApplicationForm,
     BtApplicationSettlementInfoForm,
@@ -29,7 +30,8 @@ from e_delegacje.forms import (
     BtApplicationSettlementInfoFormset,
     BtApplicationSettlementFeedingFormset,
     BtRejectionForm,
-    BtApprovedForm
+    BtApprovedForm,
+    BtChangeCostCategoryForm
 )
 from e_delegacje.models import (
     BtApplication,
@@ -53,8 +55,10 @@ from e_delegacje.tm_calculations import (
     get_diet_amount_poland,
     get_diet_amount_abroad,
     diet_reconciliation_poland,
-    diet_reconciliation_abroad
+    diet_reconciliation_abroad,
+    update_diet_amount
     )
+from e_delegacje.tm_upload_creator import Upload
 from setup.models import BtCostCenter, BtDelegationRate, BtMileageRates, BtUser, BtUserAuthorisation, BtCurrency
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
@@ -183,6 +187,7 @@ class BtApplicationListView(LoginRequiredMixin, ListView):
 
         return context
 
+
 class BtAllApplicationListView(BtApplicationListView):
     """ List View for applications"""
     model = BtApplication
@@ -200,11 +205,11 @@ class BtAllApplicationListView(BtApplicationListView):
         return context
 
 
-
 class BtApplicationDetailView(LoginRequiredMixin, DetailView):
     """ Detail View for e_delegacje application"""
     model = BtApplication
     template_name = "Application/bt_application_details.html"
+
 
 class BtApplicationApprovalDetailView(LoginRequiredMixin, View):
     """ Detail view for e_delegacje application which is shown in approoval view"""
@@ -367,7 +372,7 @@ class BtApplicationUpdateView(LoginRequiredMixin, UpdateView):
                               f'{request.user.last_name} - {application.current_datetime}\n'
             application.save()
             new_application_notification(application.target_user.manager.email, application)
-            # form.send_mail(user_mail=target_user.manager.email, sent_app=BtApplication.objects.last())
+            
 
             return HttpResponseRedirect(reverse("e_delegacje:applications-list"))
         else:
@@ -396,29 +401,47 @@ class BtApprovalListView(LoginRequiredMixin, ListView):
 class BtApprovaHistorylListView(LoginRequiredMixin, ListView):
     model = BtApplication
     template_name = "Approval/bt_approval_list_history.html"
-    # ordering = ['-id']
-
+ 
     def get_queryset(self):
         user_cost_center = BtUser.objects.get(id = self.request.user.id).department.cost_center
         return BtApplication.objects.filter(
-            application_status=BtApplicationStatus.approved.value).filter(
+            application_status=BtApplicationStatus.settled.value).filter(
             CostCenter=user_cost_center).order_by('-id')
 
+            
 # Settlement Views
 
 class BtApplicationSettlementCreateView(LoginRequiredMixin, View):
 
     def get(self, request, pk):
         bt_application = BtApplication.objects.get(id=pk)
+        now = datetime.datetime.now()
+        bt_start_date = bt_application.planned_start_date
+        bt_end_date = bt_application.planned_end_date
+
         settlement = BtApplicationSettlement.objects.create(
             bt_application_id=bt_application,
             settlement_status=BtApplicationStatus.saved.value
         )
+        settlement_log = f'Nowe rozliczenie wniosku nr: {settlement.bt_application_id.id} - ' \
+                    f'{now}\n'
         BtApplicationSettlementFeeding.objects.create(
             bt_application_settlement=settlement,
             breakfast_quantity=0,
             dinner_quantity=0,
             supper_quantity=0
+        )
+
+        BtApplicationSettlementInfo.objects.create(
+            bt_application_settlement=settlement,
+            bt_start_date=bt_start_date,
+            bt_start_time = now,
+            bt_end_date=bt_end_date,
+            bt_end_time = now,
+            advance_payment = bt_application,
+            settlement_exchange_rate = 1,
+            diet_amount = 0,
+            settlement_log = settlement_log,
         )
         bt_application.application_status = BtApplicationStatus.settlement_in_progress.value
         bt_application.save()
@@ -426,15 +449,32 @@ class BtApplicationSettlementCreateView(LoginRequiredMixin, View):
 
     def post(self, request, pk):
         bt_application = BtApplication.objects.get(id=pk)
+        now = datetime.datetime.now()
+        bt_start_date = bt_application.planned_start_date
+        bt_end_date = bt_application.planned_end_date
+
         settlement = BtApplicationSettlement.objects.create(
             bt_application_id=bt_application,
             settlement_status=BtApplicationStatus.saved.value
         )
+        settlement_log = f'Nowe rozliczenie wniosku nr: {settlement.bt_application_id.id} - ' \
+                    f'{now}\n'
         BtApplicationSettlementFeeding.objects.create(
             bt_application_settlement=settlement,
             breakfast_quantity=0,
             dinner_quantity=0,
             supper_quantity=0
+        )
+        BtApplicationSettlementInfo.objects.create(
+            bt_application_settlement=1,
+            bt_start_date=bt_start_date,
+            bt_start_time = now,
+            bt_end_date=bt_end_date,
+            bt_end_time = now,
+            advance_payment = bt_application,
+            settlement_exchange_rate = 1,
+            diet_amount = 0,
+            settlement_log = settlement_log,
         )
         bt_application.application_status = BtApplicationStatus.settlement_in_progress.value
         bt_application.save()
@@ -453,10 +493,7 @@ class BtApplicationSettlementDetailView(LoginRequiredMixin, View):
         advance = float(settlement.bt_application_id.advance_payment)
         cost_sum = float(settlement_cost_sum(BtApplicationSettlement.objects.get(pk=settlement.id)))
         mileage_cost = float(mileage_cost_sum(BtApplicationSettlement.objects.get(pk=settlement.id)))
-        if settlement.bt_application_id.bt_country.country_name.lower() == 'polska':
-            diet = round(diet_reconciliation_poland(settlement), 2)
-        else:
-            diet = round(diet_reconciliation_abroad(settlement), 2)
+        diet=float(settlement.bt_application_info.diet_amount)
         total_costs = cost_sum + mileage_cost + diet
         settlement_amount = advance - total_costs
         if settlement_amount < 0:
@@ -465,6 +502,7 @@ class BtApplicationSettlementDetailView(LoginRequiredMixin, View):
         else:
             settlement_amount = f'Do zapłaty przez pracownika: {settlement_amount} ' \
                                 f'{settlement.bt_application_id.advance_payment_currency.text}'
+
         return render(
             request,
             template_name="Settlement/bt_settlement_details.html",
@@ -503,7 +541,6 @@ class BtApplicationSettlementInfoCreateFormView(LoginRequiredMixin, View):
                 bt_application_settlement.bt_application_id.application_status = BtApplicationStatus.canceled
                 bt_application_settlement.bt_application_id.save()
                 bt_application_settlement.delete()
-                # return HttpResponseRedirect(reverse("e_delegacje:settlement-details", args=[pk]))
                 return HttpResponseRedirect(reverse("e_delegacje:applications-list"))
             else:
                 bt_completed = form.cleaned_data["bt_completed"]
@@ -518,6 +555,12 @@ class BtApplicationSettlementInfoCreateFormView(LoginRequiredMixin, View):
                 advance_payment = BtApplication.objects.get(
                     id=BtApplicationSettlement.objects.get(id=pk).bt_application_id.id
                 )
+                if bt_application_settlement.bt_application_id.bt_country.country_name.lower() == 'polska':
+                    diet = round(diet_reconciliation_poland(bt_application_settlement), 2)
+                else:
+                    diet = round(diet_reconciliation_abroad(bt_application_settlement), 2)
+                
+                diet_amount = diet
 
                 BtApplicationSettlementInfo.objects.create(
                     bt_application_settlement=bt_application_settlement,
@@ -528,7 +571,8 @@ class BtApplicationSettlementInfoCreateFormView(LoginRequiredMixin, View):
                     bt_end_time=bt_end_time,
                     settlement_exchange_rate=settlement_exchange_rate,
                     advance_payment=advance_payment,
-                    settlement_log=settlement_log
+                    settlement_log=settlement_log,
+                    diet_amount=diet_amount
                 )
                 return HttpResponseRedirect(reverse("e_delegacje:settlement-details", args=[pk]))
         else:
@@ -550,12 +594,31 @@ class BtApplicationSettlementCostCreateView(LoginRequiredMixin, View):
             context={"form": form, 'cost_list': cost_list, 'settlement': settlement, 'currency': currency})
 
     def post(self, request, pk, *args, **kwargs):
+        category_tax_dict = {
+            BtCostCategory.accommodation: BtTaxCategory.KUP, 
+            BtCostCategory.consumption_invoice: BtTaxCategory.KUP,
+            BtCostCategory.consumption: BtTaxCategory.KUP,
+            BtCostCategory.consumption_nkup: BtTaxCategory.NKUP,
+            BtCostCategory.tickets: BtTaxCategory.KUP,
+            BtCostCategory.taxi: BtTaxCategory.KUP,
+            BtCostCategory.taxi_nkup: BtTaxCategory.NKUP,
+            BtCostCategory.parking: BtTaxCategory.KUP,
+            BtCostCategory.parking_nkup: BtTaxCategory.NKUP,
+            BtCostCategory.transport: BtTaxCategory.KUP,
+            BtCostCategory.transport_nkup: BtTaxCategory.NKUP,
+            }
         settlement = BtApplicationSettlement.objects.get(id=pk)
         form = BtApplicationSettlementCostForm(request.POST, request.FILES)
         cost_list = BtApplicationSettlementCost.objects.filter(
             bt_application_settlement=BtApplicationSettlement.objects.get(id=pk))
         uploaded_file = request.FILES.get('attachment')
         currency = settlement.bt_application_id.advance_payment_currency.code
+        NKUP_cost_list = [
+            BtCostCategory.transport_nkup,
+            BtCostCategory.taxi_nkup,
+            BtCostCategory.parking_nkup,
+            BtCostCategory.consumption_nkup,
+            ]
 
         if form.is_valid():
             bt_application_settlement = BtApplicationSettlement.objects.get(id=pk)
@@ -565,6 +628,8 @@ class BtApplicationSettlementCostCreateView(LoginRequiredMixin, View):
             bt_cost_currency = settlement.bt_application_id.advance_payment_currency
             bt_cost_document_date = form.cleaned_data["bt_cost_document_date"]
             bt_cost_VAT_rate = form.cleaned_data["bt_cost_VAT_rate"]
+            tax_deductible = category_tax_dict[bt_cost_category]
+
             BtApplicationSettlementCost.objects.create(
                 bt_application_settlement=bt_application_settlement,
                 bt_cost_category=bt_cost_category,
@@ -573,7 +638,8 @@ class BtApplicationSettlementCostCreateView(LoginRequiredMixin, View):
                 bt_cost_currency=bt_cost_currency,
                 bt_cost_document_date=bt_cost_document_date,
                 bt_cost_VAT_rate=bt_cost_VAT_rate,
-                attachment=uploaded_file
+                attachment=uploaded_file,
+                tax_deductible=tax_deductible
             )
 
             return HttpResponseRedirect(reverse("e_delegacje:settlement-cost-create", args=[pk]))
@@ -610,6 +676,7 @@ class BtApplicationSettlementMileageCreateView(LoginRequiredMixin, View):
             trip_description = form.cleaned_data["trip_description"]
             trip_purpose = form.cleaned_data["trip_purpose"]
             mileage = form.cleaned_data["mileage"]
+            amount = bt_mileage_rate.rate * mileage
             BtApplicationSettlementMileage.objects.create(
                 bt_application_settlement=bt_application_settlement,
                 bt_car_reg_number=bt_car_reg_number,
@@ -618,7 +685,8 @@ class BtApplicationSettlementMileageCreateView(LoginRequiredMixin, View):
                 trip_date=trip_date,
                 trip_description=trip_description,
                 trip_purpose=trip_purpose,
-                mileage=mileage
+                mileage=mileage,
+                amount=amount
             )
             return HttpResponseRedirect(reverse("e_delegacje:settlement-mileage-create", args=[pk]))
         return render(request, "Settlement/settlement_subform_mileage.html", {"form": form, 'trip_list': trip_list})
@@ -637,6 +705,7 @@ class BtApplicationSettlementFeedingCreateView(LoginRequiredMixin, View):
             diet_rate = BtDelegationRate.objects.get(country=settlement.bt_application_id.bt_country).delagation_rate
             diet_amount = get_diet_amount_abroad(settlement)  # dieta bez odliczeń
             diet = diet_reconciliation_poland(settlement)  # dieta bez odliczeń po korekcie o wyżywienie
+        
         return render(
             request,
             template_name="Settlement/settlement_subform_feeding.html",
@@ -662,6 +731,7 @@ class BtApplicationSettlementFeedingCreateView(LoginRequiredMixin, View):
                 dinner_quantity=dinner_quantity,
                 supper_quantity=supper_quantity
             )
+            
             return HttpResponseRedirect(reverse("e_delegacje:settlement-details", args=[pk]))
         return render(request, "Settlement/settlement_subform_feeding.html", {"form": form})
 
@@ -729,9 +799,34 @@ class BtApplicationSettlementInfoUpdateView(LoginRequiredMixin, SingleObjectMixi
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
-        return reverse("e_delegacje:settlement-details", kwargs={'pk': self.object.id})
+        settlement_id = self.object.bt_application_info.id
+        return reverse("e_delegacje:settlement-diet-update", kwargs={'pk': settlement_id})
 
 
+class BtDietAmountUpdate(LoginRequiredMixin, View):
+    
+    def get(self, request, pk):
+        settlement_info = BtApplicationSettlementInfo.objects.get(id=pk)
+        diet_amount = update_diet_amount(settlement_info.bt_application_settlement)
+        settlement_info.diet_amount = diet_amount
+        settlement_info.save()
+        
+        return HttpResponseRedirect(reverse(
+            "e_delegacje:settlement-details", 
+            args=[settlement_info.bt_application_settlement.id]))
+
+    def post(self, request, pk):
+        settlement_info = BtApplicationSettlementInfo.objects.get(id=pk)
+        diet_amount = update_diet_amount(settlement_info.bt_application_settlement)
+        print(diet_amount)
+        settlement_info.diet_amount = diet_amount
+        settlement_info.save()
+        
+        return HttpResponseRedirect(reverse(
+            "e_delegacje:settlement-details", 
+            args=[settlement_info.bt_application_settlement.id]))
+
+        
 class BtApplicationSettlementFeedingUpdateView(LoginRequiredMixin, SingleObjectMixin, FormView):
     model = BtApplicationSettlementFeeding
     template_name = "Settlement/settlement_subform_feeding.html"
@@ -742,6 +837,7 @@ class BtApplicationSettlementFeedingUpdateView(LoginRequiredMixin, SingleObjectM
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object(queryset=BtApplicationSettlement.objects.all())
+
         return super().post(request, *args, **kwargs)
 
     def get_form(self, form_class=None):
@@ -752,15 +848,14 @@ class BtApplicationSettlementFeedingUpdateView(LoginRequiredMixin, SingleObjectM
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
-        return reverse("e_delegacje:settlement-details", kwargs={'pk': self.object.id})
+        settlement_id = self.object.bt_application_info.id
+        return reverse("e_delegacje:settlement-diet-update", kwargs={'pk': settlement_id})
+        # return reverse("e_delegacje:settlement-details", kwargs={'pk': self.object.id})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         settlement = BtApplicationSettlement.objects.get(id=self.object.id)
-        diet_amount = get_diet_amount_poland(settlement)
 
-        context['settlement'] = settlement
-        context['diet_amount'] = diet_amount
         if settlement.bt_application_id.bt_country.country_name.lower() == 'polska':
             context['diet'] = round(diet_reconciliation_poland(settlement), 2)
             context['diet_rate'] = BtDelegationRate.objects.get(
@@ -869,8 +964,8 @@ class CustomWeasyTemplateResponse(LoginRequiredMixin, WeasyTemplateResponse):
 class PrintInLinePDFView(WeasyTemplateResponseMixin, CreatePDF):
     # output of MyModelView rendered as PDF with hardcoded CSS
     pdf_stylesheets = [
-        settings.STATIC_ROOT + '/css/bootstrap.css',
-        # settings.STATICFILES_DIRS[0] + '/css/bootstrap.css',
+        # settings.STATIC_ROOT + '/css/bootstrap.css',
+        settings.STATICFILES_DIRS[0] + '/css/bootstrap.css',
     ]
     # show pdf in-line (default: True, show download dialog)
     pdf_attachment = False
@@ -885,8 +980,8 @@ class PrintInLinePDFView(WeasyTemplateResponseMixin, CreatePDF):
 class DownloadPDFView(WeasyTemplateResponseMixin, CreatePDF):
     # suggested filename (is required for attachment/download!)
     pdf_stylesheets = [
-        settings.STATIC_ROOT + '/css/bootstrap.css',
-        # settings.STATICFILES_DIRS[0] + '/css/bootstrap.css',
+        # settings.STATIC_ROOT + '/css/bootstrap.css',
+        settings.STATICFILES_DIRS[0] + '/css/bootstrap.css',
     ]
     # show pdf in-line (default: True, show download dialog)
     pdf_attachment = True
@@ -994,3 +1089,125 @@ def load_all_applications_filter(request):
     
     return render(request, 'Application/bt_all_applications_filtered.html', 
     {'applications': applications.order_by('-id')})
+
+
+class ApplicationsToBeBooked(BtApplicationListView):
+    """ List View for approved applications"""
+    model = BtApplication
+    template_name = "CreateCSV/bt_applications_to_be_booked_list.html"
+    
+
+    def get_context_data(self, **kwargs):
+        """Add context data to the view filters only settled applications"""
+        context = super().get_context_data(**kwargs)
+        settled_applications = BtApplication.objects.filter(
+            application_status='settled').filter(
+                booked=None).order_by('-id')
+        booked_application = BtApplication.objects.filter(
+                booked__isnull=False).order_by('-id')
+        target_users_set = {item.target_user for item in BtApplication.objects.all()}
+        application_statuses = {item.application_status for item in BtApplication.objects.all()}
+
+        context['all_statuses'] = application_statuses
+        context['target_users'] = target_users_set
+        context['settled_applications'] = settled_applications
+        context['booked_application'] = booked_application
+        return context
+
+
+def load_applications_to_be_booked_filter(request):
+    """Takes company_code, target_user id, start_date and end_date from request.
+        Filters applications_to_be_booked table queryset.
+        returns filtered objects to context data.
+    """
+    applications = BtApplication.objects.all()
+
+    target_user = request.GET.get('target_user')
+    c_code = request.GET.get('c_code')
+    if target_user:   
+        applications = applications.filter(target_user=target_user)
+        
+    if c_code:
+        applications = applications.filter(bt_company_code=c_code)
+    
+    return render(request, 'Application/bt_applications_to_be_booked_filtered.html', 
+    {'applications': applications.order_by('-id')})
+
+
+class ApplicationToBeBookedDetails(DetailView):
+    model = BtApplicationSettlement
+    template_name = "CreateCSV/bt_application_to_be_booked_details.html"
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        settlement = BtApplicationSettlement.objects.get(id=self.object.id)
+        cost_sum = float(settlement_cost_sum(BtApplicationSettlement.objects.get(pk=settlement.id)))
+        mileage_cost = float(mileage_cost_sum(BtApplicationSettlement.objects.get(pk=settlement.id)))
+        diet=float(settlement.bt_application_info.diet_amount)
+        total_costs = cost_sum + mileage_cost + diet
+        upload =  Upload(settlement)
+        file_name = upload.file_name
+        csv_file = upload.read_upload_file()
+        invoice_required_cost_categories = [
+            BtCostCategory.accommodation, 
+            BtCostCategory.consumption_invoice,
+            BtCostCategory.taxi,
+            BtCostCategory.parking,
+            BtCostCategory.transport,
+            ]
+
+        context['total_costs'] = total_costs
+        context['mileage_cost'] = mileage_cost
+        context['cost_sum'] = cost_sum
+        context['csv_file'] = csv_file
+        context['file_name'] = file_name
+        context['invoice_required_cost_categories'] = invoice_required_cost_categories
+       
+        return context
+
+class CostCategoryUpdateView(UpdateView):
+    model= BtApplicationSettlementCost
+    template_name = 'CreateCSV/bt_application_to_be_booked_update_cost.html'
+    fields = ['bt_cost_category']
+
+
+    def get_form(self, form_class=None):
+        return BtChangeCostCategoryForm()
+        
+
+    def post(self, request, *args, **kwargs):
+        category_tax_dict = {
+            BtCostCategory.accommodation: BtTaxCategory.KUP, 
+            BtCostCategory.consumption_invoice: BtTaxCategory.KUP,
+            BtCostCategory.consumption: BtTaxCategory.KUP,
+            BtCostCategory.consumption_nkup: BtTaxCategory.NKUP,
+            BtCostCategory.tickets: BtTaxCategory.KUP,
+            BtCostCategory.taxi: BtTaxCategory.KUP,
+            BtCostCategory.taxi_nkup: BtTaxCategory.NKUP,
+            BtCostCategory.parking: BtTaxCategory.KUP,
+            BtCostCategory.parking_nkup: BtTaxCategory.NKUP,
+            BtCostCategory.transport: BtTaxCategory.KUP,
+            BtCostCategory.transport_nkup: BtTaxCategory.NKUP,
+            }
+        cost = self.get_object()
+        settlement_id = cost.bt_application_settlement.id
+        form = BtChangeCostCategoryForm(request.POST)
+        if form.is_valid():
+            cost.bt_cost_category = form.cleaned_data['bt_cost_category']
+            cost.tax_deductible = category_tax_dict[cost.bt_cost_category]
+            cost.save()
+
+        return HttpResponseRedirect(reverse("e_delegacje:create-csv-ht",
+                args=[settlement_id]))
+  
+
+class CreateCSVview(LoginRequiredMixin,View):
+    """View for accounting department for updateing all necessary data to prepare 
+    CSV upload to SAP system"""
+    def get(self, request):
+
+        return render(request,
+                      template_name="form_template.html",
+                      context={}
+                      )
+
