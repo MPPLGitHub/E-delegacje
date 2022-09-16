@@ -1197,7 +1197,6 @@ class CostCategoryUpdateView(UpdateView):
         return HttpResponseRedirect(reverse("e_delegacje:create-csv-ht",
                 args=[settlement_id]))
   
-
 class CreateCSVview(LoginRequiredMixin,View):
     """View for accounting department for updateing all necessary data to prepare 
     CSV upload to SAP system"""
