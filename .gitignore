@@ -31,6 +31,6 @@ setup/migrations
 delegacje/
 *.csv
 .vscode/
-
+e_delegacje/tm_notifications.py
 
 
