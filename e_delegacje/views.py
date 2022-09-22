@@ -434,10 +434,10 @@ class BtApplicationSettlementCreateView(LoginRequiredMixin, View):
 
         BtApplicationSettlementInfo.objects.create(
             bt_application_settlement=settlement,
-            bt_start_date=bt_start_date,
-            bt_start_time = now,
-            bt_end_date=bt_end_date,
-            bt_end_time = now,
+            # bt_start_date=bt_start_date,
+            # bt_start_time = now,
+            # bt_end_date=bt_end_date,
+            # bt_end_time = now,
             advance_payment = bt_application,
             settlement_exchange_rate = 1,
             diet_amount = 0,

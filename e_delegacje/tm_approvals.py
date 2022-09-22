@@ -26,7 +26,7 @@ def bt_application_approved(request, pk):
         bt_application.approver = request.user
         bt_application.approval_date = now
         bt_application.save()
-        # approved_or_rejected_notification(bt_application, request.user, BtApplicationStatus.approved.label, rejection_reason)
+        approved_or_rejected_notification(bt_application, request.user, BtApplicationStatus.approved.label, rejection_reason)
         if bt_application.advance_payment > 0:
             pass
             # advance_payment_notification(bt_application, approver)
@@ -46,7 +46,7 @@ def bt_application_rejected(request, pk):
             + f"\n-----\nWniosek odrzucony przez: {request.user.first_name} {request.user.last_name} \n\n" \
             + f"Powód: "
         bt_application.save()
-        # approved_or_rejected_notification(bt_application, request.user, BtApplicationStatus.rejected.label)
+        approved_or_rejected_notification(bt_application, request.user, BtApplicationStatus.rejected.label)
     else:
         return render(request, template_name='Approval/already_processed.html', context={'application': bt_application})
 
@@ -84,7 +84,7 @@ def bt_settlement_approved(request, pk):
     settlement.bt_application_info.approval_date = now.strftime("%Y-%m-%d")
     settlement.bt_application_info.save()
     
-    # approved_or_rejected_notification(bt_application, request.user, BtApplicationStatus.approved.label,"")
+    approved_or_rejected_notification(bt_application, request.user, BtApplicationStatus.approved.label,"")
 
     return HttpResponseRedirect(reverse("e_delegacje:approval-list"))
 
