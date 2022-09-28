@@ -401,7 +401,7 @@ class BtApprovalListView(LoginRequiredMixin, ListView):
 class BtApprovaHistorylListView(LoginRequiredMixin, ListView):
     model = BtApplication
     template_name = "Approval/bt_approval_list_history.html"
-
+ 
     def get_queryset(self):
         user_cost_center = BtUser.objects.get(id = self.request.user.id).department.cost_center
         return BtApplication.objects.filter(
@@ -855,7 +855,6 @@ class BtApplicationSettlementFeedingUpdateView(LoginRequiredMixin, SingleObjectM
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         settlement = BtApplicationSettlement.objects.get(id=self.object.id)
-
         if settlement.bt_application_id.bt_country.country_name.lower() == 'polska':
             diet = round(diet_reconciliation_poland(settlement), 2)
         else:
@@ -1089,7 +1088,6 @@ def load_all_applications_filter(request):
     {'applications': applications.order_by('-id')})
 
 
-
 class ApplicationsToBeBooked(BtApplicationListView):
     """ List View for approved applications"""
     model = BtApplication
@@ -1199,7 +1197,6 @@ class CostCategoryUpdateView(UpdateView):
         return HttpResponseRedirect(reverse("e_delegacje:create-csv-ht",
                 args=[settlement_id]))
   
-  
 class CreateCSVview(LoginRequiredMixin,View):
     """View for accounting department for updateing all necessary data to prepare 
     CSV upload to SAP system"""
@@ -1209,4 +1206,3 @@ class CreateCSVview(LoginRequiredMixin,View):
                       template_name="form_template.html",
                       context={}
                       )
-
