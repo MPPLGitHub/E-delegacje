@@ -280,7 +280,7 @@
 
         {% for item in object_list %}
 
-            
+        {% if item.target_user == request.user or item.application_author == request.user %}
                 {% if item.application_status in 'settled, canceled' %}
                 <tr>
                     <td>
@@ -336,7 +336,7 @@
 
                 {% endif %}
            
-
+        {% endif %}
 
 
 

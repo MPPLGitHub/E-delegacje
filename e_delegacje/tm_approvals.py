@@ -26,10 +26,9 @@ def bt_application_approved(request, pk):
         bt_application.approver = request.user
         bt_application.approval_date = now
         bt_application.save()
-        # approved_or_rejected_notification(bt_application, request.user, BtApplicationStatus.approved.label, rejection_reason)
+        approved_or_rejected_notification(bt_application, request.user, BtApplicationStatus.approved.label, rejection_reason)
         if bt_application.advance_payment > 0:
-            pass
-            # advance_payment_notification(bt_application, approver)
+            advance_payment_notification(bt_application, approver)
     else:
         return render(request, template_name='Approval/already_processed.html', context={'application': bt_application})
 
@@ -46,7 +45,7 @@ def bt_application_rejected(request, pk):
             + f"\n-----\nWniosek odrzucony przez: {request.user.first_name} {request.user.last_name} \n\n" \
             + f"Powód: "
         bt_application.save()
-        # approved_or_rejected_notification(bt_application, request.user, BtApplicationStatus.rejected.label)
+        approved_or_rejected_notification(bt_application, request.user, BtApplicationStatus.rejected.label)
     else:
         return render(request, template_name='Approval/already_processed.html', context={'application': bt_application})
 
@@ -64,7 +63,7 @@ def send_settlement_to_approver(request, pk):
         + f'\n-----\nRozliczenie skierowane do akceptacji do: {bt_application.target_user.manager} ' \
         + f' - {now}'
     bt_application.save()
-    # new_application_notification(bt_application.target_user.manager.email,bt_application)
+    new_application_notification(bt_application.target_user.manager.email,bt_application)
     return HttpResponseRedirect(reverse("e_delegacje:applications-list"))
 
 
@@ -81,10 +80,10 @@ def bt_settlement_approved(request, pk):
     settlement.settlement_status = BtApplicationStatus.approved.value
     settlement.save()
     settlement.bt_application_info.approver = request.user
-    settlement.bt_application_info.approval_date = now.strftime("%Y-%m-%d")
+    settlement.bt_application_info.approval_date = now
     settlement.bt_application_info.save()
     
-    # approved_or_rejected_notification(bt_application, request.user, BtApplicationStatus.approved.label,"")
+    approved_or_rejected_notification(bt_application, request.user, BtApplicationStatus.approved.label,"")
 
     return HttpResponseRedirect(reverse("e_delegacje:approval-list"))
 

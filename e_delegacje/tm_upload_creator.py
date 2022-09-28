@@ -109,7 +109,7 @@ class Upload():
             BtCostCategory.consumption,
             ]
         self.total_costs = round((self.cost_sum + self.mileage_cost + self.diet),2)
-        self.approval_date = self.settlement.bt_application_info.approval_date.strftime("%Y%m%d")
+        self.approval_date = self.settlement.bt_application_info.approval_date.replace("-","")
         self.cost_list = self.get_cost_list()
         self.invoice_required_cost_list = self.get_invoice_required_cost_list()
         self.vat_rates = {'W1' : 1.23, 'W8' : 1.08, 'WN' : 1, 'W0' : 1}

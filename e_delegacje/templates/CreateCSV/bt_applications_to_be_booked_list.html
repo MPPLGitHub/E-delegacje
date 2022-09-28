@@ -65,13 +65,16 @@
                 <th colspan="2">
                 <p>Oznacz: <br>"Zaksięgowany ręcznie"</p>
             </th>
+            <th>
+                <p>PDF</p>
+            </th>
 
         </tr>
     </thead>
     <tbody id="applications_to_be_booked_table_body"        
             data-users-url="{% url 'e_delegacje:ApplicationsToBeBooked-filter' %}" 
             novalidate>
-        <tr><td colspan="9"></td></tr>
+        <tr><td colspan="10"></td></tr>
 
         {% for item in settled_applications %}
 
@@ -116,7 +119,7 @@
 
                 </td>
 
-                 <td>                    
+                 <td colspan="2" >                    
                      <a 
                      class="btn btn-outline-secondary" 
                      href="{% url 'e_delegacje:ApplicationsToBeBooked-booked-manually' pk=item.id %}"
@@ -124,6 +127,15 @@
                   >
                     zaksięgowany ręcznie
                 </a></td>
+                <td>
+                    <a class="btn btn-outline-danger rounded mx-auto d-block"
+                    style="font-size: 14px"
+                   href="{% url 'e_delegacje:pdf-in-line' pk=item.id %}"
+                   target="_blank" 
+                >
+                   <br> PDF
+                </a>
+            </td>
 
                     </tr>
 
@@ -233,7 +245,7 @@
                href="{% url 'e_delegacje:pdf-in-line' pk=item.id %}"
                target="_blank" 
             >
-                pdf
+                PDF
             </a>
         </td>
 

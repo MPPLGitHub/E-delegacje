@@ -50,7 +50,7 @@ def get_delegation_rate(settlement):
         country = settlement.bt_application_id.bt_country
         start_date = settlement.bt_application_info.bt_start_date
         rate_list = [rate for rate in BtDelegationRate.objects.filter(country=country).order_by('-start_date')]
-        print(rate_list)
+        
         if len(rate_list) == 1:
             result = rate_list[0]  
         else:

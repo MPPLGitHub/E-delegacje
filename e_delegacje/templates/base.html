@@ -58,11 +58,9 @@
 					 </a>
 			</li>
           <li class="nav-item pr-6">
-			  <a class="navbar-brand text-light " href="{% url 'e_delegacje:index' %}"><h3>E-delegacje - Test!!!</h3></a>
+			  <a class="navbar-brand text-light " href="{% url 'e_delegacje:index' %}"><h3>E-delegacje</h3></a>
           </li>
-          <li class="nav-item mx-auto" style="border-right: solid;">
-			
-          </li>
+         
         {% if request.user.is_authenticated %}
 
 
@@ -82,7 +80,7 @@
               </a>
 			</li>
                 {% endif %}
-				{% if request.user.group.id == 2 or 1 %}
+				{% if request.user.group.id == 2 %}
 				<li class="nav-item">
 					<a class="nav-item nav-link text-warning hello-msg" href="{% url 'e_delegacje:applications-all-list' %}">
 						Wszystkie wnioski

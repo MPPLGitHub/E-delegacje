@@ -1,7 +1,6 @@
 """ Business logic for Views in e-delegacje """
 import functools
 import ssl
-from turtle import up
 from black import T
 from django.conf import settings
 from django.http import HttpResponseRedirect
@@ -434,10 +433,10 @@ class BtApplicationSettlementCreateView(LoginRequiredMixin, View):
 
         BtApplicationSettlementInfo.objects.create(
             bt_application_settlement=settlement,
-            bt_start_date=bt_start_date,
-            bt_start_time = now,
-            bt_end_date=bt_end_date,
-            bt_end_time = now,
+            # bt_start_date=bt_start_date,
+            # bt_start_time = now,
+            # bt_end_date=bt_end_date,
+            # bt_end_time = now,
             advance_payment = bt_application,
             settlement_exchange_rate = 1,
             diet_amount = 0,
@@ -494,6 +493,7 @@ class BtApplicationSettlementDetailView(LoginRequiredMixin, View):
         cost_sum = float(settlement_cost_sum(BtApplicationSettlement.objects.get(pk=settlement.id)))
         mileage_cost = float(mileage_cost_sum(BtApplicationSettlement.objects.get(pk=settlement.id)))
         diet=float(settlement.bt_application_info.diet_amount)
+        diet2=float(diet_reconciliation_poland(settlement))
         total_costs = cost_sum + mileage_cost + diet
         settlement_amount = advance - total_costs
         if settlement_amount < 0:
@@ -512,7 +512,8 @@ class BtApplicationSettlementDetailView(LoginRequiredMixin, View):
                      'advance': advance,
                      'settlement_amount': settlement_amount,
                      'mileage_cost': mileage_cost,
-                     'diet': diet
+                     'diet': diet,
+                     'diet2': diet2
                      })
 
 

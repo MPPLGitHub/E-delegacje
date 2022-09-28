@@ -97,9 +97,15 @@ def application_to_be_booked_notification(sent_app):
     application = sent_app
     attachments = []
     receipient_list = []
-    for accountant in BtUser.objects.filter(group=1):
-        """collecting the list of accountants marked to receive the notifications"""
-        receipient_list.append(accountant.email)
+
+    if application.bt_company_code.company_code == "3732":
+        for accountant in BtUser.objects.filter(group=3):
+            """collecting the list of accountants marked to receive the notifications"""
+            receipient_list.append(accountant.email)
+    elif application.bt_company_code.company_code == "0214":
+        for accountant in BtUser.objects.filter(group=1):
+            """collecting the list of accountants marked to receive the notifications"""
+            receipient_list.append(accountant.email)
         
     
     mail_subject = \
