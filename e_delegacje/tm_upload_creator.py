@@ -99,7 +99,8 @@ class Upload():
         if self.settlement.bt_application_id.bt_country.country_name.lower() == 'polska':
             self.diet = round(diet_reconciliation_poland(self.settlement), 2)
         else:
-            self.diet = round(diet_reconciliation_abroad(self.settlement), 2)
+            self.diet = round(diet_reconciliation_abroad(self.settlement)\
+                        *float(self.application.bt_application_settlement_info.settlement_exchange_rate), 2)
         self.invoice_required_cost_categories = [
             BtCostCategory.accommodation, 
             BtCostCategory.consumption_invoice,
@@ -125,6 +126,9 @@ class Upload():
             cost_sum = 0
             for cost in self.settlement.bt_application_settlement_costs.all():
                 cost_sum+= round(cost.bt_cost_amount,2)
+        if self.application.advance_payment_currency != 'PLN':
+            cost_sum *= self.application.bt_application_settlement_info.settlement_exchange_rate
+
         return float(cost_sum)
 
     def get_cost_list(self):
@@ -173,7 +177,7 @@ class Upload():
             self.today,  # posting Date - currently today, później mozna dac możliwośc wprowadenia z ekranu
             self.approval_date,  # Document date
             self.approval_date,  # VAT date
-            self.application.advance_payment_currency.code,  # Currency
+            "PLN",  # Currency
             "",  # empty cell
             'TM/' + str(self.application.id),  # assignment
             ""
@@ -192,7 +196,7 @@ class Upload():
             self.today,  # posting Date - currently today, później mozna dac możliwośc wprowadenia z ekranu
             cost.bt_cost_document_date.strftime("%Y%m%d"),  # Document date
             vat_date.strftime("%Y%m%d"),  # VAT date
-            cost.bt_cost_currency,  # Currency
+            "PLN",  # Currency
             "",  # empty cell
             'TM/' + str(self.application.id),  # assignment
             ""
@@ -238,6 +242,11 @@ class Upload():
 
     def create_diet_row(self):
         """Creates Line of booking- diet"""
+        if self.application.CostCenter.order is None:
+            order = " "
+        else:
+            order = self.application.CostCenter.order.order,  # order
+
         BBSEG_diet_row = [
             'BBSEG',  # upload row category
             '40',  # posting key
@@ -250,7 +259,7 @@ class Upload():
                 +  self.application.target_user.last_name,  # text
             '',  # empty cell
             self.application.CostCenter.profit_center_id.profit_center,  # profit center
-            '',  # empty cell(order-only in P&L line)
+            order[0],  # empty cell(order-only in P&L line)
             'TM/' + str(self.application.id),  # assignment
             ]
         return BBSEG_diet_row
@@ -261,7 +270,6 @@ class Upload():
         gl_account_NKUP = BtGLAccounts.objects.get(
             cost_category=BtCostCategory.transport, tax_category=BtTaxCategory.NKUP) 
         net_amount = round(float(cost.bt_cost_amount) / self.vat_rates[cost.bt_cost_VAT_rate],2)
-        print(net_amount)
         vat_amount = float(cost.bt_cost_amount) - net_amount
         net_amount_NKUP = round((net_amount +  vat_amount/2) * 0.25,2)
         vat_amount_KUP = round((vat_amount/2),2)
@@ -269,7 +277,7 @@ class Upload():
         net_amount_WN = round(net_amount - net_amount_NKUP - net_amount_KUP_tax + (vat_amount - vat_amount_KUP),2)
 
         if self.application.CostCenter.order is None:
-            order = None
+            order = " "
         else:
             order = self.application.CostCenter.order.order,  # order
         
@@ -286,7 +294,7 @@ class Upload():
             +  unicodedata.normalize("NFKD",self.application.target_user.last_name),  # text - cost decription
             '',
             self.application.CostCenter.profit_center_id.profit_center,  # profit center
-            order,
+            order[0],
             'TM/' + str(self.application.id),  # assignment
         ]
         
@@ -302,7 +310,7 @@ class Upload():
                 +  unicodedata.normalize("NFKD",self.application.target_user.last_name),  # text - cost decription
             '',
             self.application.CostCenter.profit_center_id.profit_center,  # profit center
-            order,
+            order[0],
             'TM/' + str(self.application.id),  # assignment
         ]
         row3 = [
@@ -317,7 +325,7 @@ class Upload():
                 +  self.application.target_user.last_name,  # text - cost decription
             '',
             self.application.CostCenter.profit_center_id.profit_center,  # profit center
-            order,
+            order[0],
             'TM/' + str(self.application.id),  # assignment
         ]
         BBSEG_Cost_rows = [row3, row1, row2]
@@ -328,15 +336,18 @@ class Upload():
             cost_category=cost.bt_cost_category, tax_category=BtTaxCategory.NKUP)
 
         if self.application.CostCenter.order is None:
-                order = ""
+                order = " "
         else:
             order = self.application.CostCenter.order.order,  # order
+        cost_amount = cost.bt_cost_amount
+        if self.application.advance_payment_currency != 'PLN':
+            cost_amount *= self.application.bt_application_settlement_info.settlement_exchange_rate
 
         BBSEG_Cost_row = [
             'BBSEG',  # upload row category
             '40',  # posting key
             gl_account.gl_account_number,  # GL account
-            str(cost.bt_cost_amount).replace('.', ','),  # Amount
+            str(round(cost_amount,2)).replace('.', ','),  # Amount
             "",  # Vat amount
             "WN",  # tax Code
             self.application.CostCenter.cost_center_number,  # Cost Center
@@ -344,7 +355,7 @@ class Upload():
                 +  unicodedata.normalize("NFD",self.application.target_user.last_name),  # text - cost decription
             '',
             self.application.CostCenter.profit_center_id.profit_center,  # profit center
-            order,
+            order[0],
             'TM/' + str(self.application.id),  # assignment
         ]
         return [BBSEG_Cost_row]
@@ -354,7 +365,7 @@ class Upload():
             cost_category=cost.bt_cost_category, tax_category=BtTaxCategory.KUP)
 
         if self.application.CostCenter.order is None:
-                order = ""
+                order = " "
         else:
             order = self.application.CostCenter.order.order,  # order
 
@@ -370,7 +381,7 @@ class Upload():
                 +  self.application.target_user.last_name,  # text - cost decription
             '',
             self.application.CostCenter.profit_center_id.profit_center,  # profit center
-            order,
+            order[0],
             'TM/' + str(self.application.id),  # assignment
         ]
         return [BBSEG_Cost_row]
@@ -398,7 +409,7 @@ class Upload():
     def create_mileage_row(self):
         """Creates Line of booking- Mileage"""
         if self.application.CostCenter.order is None:
-            order = None
+            order = " "
         else:
             order = self.application.CostCenter.order.order,  # order
         BBSEG_mileage_row = [
@@ -413,7 +424,7 @@ class Upload():
                 +  unicodedata.normalize("NFD",self.application.target_user.last_name),  # text
             '',  # empty cell
             self.application.CostCenter.profit_center_id.profit_center,  # profit center
-            order,  
+            order[0],  
             'TM/' + str(self.application.id),  # assignment
             ]
         return BBSEG_mileage_row
