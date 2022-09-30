@@ -96,10 +96,10 @@ class Upload():
         self.today = datetime.now().strftime("%Y%m%d")
         self.mileage_cost = float(mileage_cost_sum(BtApplicationSettlement.objects.get(pk=self.settlement.id)))
         self.cost_sum = self.get_cost_sum()
-        if self.settlement.bt_application_id.bt_country.country_name.lower() == 'polska':
-            self.diet = round(diet_reconciliation_poland(self.settlement), 2)
+        if self.settlement.bt_application_id.advance_payment_currency.code == "PLN":
+                self.diet = float(self.application.bt_application_settlement_info.diet_amount)
         else:
-            self.diet = round(diet_reconciliation_abroad(self.settlement)\
+            self.diet = round(float(self.application.bt_application_settlement_info.diet_amount)\
                         *float(self.application.bt_application_settlement_info.settlement_exchange_rate), 2)
         self.invoice_required_cost_categories = [
             BtCostCategory.accommodation, 
