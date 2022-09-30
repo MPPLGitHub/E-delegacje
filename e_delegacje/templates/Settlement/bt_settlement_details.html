@@ -128,7 +128,7 @@
                     <hr>
                 </div>
 
-                {% if object.bt_application_info %}
+                {% if object.bt_application_info.bt_completed %}
                   <table class="table table-light table-striped" style="font-size: 12px">
                           <tr>
                               <td class="fw-bold">Delegacja zrealizowana?</td>
@@ -171,7 +171,7 @@
                 {% else %}
 
                   <a class="btn btn-outline-warning d-grid"
-                     href="{% url 'e_delegacje:settlement-info-create' pk=object.id %}"
+                     href="{% url 'e_delegacje:settlement-info-update' pk=object.id %}"
                      style="font-size: 12px"
                   >
                       Dodaj informacje
@@ -180,7 +180,7 @@
                 {% endif %}
 
             </div>
-            {% if object.bt_application_info %}
+        {% if object.bt_application_info.bt_completed %}
             <div class="col-3">
 
 
@@ -249,7 +249,7 @@
                 {% endif %}
 
                 </div>
-{% if object.bt_application_id.transport_type == 'own_car' %}
+                {% if object.bt_application_id.transport_type == 'own_car' %}
             <div class="col-3 align-content-end">
 
 
@@ -257,7 +257,7 @@
                         <h5>Kilometrówka: {{ mileage_cost|floatformat:2 }} zł.</h5>
                     <hr>
                     </div>
-                {% if object.bt_application_settlement_mileages.exists %}
+                    {% if object.bt_application_settlement_mileages.exists %}
                     <table class="table table-light table-striped" style="font-size: 12px">
                        <thead>
                             <tr class="fw-bold table-active">
@@ -301,7 +301,7 @@
                 {% endif %}
 
             </div>
-{% endif %}
+        {% endif %}
             <div class="col-3 align-content-end">
                     <div class="row">
                         <h5 class="vIntegerField">
@@ -358,11 +358,10 @@
                     {{ object.bt_application_id.advance_payment_currency.text }}</h5>
             </div>
             <div class="col-6 text-center">
-                {% if settlement_amount > 0 %}
-                    <h3>{{ settlement_amount }}</h3>
-                {% else %}
-                    <h3>{{ settlement_amount }}</h3>
-                {% endif %}
+   
+                    <h3>{{ settlement_amount }}<br>
+                    </h3>
+                
             </div>
             <div class="col-3 text-end">
                 <h5>Suma kosztów: {{ total_costs|floatformat:2 }}

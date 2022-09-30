@@ -237,10 +237,13 @@ class BtApplicationApprovalDetailView(LoginRequiredMixin, View):
             settlement_amount = round(advance - total_costs, 2)
             if settlement_amount < 0:
                 settlement_amount = f'Do zwrotu dla pracownika: {abs(settlement_amount)} ' \
-                                    f'{settlement.bt_application_id.advance_payment_currency.text}.'
+                                    f'{settlement.bt_application_id.advance_payment_currency.text} - ' \
+                                    f'{abs(float(settlement_amount * settlement.bt_application_id.bt_application_settlement_info.settlement_exchange_rate))}.'
+                                    
             else:
                 settlement_amount = f'Do zapłaty przez pracownika: {settlement_amount} ' \
-                                    f'{settlement.bt_application_id.advance_payment_currency.text}'
+                                    f'{settlement.bt_application_id.advance_payment_currency.text} - ' +\
+                                    f'{abs(float(settlement_amount * settlement.bt_application_id.bt_application_settlement_info.settlement_exchange_rate))}.'
             return render(
                 request,
                 template_name="bt_application_approval.html",
@@ -400,7 +403,7 @@ class BtApprovalListView(LoginRequiredMixin, ListView):
 class BtApprovaHistorylListView(LoginRequiredMixin, ListView):
     model = BtApplication
     template_name = "Approval/bt_approval_list_history.html"
-
+ 
     def get_queryset(self):
         user_cost_center = BtUser.objects.get(id = self.request.user.id).department.cost_center
         return BtApplication.objects.filter(
@@ -496,12 +499,30 @@ class BtApplicationSettlementDetailView(LoginRequiredMixin, View):
         diet2=float(diet_reconciliation_poland(settlement))
         total_costs = cost_sum + mileage_cost + diet
         settlement_amount = advance - total_costs
-        if settlement_amount < 0:
-            settlement_amount = f'Do zwrotu dla pracownika: {abs(round(settlement_amount,2))} ' \
-                                f'{settlement.bt_application_id.advance_payment_currency.text}'
+
+        if settlement.bt_application_id.advance_payment_currency.code != "PLN":
+            settlement_amount_curency = settlement_amount
+            rate = settlement.bt_application_id.bt_application_settlement_info.settlement_exchange_rate
+            settlement_amount_PLN = round(settlement_amount * float(rate),2)
+            
+            if settlement_amount < 0:
+                settlement_amount_text = f'Do zwrotu dla pracownika: {abs(round(settlement_amount,2))} ' \
+                                    f'{settlement.bt_application_id.advance_payment_currency.text} ('\
+                                    f'{abs(settlement_amount_PLN)}zł.).'
+            else:
+                settlement_amount_text = f'Do zapłaty przez pracownika: {settlement_amount} ' \
+                                    f'{settlement.bt_application_id.advance_payment_currency.text} ('\
+                                    f'{abs(settlement_amount_PLN)}zł.).'
         else:
-            settlement_amount = f'Do zapłaty przez pracownika: {settlement_amount} ' \
-                                f'{settlement.bt_application_id.advance_payment_currency.text}'
+            if settlement_amount < 0:
+                    settlement_amount_text = f'Do zwrotu dla pracownika: {abs(round(settlement_amount,2))} ' \
+                                    f'{settlement.bt_application_id.advance_payment_currency.text}'\
+                                    
+            else:
+                settlement_amount_text = f'Do zapłaty przez pracownika: {settlement_amount} - ' \
+                                    f'{settlement.bt_application_id.advance_payment_currency.text}'\
+                                   
+ 
 
         return render(
             request,
@@ -510,7 +531,7 @@ class BtApplicationSettlementDetailView(LoginRequiredMixin, View):
                      'cost_sum': cost_sum,
                      'total_costs': total_costs,
                      'advance': advance,
-                     'settlement_amount': settlement_amount,
+                     'settlement_amount': settlement_amount_text,
                      'mileage_cost': mileage_cost,
                      'diet': diet,
                      'diet2': diet2
@@ -856,7 +877,6 @@ class BtApplicationSettlementFeedingUpdateView(LoginRequiredMixin, SingleObjectM
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         settlement = BtApplicationSettlement.objects.get(id=self.object.id)
-
         if settlement.bt_application_id.bt_country.country_name.lower() == 'polska':
             diet = round(diet_reconciliation_poland(settlement), 2)
         else:
@@ -1090,7 +1110,6 @@ def load_all_applications_filter(request):
     {'applications': applications.order_by('-id')})
 
 
-
 class ApplicationsToBeBooked(BtApplicationListView):
     """ List View for approved applications"""
     model = BtApplication
@@ -1200,7 +1219,6 @@ class CostCategoryUpdateView(UpdateView):
         return HttpResponseRedirect(reverse("e_delegacje:create-csv-ht",
                 args=[settlement_id]))
   
-  
 class CreateCSVview(LoginRequiredMixin,View):
     """View for accounting department for updateing all necessary data to prepare 
     CSV upload to SAP system"""
@@ -1210,4 +1228,3 @@ class CreateCSVview(LoginRequiredMixin,View):
                       template_name="form_template.html",
                       context={}
                       )
-

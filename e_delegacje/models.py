@@ -51,7 +51,6 @@ class BtApplication(models.Model):
     approval_date = models.CharField(max_length=50, blank=True, null=True)
     booked = models.CharField(max_length=50, choices=BtBookingStatus.choices, null=True, blank=True)
 
-
     def __str__(self):
         return f'Wniosek {self.id}: {self.trip_purpose_text} utworzony przez: \
         {self.application_author} dla {self.target_user}'
