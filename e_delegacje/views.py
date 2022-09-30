@@ -229,21 +229,38 @@ class BtApplicationApprovalDetailView(LoginRequiredMixin, View):
             advance = float(settlement.bt_application_id.advance_payment)
             cost_sum = float(settlement_cost_sum(BtApplicationSettlement.objects.get(pk=settlement.id)))
             mileage_cost = float(mileage_cost_sum(BtApplicationSettlement.objects.get(pk=settlement.id)))
+            
             if settlement.bt_application_id.bt_country.country_name.lower() == 'polska':
                 diet = diet_reconciliation_poland(settlement)
             else:
                 diet = diet_reconciliation_abroad(settlement)
             total_costs = cost_sum + mileage_cost + diet
             settlement_amount = round(advance - total_costs, 2)
-            if settlement_amount < 0:
-                settlement_amount = f'Do zwrotu dla pracownika: {abs(settlement_amount)} ' \
-                                    f'{settlement.bt_application_id.advance_payment_currency.text} - ' \
-                                    f'{abs(float(settlement_amount * settlement.bt_application_id.bt_application_settlement_info.settlement_exchange_rate))}.'
-                                    
+            
+
+            if settlement.bt_application_id.advance_payment_currency.code != "PLN":
+                settlement_amount_curency = settlement_amount
+                rate = settlement.bt_application_id.bt_application_settlement_info.settlement_exchange_rate
+                settlement_amount_PLN = round(settlement_amount * float(rate),2)
+            
+                if settlement_amount < 0:
+                    settlement_amount_text = f'Do zwrotu dla pracownika: {abs(settlement_amount_curency)} ' \
+                                   + f'{settlement.bt_application_id.advance_payment_currency.text} ('\
+                                    f'{abs(settlement_amount_PLN)}zł.).'
+                else:
+                    settlement_amount_text = f'Do zapłaty przez pracownika: {settlement_amount_curency} ' \
+                                    f'{settlement.bt_application_id.advance_payment_currency.text} ('\
+                                    f'{abs(settlement_amount_PLN)}zł.).'
             else:
-                settlement_amount = f'Do zapłaty przez pracownika: {settlement_amount} ' \
-                                    f'{settlement.bt_application_id.advance_payment_currency.text} - ' +\
-                                    f'{abs(float(settlement_amount * settlement.bt_application_id.bt_application_settlement_info.settlement_exchange_rate))}.'
+                if settlement_amount < 0:
+                    settlement_amount_text = f'Do zwrotu dla pracownika: {abs(settlement_amount)} ' \
+                                    f'{settlement.bt_application_id.advance_payment_currency.text}'\
+                                    
+                else:
+                    settlement_amount_text = f'Do zapłaty przez pracownika: {settlement_amount} - ' \
+                                    f'{settlement.bt_application_id.advance_payment_currency.text}'\
+                 
+
             return render(
                 request,
                 template_name="bt_application_approval.html",
@@ -252,7 +269,7 @@ class BtApplicationApprovalDetailView(LoginRequiredMixin, View):
                     'cost_sum': round(cost_sum, 2),
                     'total_costs': round(total_costs, 2),
                     'advance': advance,
-                    'settlement_amount': settlement_amount,
+                    'settlement_amount': settlement_amount_text,
                     'mileage_cost': mileage_cost,
                     'diet': diet,
                     'rejected_form': rejected_form,
@@ -266,7 +283,7 @@ class BtApplicationApprovalDetailView(LoginRequiredMixin, View):
                     'cost_sum': round(cost_sum, 2),
                     'total_costs': round(total_costs, 2),
                     'advance': advance,
-                    'settlement_amount': settlement_amount,
+                    'settlement_amount': settlement_amount_text,
                     'mileage_cost': mileage_cost,
                     'diet': diet,
                 'rejected_form': rejected_form, 
@@ -321,12 +338,29 @@ class BtApplicationApprovalMailDetailView(LoginRequiredMixin, View):
                 diet = diet_reconciliation_abroad(settlement)
             total_costs = cost_sum + mileage_cost + diet
             settlement_amount = round(advance - total_costs, 2)
-            if settlement_amount < 0:
-                settlement_amount = f'Do zwrotu dla pracownika: {abs(settlement_amount)} ' \
-                                    f'{settlement.bt_application_id.advance_payment_currency.code}.'
+
+            if settlement.bt_application_id.advance_payment_currency.code != "PLN":
+                settlement_amount_curency = settlement_amount
+                rate = settlement.bt_application_id.bt_application_settlement_info.settlement_exchange_rate
+                settlement_amount_PLN = round(settlement_amount * float(rate),2)
+            
+                if settlement_amount < 0:
+                    settlement_amount_text = f'Do zwrotu dla pracownika: {abs(round(settlement_amount_curency,2))} ' \
+                                    f'{settlement.bt_application_id.advance_payment_currency.text} ('\
+                                    f'{abs(settlement_amount_PLN)}zł.).'
+                else:
+                    settlement_amount_text = f'Do zapłaty przez pracownika: {settlement_amount_curency} ' \
+                                    f'{settlement.bt_application_id.advance_payment_currency.text} ('\
+                                    f'{abs(settlement_amount_PLN)}zł.).'
             else:
-                settlement_amount = f'Do zapłaty przez pracownika: {settlement_amount} ' \
-                                    f'{settlement.bt_application_id.advance_payment_currency.code}'
+                if settlement_amount < 0:
+                    settlement_amount_text = f'Do zwrotu dla pracownika: {abs(round(settlement_amount,2))} ' \
+                                    f'{settlement.bt_application_id.advance_payment_currency.text}'\
+                                    
+                else:
+                    settlement_amount_text = f'Do zapłaty przez pracownika: {settlement_amount} - ' \
+                                    f'{settlement.bt_application_id.advance_payment_currency.text}'\
+                 
             return render(
                 request,
                 template_name="Approval/bt_approval_mail_detail.html",
@@ -335,7 +369,7 @@ class BtApplicationApprovalMailDetailView(LoginRequiredMixin, View):
                     'cost_sum': round(cost_sum, 2),
                     'total_costs': round(total_costs, 2),
                     'advance': advance,
-                    'settlement_amount': settlement_amount,
+                    'settlement_amount': settlement_amount_text,
                     'mileage_cost': mileage_cost,
                     'diet': diet
                 })
@@ -506,11 +540,11 @@ class BtApplicationSettlementDetailView(LoginRequiredMixin, View):
             settlement_amount_PLN = round(settlement_amount * float(rate),2)
             
             if settlement_amount < 0:
-                settlement_amount_text = f'Do zwrotu dla pracownika: {abs(round(settlement_amount,2))} ' \
+                settlement_amount_text = f'Do zwrotu dla pracownika: {abs(settlement_amount_curency)} ' \
                                     f'{settlement.bt_application_id.advance_payment_currency.text} ('\
                                     f'{abs(settlement_amount_PLN)}zł.).'
             else:
-                settlement_amount_text = f'Do zapłaty przez pracownika: {settlement_amount} ' \
+                settlement_amount_text = f'Do zapłaty przez pracownika: {settlement_amount_curency} ' \
                                     f'{settlement.bt_application_id.advance_payment_currency.text} ('\
                                     f'{abs(settlement_amount_PLN)}zł.).'
         else:
