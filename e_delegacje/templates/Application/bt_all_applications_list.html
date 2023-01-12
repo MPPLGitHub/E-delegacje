@@ -54,7 +54,7 @@
                 id="filter_comp_code_dropdown" 
                 onchange="filter_all_applications(this)">   
                     <option value="">Spółka</option>
-                        {% for company_code in company_codes2 %}
+                        {% for company_code in company_codes1 %}
                             <option value="{{ company_code.pk }}"> {{ company_code.company_code }} </option>
                         {% endfor %}                            
                     </select>

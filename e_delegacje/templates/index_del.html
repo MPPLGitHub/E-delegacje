@@ -23,14 +23,14 @@
 			  <li><h4>
 			  <a class="btn btn-outline-secondary my-3 d-block" href="{% url 'e_delegacje:approval-list' %}">
                   Akceptacja wniosków
-                    <span class="fs-6 fw-lighter fst-italic">
+                    <!-- <span class="fs-6 fw-lighter fst-italic">
                         ({{ approval_items }})
-                    </span>
+                    </span> -->
               </a>
 			</h4></li>
                 {% endif %}
 
-                {% if request.user.group.id == 2 or 1 %}
+                {% if request.user.group.id == 2 or request.user.group.id == 1 %}
                 <li><h4>
                     <a class="btn btn-outline-secondary my-3 d-block" 
                     href="{% url 'e_delegacje:applications-all-list' %}">
@@ -38,7 +38,8 @@
                     </a>
                   </h4></li>
 				{% endif %}
-				{% if request.user.group.id == 1 %}
+
+				{% if request.user.group.id == 1 or request.user.group.id == 3 %}
                 <li><h4>
                     <a class="btn btn-outline-secondary my-3 d-block" 
                     href="{% url 'e_delegacje:ApplicationsToBeBooked-list' %}"

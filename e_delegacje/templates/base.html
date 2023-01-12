@@ -87,7 +87,7 @@
 					</a>
 				  </li>
 				{% endif %}
-				{% if request.user.group.id == 1 %}
+				{% if request.user.group.id == 1 or request.user.group.id == 3 %}
 				<li class="nav-item">
 					<a 
 					class="nav-item nav-link text-warning hello-msg" 

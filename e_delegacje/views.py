@@ -198,9 +198,10 @@ class BtAllApplicationListView(BtApplicationListView):
         context = super().get_context_data(**kwargs)
         target_users_set = {item.target_user for item in BtApplication.objects.all()}
         application_statuses = {item.application_status for item in BtApplication.objects.all()}
-
+        company_codes = {item.bt_company_code for item in BtApplication.objects.all()}
         context['all_statuses'] = application_statuses
         context['target_users'] = target_users_set
+        context['company_codes1'] = company_codes
         return context
 
 
@@ -221,6 +222,8 @@ class BtApplicationApprovalDetailView(LoginRequiredMixin, View):
         diet = 0
         total_costs = 0
         settlement_amount = 0
+        
+
         rejected_form = BtRejectionForm()
         approved_form = BtApprovedForm()
         try:
@@ -257,7 +260,7 @@ class BtApplicationApprovalDetailView(LoginRequiredMixin, View):
                                     f'{settlement.bt_application_id.advance_payment_currency.text}'\
                                     
                 else:
-                    settlement_amount_text = f'Do zapłaty przez pracownika: {settlement_amount} - ' \
+                    settlement_amount_text = f'Do zapłaty przez pracownika: {settlement_amount} ' \
                                     f'{settlement.bt_application_id.advance_payment_currency.text}'\
                  
 
@@ -283,7 +286,7 @@ class BtApplicationApprovalDetailView(LoginRequiredMixin, View):
                     'cost_sum': round(cost_sum, 2),
                     'total_costs': round(total_costs, 2),
                     'advance': advance,
-                    'settlement_amount': settlement_amount_text,
+                    
                     'mileage_cost': mileage_cost,
                     'diet': diet,
                 'rejected_form': rejected_form, 
@@ -553,7 +556,7 @@ class BtApplicationSettlementDetailView(LoginRequiredMixin, View):
                                     f'{settlement.bt_application_id.advance_payment_currency.text}'\
                                     
             else:
-                settlement_amount_text = f'Do zapłaty przez pracownika: {settlement_amount} - ' \
+                settlement_amount_text = f'Do zapłaty przez pracownika: {settlement_amount} ' \
                                     f'{settlement.bt_application_id.advance_payment_currency.text}'\
                                    
  

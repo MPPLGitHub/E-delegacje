@@ -146,7 +146,9 @@
             <div class="col-3">
 
                     <div class="row">
-                        <h5>Koszty: {{ cost_sum|floatformat:2 }} zł.</h5>
+                        <h5>Koszty: {{ cost_sum|floatformat:2 }} 
+                            {{ application.advance_payment_currency.code }}
+                        </h5>
                     <hr>
                     </div>
 
@@ -189,7 +191,8 @@
 
             <div class="col-3 align-content-end">
                     <div class="row">
-                        <h5>Kilometrówka: {{ mileage_cost|floatformat:2 }} zł.</h5>
+                        <h5>Kilometrówka: {{ mileage_cost|floatformat:2 }} 
+                            {{ application.advance_payment_currency.code }}</h5>
                     <hr>
                     </div>
                     <table class="table table-light table-striped" style="font-size: 12px">
@@ -217,7 +220,8 @@
 
             <div class="col-3 align-content-end">
                     <div class="row">
-                        <h5 class="vIntegerField">Dieta: {{ diet|floatformat:2 }} zł. </h5>
+                        <h5 class="vIntegerField">Dieta: {{ diet|floatformat:2 }} 
+                            {{ application.advance_payment_currency.code }} </h5>
                     <hr>
                     </div>
                     <table class="table table-light  table-striped" style="font-size: 12px">
@@ -255,7 +259,7 @@
         <div class="row align-content-between">
             <div class="col-3 ">
                 <h5>Zaliczka: {{ application.advance_payment|floatformat:2 }}
-                    {{ application.advance_payment_currency.text }} </h5>
+                    {{ application.advance_payment_currency.code }} </h5>
             </div>        
             {% if application.bt_applications_settlements %}
             <div class="col-6 text-center">
@@ -263,7 +267,8 @@
             </div>
 
             <div class="col-3 text-end">
-                <h5>Suma kosztów: {{ total_costs|floatformat:2 }} zł.</h5>
+                <h5>Suma kosztów: {{ total_costs|floatformat:2 }} 
+                    {{ application.advance_payment_currency.code }}</h5>
             </div>
         {% endif %}
         </div>

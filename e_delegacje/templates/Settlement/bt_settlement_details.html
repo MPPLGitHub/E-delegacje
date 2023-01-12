@@ -186,7 +186,8 @@
 
 
                     <div class="row">
-                        <h5>Koszty: {{ cost_sum|floatformat:2 }} {{ object.bt_application_id.advance_payment_currency.text }}.</h5>
+                        <h5>Koszty: {{ cost_sum|floatformat:2 }} 
+                            {{ object.bt_application_id.advance_payment_currency.text }}.</h5>
                     <hr>
                     </div>
                 {% if object.bt_application_settlement_costs.exists %}
@@ -305,7 +306,8 @@
             <div class="col-3 align-content-end">
                     <div class="row">
                         <h5 class="vIntegerField">
-                            Dieta: {{ object.bt_application_info.diet_amount|floatformat:2 }} {{ object.bt_application_id.advance_payment_currency.text }}.
+                            Dieta: {{ object.bt_application_info.diet_amount|floatformat:2 }} 
+                            {{ object.bt_application_id.advance_payment_currency.text }}.
                         </h5>
                     <hr>
                     </div>
@@ -385,7 +387,7 @@
 
 
             <div class="col-2 align-self-end">
-        {% if object.bt_application_info %}
+        {% if object.bt_application_info.bt_completed %}
             {% if object.bt_application_id.bt_applications_settlements.settlement_status == 'saved' %}
                 <a class="btn btn-outline-success d-grid"
                  href="{% url 'e_delegacje:settlement-send' pk=object.id %}"
