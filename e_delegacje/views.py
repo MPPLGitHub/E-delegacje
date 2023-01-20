@@ -35,6 +35,7 @@ from e_delegacje.forms import (
 from e_delegacje.models import (
     BtApplication,
     BtCompanyCode,
+    BtCurrency,
     BtApplicationSettlement,
     BtApplicationSettlementInfo,
     BtApplicationSettlementCost,
@@ -58,7 +59,7 @@ from e_delegacje.tm_calculations import (
     update_diet_amount
     )
 from e_delegacje.tm_upload_creator import Upload
-from setup.models import BtCostCenter, BtDelegationRate, BtMileageRates, BtUser, BtUserAuthorisation, BtCurrency
+from setup.models import BtCostCenter, BtCountry, BtDelegationRate, BtMileageRates, BtUser, BtUserAuthorisation, BtCurrency
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.template.loader import get_template
@@ -1071,6 +1072,23 @@ def load_costcenters(request):
         [authorisation.cost_center for authorisation in \
         BtUserAuthorisation.objects.filter(user_id=target_user).filter(company_code=company_code)]
     return render(request, 'Cost_center/cost_centers_list_options.html', {'cost_centers': cost_centers})
+
+def load_advance_payment_currency(request):
+    """Takes bt_country id from request.
+        Filters advance payment currency queryset.  
+        returns objects if it is local trip - PLN if it is Abroad - no PLN allowed
+        passes context data to a view.
+    """
+    bt_country_id = request.GET.get('country_id')
+    bt_country = BtCountry.objects.get(id=bt_country_id)
+    if bt_country.alpha_code == "PL":
+        advance_payment_currency = BtCurrency.objects.filter(code="PLN")
+    else:
+        advance_payment_currency = [currency for currency in BtCurrency.objects.exclude(code="PLN")]
+    return render(request, 
+                    'Company_code/currency_list_options.html', 
+                    {'advance_payment_currency': advance_payment_currency}
+                )
 
 
 def load_settled_cancelled_filter(request):

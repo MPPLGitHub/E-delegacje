@@ -368,12 +368,15 @@ class Upload():
                 order = " "
         else:
             order = self.application.CostCenter.order.order,  # order
+        cost_amount = cost.bt_cost_amount
+        if self.application.advance_payment_currency != 'PLN':
+            cost_amount *= self.application.bt_application_settlement_info.settlement_exchange_rate
 
         BBSEG_Cost_row = [
             'BBSEG',  # upload row category
             '40',  # posting key
             gl_account.gl_account_number,  # GL account
-            str(cost.bt_cost_amount).replace('.', ','),  # Amount
+            str(round(cost_amount,2)).replace('.', ','),  # Amount
             "",  # Vat amount
             "WN",  # tax Code
             self.application.CostCenter.cost_center_number,  # Cost Center
@@ -433,11 +436,14 @@ class Upload():
         """Creates Line of booking- reconciliation fow for invoice-required costs"""
         cost_list = []
         for cost in self.invoice_required_cost_list:
+            cost_amount = round(
+                cost.bt_cost_amount * self.application.bt_application_settlement_info.settlement_exchange_rate, 
+                2)
             BBSEG_reconciliation_row = [
                 'BBSEG',  # upload row category
                 '21',  # posting key
                 self.application.target_user.vendor_id,  # account- vendor number
-                str(cost.bt_cost_amount).replace('.', ','),  # Amount - gross amount booked on vendor
+                str(cost_amount).replace('.', ','),  # Amount - gross amount booked on vendor
                 '',  # empty cell
                 '**',  # Tax code - on Vendor - None = **
                 '',  # empty cell

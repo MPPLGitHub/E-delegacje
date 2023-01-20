@@ -184,7 +184,7 @@
     <div class="col-6 text-center" style="font-size: 10px">
         {% if settlement_amount > 0 %}
             <p style="font-size: 11px">
-                {{ settlement_amount }}
+                {{ settlement_amount }} {{ object.advance_payment_currency }}
             </p>
         {% else %}
             <p style="font-size: 11px">
@@ -194,7 +194,7 @@
     </div>
     <div class="col-3 text-end">
         <p style="font-size: 14px">
-            Suma kosztów: {{ total_costs|floatformat:2  }} zł.
+            Suma kosztów: {{ total_costs|floatformat:2  }} {{ object.advance_payment_currency }}
         </p>
     </div>
 
@@ -209,7 +209,7 @@
     <div class="col-5">
 
             <h6 >
-                Dieta: {{ diet|floatformat:2  }} zł.
+                Dieta: {{ diet|floatformat:2  }} {{ object.advance_payment_currency }}
             </h6>
         <hr>
 
@@ -241,7 +241,7 @@
 
    {% if object.bt_applications_settlements.bt_application_settlement_costs.exists %}
     <div class="col-6">
-        <h6>Koszty: {{ cost_sum|floatformat:2  }} zł.</h6>
+        <h6>Koszty: {{ cost_sum|floatformat:2  }} {{ object.advance_payment_currency }}</h6>
         <hr>
         <table class="table table-light table-striped" style="font-size: 10px">
             <thead>
@@ -277,7 +277,7 @@
         <div class="col-6"></div>
         <div class="col-6 ">
             <div class="row">
-                <h6>Kilometrówka: {{ mileage_cost|floatformat:2  }} zł.</h6>
+                <h6>Kilometrówka: {{ mileage_cost|floatformat:2  }} {{ object.advance_payment_currency }}</h6>
             <hr>
             </div>
             <div class="row">

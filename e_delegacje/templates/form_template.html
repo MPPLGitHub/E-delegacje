@@ -9,6 +9,7 @@
         id="formTemplate" 
         data-costcenters-url="{% url 'e_delegacje:load-costcenters' %}" 
         data-companycodes-url="{% url 'e_delegacje:load-company-codes' %}" 
+        data-currency-url="{% url 'e_delegacje:load-currency' %}" 
         novalidate>
         {% csrf_token %}
       
@@ -110,6 +111,22 @@
 
     });
   </script>
+
+<script>
+  $("#id_bt_country").change(function () {
+    var url_currency = $("#formTemplate").attr("data-currency-url"); // get the url of the `load_advance_payment_currency` view
+    var country_id = $(this).val(); // get the selected country ID from the HTML input
+    $.ajax({                       // initialize an AJAX request
+      url: url_currency,                    // set the url of the request (= localhost:8000/hr/ajax/load-cities/)
+      data: {
+        'country_id': country_id, // add the country_id id to the GET parameters
+      },
+      success: function (data) {   // `data` is the return of the `load_costcenters` view function
+        $("#id_advance_payment_currency").html(data);  // replace the contents of the advance_payment_currency input with the data that came from the server
+      }
+    });
+  });
+</script>
 
   {% endblock %}
 

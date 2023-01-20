@@ -58,7 +58,7 @@ class BtApplicationForm(forms.ModelForm):
         label="Wybierz kraj",
         error_messages={'required': 'To pole musi być wypełnione'},
         
-        initial=BtCountry.objects.get(id=2)
+        # initial=BtCountry.objects.get(id=2)
     )
     trip_purpose_text = forms.CharField(
         max_length=250,
@@ -136,6 +136,7 @@ class BtApplicationForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['bt_company_code'].queryset = BtCompanyCode.objects.none()
         self.fields['CostCenter'].queryset = BtCostCenter.objects.none()
+        self.fields['advance_payment_currency'].queryset = BtCurrency.objects.none()
 
         if 'target_user' in self.data:
             try:
