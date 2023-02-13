@@ -248,13 +248,14 @@
                         {% endif %}
 
                             </td>
-                        {% if cost.in_upload == 'nie' %}
-                            {% if cost.bt_cost_category in invoice_required_cost_categories  %}
+                        
+                        {% if cost.bt_cost_category in invoice_required_cost_categories  %}
+                            {% if cost.in_upload == 'nie' %}
                             <td class="pt-2 ps-2" >
                                 
 
 
-                                        <a class="btn btn-outline-secondary d-grid"
+                                        <a class="btn btn-outline-danger d-grid"
                                             style="font-size: 12px"
                                             href="{% url 'e_delegacje:add-invoice-document-upload' pk=cost.id %}"
 
@@ -266,7 +267,13 @@
                             </td>
                             {% else %}
                             <td class="pt-2 ps-2" >
-                                {{ cost.in_upload }}
+                                <a class="btn btn-outline-info d-grid"
+                                style="font-size: 12px"
+                                href="{% url 'e_delegacje:add-invoice-document-upload' pk=cost.id %}"
+
+                            >
+                                Zmień dane do faktury
+                            </a>
         
 
                             </td>

@@ -699,7 +699,8 @@ class BtApplicationSettlementCostCreateView(LoginRequiredMixin, View):
                 bt_cost_document_date=bt_cost_document_date,
                 bt_cost_VAT_rate=bt_cost_VAT_rate,
                 attachment=uploaded_file,
-                tax_deductible=tax_deductible
+                tax_deductible=tax_deductible,
+                vendor='21'
             )
 
             return HttpResponseRedirect(reverse("e_delegacje:settlement-cost-create", args=[pk]))
@@ -854,7 +855,7 @@ class BtApplicationSettlementInfoUpdateView(LoginRequiredMixin, SingleObjectMixi
         messages.add_message(
             self.request,
             messages.SUCCESS,
-            "Zmiany zostąły zapisane"
+            "Zmiany zostały zapisane"
         )
         return HttpResponseRedirect(self.get_success_url())
 
@@ -1228,6 +1229,7 @@ class ApplicationToBeBookedDetails(DetailView):
             BtCostCategory.taxi,
             BtCostCategory.parking,
             BtCostCategory.transport,
+            BtCostCategory.consumption,
             ]
 
         context['total_costs'] = total_costs
