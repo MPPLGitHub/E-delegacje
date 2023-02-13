@@ -120,6 +120,9 @@ class BtApplicationSettlementCost(models.Model):
     attachment = models.FileField(null=True, )
     tax_deductible = models.CharField(max_length=4, choices=BtTaxCategory.choices, null=True, blank=True)
     in_upload = models.CharField(max_length=3, choices=[('tak', 'tak'), ('nie', 'nie')], null=True, blank=True)
+    vendor = models.CharField(max_length=10, null=True, blank=True)
+    reference = models.CharField(max_length=30, null=True, blank=True)
+    vat_date = models.DateField(null=True, blank=True)
 
     def __str__(self):
         return f'{self.bt_application_settlement} - {self.bt_cost_description}'

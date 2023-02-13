@@ -5,7 +5,7 @@
     <table class="table table-light table-striped" style="font-size: 12px">
         <thead>
             <tr class="fw-bold table-active">
-                <th>Kategoria</th>
+                <th colspan="2">Kategoria</th>
                 <th>Opis kosztu</th>
                 <th>Data dokumentu</th>
                 <th>Kwota</th>
@@ -19,6 +19,13 @@
             <tr>
               
                 <td>{{ cost.get_bt_cost_category_display }}</td>
+                <td>
+                    <a class="btn btn-sm btn-outline-warning"
+                    href="{% url 'e_delegacje:settlement-cost-update' pk=cost.id %}"
+                    style="font-size: 12px"
+                    >zmień kategorię
+                </a>
+                </td>
                 <td>{{ cost.bt_cost_description }}</td>
                 <td>{{ cost.bt_cost_document_date }}</td>
                 <td>{{ cost.bt_cost_amount|floatformat:2 }}</td>

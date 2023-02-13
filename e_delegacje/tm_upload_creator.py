@@ -110,7 +110,8 @@ class Upload():
             BtCostCategory.consumption,
             ]
         self.total_costs = round((self.cost_sum + self.mileage_cost + self.diet),2)
-        self.approval_date = self.settlement.bt_application_info.approval_date.replace("-","")
+        self.approval_date = str(self.settlement.bt_application_info.approval_date).replace('-','')
+        # self.approval_date = self.settlement.bt_application_info.approval_date.replace("-","")
         self.cost_list = self.get_cost_list()
         self.invoice_required_cost_list = self.get_invoice_required_cost_list()
         self.vat_rates = {'W1' : 1.23, 'W8' : 1.08, 'WN' : 1, 'W0' : 1}
@@ -132,7 +133,8 @@ class Upload():
         return float(cost_sum)
 
     def get_cost_list(self):
-        """list of costs that are to be booked in HT document - application reconciliation"""
+        """ list of costs that are to be booked and do not require additional booking to vendor 
+            in HT document - application reconciliation"""
         cost_list = [
             cost for cost in BtApplicationSettlementCost.objects.filter(
             bt_application_settlement = self.settlement.id
@@ -141,7 +143,7 @@ class Upload():
         return cost_list
     
     def get_invoice_required_cost_list(self):
-        """costs that has categories for which it is needed to ceate separate booking of invoice"""
+        """costs that has categories for which it is needed to ceate separate booking for invoice"""
 
         cost_list = [
             cost for cost in BtApplicationSettlementCost.objects.filter(
@@ -390,7 +392,7 @@ class Upload():
         return [BBSEG_Cost_row]
 
     def create_cost_rows(self):
-        """Creates list of rows for each cost, diet, mileage lum sum for travel reconciliation"""
+        """Creates list of rows for each cost, diet, mileage lump sum for travel reconciliation"""
         BBSEG_Cost_rows = []
         for cost in self.cost_list:
             data = self.get_function_from_category(cost.bt_cost_category, cost)
@@ -442,7 +444,7 @@ class Upload():
             BBSEG_reconciliation_row = [
                 'BBSEG',  # upload row category
                 '21',  # posting key
-                self.application.target_user.vendor_id,  # account- vendor number
+                cost.vendor,  # account- vendor number initially  CPD or employee number
                 str(cost_amount).replace('.', ','),  # Amount - gross amount booked on vendor
                 '',  # empty cell
                 '**',  # Tax code - on Vendor - None = **
@@ -515,11 +517,16 @@ class Upload():
 def prepare_ht_document_upload(request, pk):
     """Preparing initial upload for further verification"""
     settlement = BtApplicationSettlement.objects.get(id=pk)
-    for cost in settlement.bt_application_settlement_costs.all():
-        cost.in_upload = 'nie'
-        cost.save()
+    # for cost in settlement.bt_application_settlement_costs.all():
+    #     cost.in_upload = 'nie'
+    #     cost.save()
     upl = Upload(settlement)
     upl.create_ht_document_upload()
+    invoice_required_cost_list = upl.invoice_required_cost_list
+    for cost in invoice_required_cost_list:
+        if cost.in_upload == "tak":
+            upl.create_invoice_document_upload(cost.id, cost.vendor, cost.vat_date, cost.reference)
+        
     return HttpResponseRedirect(reverse("e_delegacje:ApplicationsToBeBooked-details",
     args=[settlement.id]))
     
@@ -537,8 +544,11 @@ def create_invoice_document_upload(request, pk):
             vendor = form.cleaned_data['vendor']
             upload.create_invoice_document_upload(cost=cost.id,reference=reference, vat_date=vat_date, vendor=vendor)
             cost.in_upload = 'tak'
+            cost.vendor = vendor
+            cost.reference = reference
+            cost.vat_date = vat_date
             cost.save()
-            return HttpResponseRedirect(reverse("e_delegacje:ApplicationsToBeBooked-details", 
+            return HttpResponseRedirect(reverse("e_delegacje:create-csv-ht", 
             args=[settlement.id]))
     else:
         form = BtAddInvoiceDataForm()

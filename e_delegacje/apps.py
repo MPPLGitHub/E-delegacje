@@ -1,3 +1,4 @@
+""" Registrated application name"""
 from django.apps import AppConfig
 
 
