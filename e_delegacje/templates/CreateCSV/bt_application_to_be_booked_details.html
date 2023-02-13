@@ -250,29 +250,27 @@
                             </td>
                         
                         {% if cost.bt_cost_category in invoice_required_cost_categories  %}
-                            {% if cost.in_upload == 'nie' %}
+                            {% if cost.in_upload == 'tak' %}
                             <td class="pt-2 ps-2" >
                                 
-
-
-                                        <a class="btn btn-outline-danger d-grid"
-                                            style="font-size: 12px"
-                                            href="{% url 'e_delegacje:add-invoice-document-upload' pk=cost.id %}"
-
-                                        >
-                                        Dodaj dane do faktury
-                                        </a>
-                                
+                               
+                                        <a class="btn btn-outline-info d-grid"
+                                        style="font-size: 12px"
+                                        href="{% url 'e_delegacje:add-invoice-document-upload' pk=cost.id %}"
+        
+                                    >
+                                        Zmień dane do faktury
+                                    </a>
 
                             </td>
                             {% else %}
                             <td class="pt-2 ps-2" >
-                                <a class="btn btn-outline-info d-grid"
+                                <a class="btn btn-outline-danger d-grid"
                                 style="font-size: 12px"
                                 href="{% url 'e_delegacje:add-invoice-document-upload' pk=cost.id %}"
 
                             >
-                                Zmień dane do faktury
+                            Dodaj dane do faktury
                             </a>
         
 
